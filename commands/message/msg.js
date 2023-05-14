@@ -16,8 +16,13 @@ module.exports = {
         }
 
         var msg = args.slice(1).join(" ");
-        await message.delete().then(async()=> {
+
+        try {
+            await message.delete();
             await chan.send({ content: `${msg}` });
-        });
+        } catch (error) {
+            console.error(error);
+            message.reply({ content: 'An error occurred while sending the message. Please try again later.'});
+        }
     }
 }

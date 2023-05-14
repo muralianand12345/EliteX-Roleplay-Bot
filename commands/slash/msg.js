@@ -37,12 +37,12 @@ module.exports = {
                 .setName('default')
                 .setDescription('Text Channel or Ban/Warning Message!')
                 .addChannelOption(option => option
-                    .setName('channel-ban')
+                    .setName('channel-def')
                     .setDescription('Channel to send message')
                     .setRequired(true)
                 )
                 .addStringOption(option => option
-                    .setName('text-ban')
+                    .setName('text-def')
                     .setDescription('Message to be sent')
                     .setRequired(true)
                 ),
@@ -67,7 +67,7 @@ module.exports = {
                     .setDescription('Select the color of the embed!')
                     .setRequired(true)
                     .addChoices(
-                        { name: 'RED', value: 'FF0000' },
+                        { name: 'Red', value: 'FF0000' },
                         { name: 'Green', value: '00FF00' },
                         { name: 'Orange', value: 'FFA500' },
                     )
@@ -82,12 +82,12 @@ module.exports = {
 
         async function logEmbedSend(command, channelId, userId, msg) {
             const logEmbed = new EmbedBuilder()
-            .setColor('Blue')
-            .setDescription(`Command \`/msg ${command} ${msg}\``)
-            .addFields(
-                { name: 'Client', value: `<@${userId}>`},
-                { name: 'Target Channel', value: `<#${channelId}>`},
-            )
+                .setColor('Blue')
+                .setDescription(`Command \`/msg ${command} ${msg}\``)
+                .addFields(
+                    { name: 'Client', value: `<@${userId}>` },
+                    { name: 'Target Channel', value: `<#${channelId}>` },
+                )
 
             await client.channels.cache.get('1059443607112790016').send({
                 embeds: [logEmbed]
@@ -131,8 +131,8 @@ module.exports = {
 
         if (interaction.options.getSubcommand() === "default") {
 
-            const channel = await interaction.options.getChannel("channel-ban");
-            const text = await interaction.options.getString("text-ban");
+            const channel = await interaction.options.getChannel("channel-def");
+            const text = await interaction.options.getString("text-def");
 
             if (channel.type !== ChannelType.GuildText) {
                 const ReplyEmbed = new EmbedBuilder()

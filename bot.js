@@ -3,7 +3,6 @@ const path = require('path');
 require("dotenv").config();
 const {
     Client,
-    Collection,
     GatewayIntentBits,
     Partials
 } = require('discord.js');
@@ -14,25 +13,16 @@ const client = new Client({
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildWebhooks,
-        GatewayIntentBits.GuildPresences,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.GuildMessageTyping,
         GatewayIntentBits.DirectMessages,
-        GatewayIntentBits.DirectMessageTyping,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildInvites,
-        GatewayIntentBits.GuildEmojisAndStickers,
         GatewayIntentBits.GuildMessageReactions,
         GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildBans
     ],
     partials: [
         Partials.Channel,
         Partials.Message
     ],
-    presence: {
-        status: 'idle'
-    },
     shards: 'auto',
     fetchAllMembers: true
 });
