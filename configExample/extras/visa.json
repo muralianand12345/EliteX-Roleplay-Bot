@@ -1,0 +1,38 @@
+{
+    "LOGO": "https://cdn.discordapp.com/attachments/1096858331110457485/1099401752488452137/FInal-logo-word-mark.jpg",
+    "LINK": "",
+    "CONNECT": "",
+    "NAME": "Icnoic Roleplay",
+    "GUILDID": "",
+
+    "ACCEPTED": {
+        "ROLEID": "",
+        "LOGCHAN": "",
+        "VPCHAN": "",
+        "WAITING_HALL": ""
+    },
+    "REJECTED": {
+        "REJCHAN": "",
+        "LOGCHAN": "",
+        "RULECHAN": "",
+        "APPLYCHAN": ""
+    },
+    "VISA": {
+        "VISACHAN": "",
+        "HELPCHAN": "",
+        "LOGCHAN": "",
+        "ROLEID1": "",
+        "ROLEID2": ""
+    },
+    "HOLD": {
+        "HOLDCHAN": "",
+        "RULECHAN": "",
+        "LOGCHAN": ""
+    },
+    "WELCOME": {
+        "LOGCHAN": "",
+        "TAGCHAN": "",
+        "GUILDID": "",
+        "VERIFY": ""
+    }
+}

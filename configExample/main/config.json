@@ -1,0 +1,47 @@
+{
+    "INFO": {
+        "OWNER_ID": "678402714765361182",
+        "PREFIX": "-"
+    },
+
+    "MESSAGE": {
+		"COOLDOWN_MESSAGE": "You are on `<duration>` cooldown!" 
+	},
+
+    "ERR_LOG": {
+        "CHAN_ID": "",
+        "ERR_TAG":"<@678402714765361182>"
+    },
+
+    "STD_LOG": {
+        "CHAN_ID": ""
+    },
+
+    "EMBED": {
+        "IMAGE": "https://cdn.discordapp.com/attachments/1096858331110457485/1097144237176389682/dDrogT3Hn5RV4Pu88w6h1nO4oubjd5xghGR6LEnYUOxgD8UUkuPteIqqK7XzUlZr8xfsDdpxgHGKRCSLYijggSgvCSieyPvAoW3z0E4OzZhM86P8ByzqDcIqf784AAAAASUVORK5CYII.png",
+        "FOOTTEXT": "Iconic Roleplay"
+    },
+
+    "ENABLE": {
+        "DATE": true, 
+        "NICKNAME": true,
+        "AUTOTICKET": true,
+        "VISADM": true
+    },
+
+    "ROLE_CHECK": {
+        "ROLE1": "",
+        "ROLE2": "",
+        "GUILDID": ""
+    },
+    
+    "DMREPLY": {
+        "DM": "",
+        "REPLY": ""
+    },
+
+    "RESTART": {
+        "CHAN": "",
+        "VISAROLE": ""
+    }
+}
