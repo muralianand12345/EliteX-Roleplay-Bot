@@ -27,11 +27,6 @@ module.exports = {
                     .setRequired(true)
                 )
                 .addStringOption(option => option
-                    .setName('vote-text')
-                    .setDescription('Voting Message')
-                    .setRequired(true)
-                )
-                .addStringOption(option => option
                     .setName('vote-num')
                     .setDescription('Total number of buttons')
                     .setRequired(true)
@@ -88,22 +83,37 @@ module.exports = {
         client.std_log.error(client, commandName, interaction.user.id, interaction.channel.id);
 
         if (interaction.options.getSubcommand() === "create") {
-
-            await interaction.reply({ content: "Preparing...", ephemeral: true });
-
             const channel = await interaction.options.getChannel("vote-channel");
-            const text = await interaction.options.getString("vote-text");
-            const numButtons = await interaction.options.getString("vote-num");
-            const btnType = await interaction.options.getString("vote-type");
-            const numButtonsInt = parseInt(numButtons);
+
+            var text;
+
+            const collectorFilter = (message) => message.author.id === interaction.user.id;
+
+            await interaction.reply({ content: "Type down the voting content! (Auto cancel in 5 minutes)", ephemeral: true }).then(async () => {
+                await interaction.channel.awaitMessages({ filter: collectorFilter, max: 1, time: 300000, errors: ['time'] })
+                    .then(async (collected) => {
+                        await interaction.editReply({ content: 'Processing...', ephemeral: true });
+                        text = collected.first().content;
+                    })
+                    .catch(async (collected) => {
+                        if (collected.size === 0) {
+                            await interaction.editReply({ content: 'No voting poll text sent!', ephemeral: true });
+                        } 
+                    })
+            });
+            
+            if (!text) return;
 
             const reacEmbed = new EmbedBuilder()
                 .setColor('#8F00FF')
                 .setDescription(`\`\`\`${text}\`\`\``)
-                .setTimestamp()
+                .setTimestamp();
+
+            const numButtons = await interaction.options.getString("vote-num");
+            const btnType = await interaction.options.getString("vote-type");
+            const numButtonsInt = parseInt(numButtons);
 
             if (!isNaN(numButtonsInt) && numButtonsInt > 0) {
-
                 const message = await channel.send({ embeds: [reacEmbed] });
                 const buttonIds = ["vote-button-1", "vote-button-2", "vote-button-3", "vote-button-4"];
                 const row = new ActionRowBuilder();
@@ -116,6 +126,7 @@ module.exports = {
                         .setStyle(ButtonStyle.Primary);
                     row.addComponents(button);
                 }
+
                 await message.edit({ content: "", components: [row] });
 
                 const currentTime = new Date().toISOString();
@@ -129,7 +140,6 @@ module.exports = {
                 await newVoting.save();
 
                 await interaction.editReply({ content: `Voting Added to the channel: <#${channel.id}>`, ephemeral: true });
-
             } else {
                 await interaction.editReply("Invalid number of reactions. Please specify a positive integer.");
             }

@@ -99,30 +99,31 @@ module.exports = {
         await memDoc.save();
         //var count = memDoc.memCount;
 
-        var currCount;
+        await member.guild.members.fetch().then(async (fetchedMembers) => {
+            const count = Array.from(fetchedMembers)
+                .sort((a, b) => a[1].joinedAt - b[1].joinedAt)
+                .findIndex(m => m[0] === member.id) + 1;
 
-        const count = Array.from(member.guild.members.cache)
-            .sort((a, b) => a[1].joinedAt - b[1].joinedAt)
-            .findIndex((m) => m[0] === member.id) + 1;
-
-        function checkNumberEnding(number) {
-            const endingDigit = number % 10;
-            if (endingDigit === 0 || endingDigit > 3 && endingDigit < 10 || number > 10 && number < 20) {
-                return "th";
-            } else if (endingDigit === 1) {
-                return "st";
-            } else if (endingDigit === 2) {
-                return "nd";
-            } else if (endingDigit === 3) {
-                return "rd";
+            function checkNumberEnding(number) {
+                const endingDigit = number % 10;
+                if (endingDigit === 0 || endingDigit > 3 && endingDigit < 10 || number > 10 && number < 20) {
+                    return "th";
+                } else if (endingDigit === 1) {
+                    return "st";
+                } else if (endingDigit === 2) {
+                    return "nd";
+                } else if (endingDigit === 3) {
+                    return "rd";
+                } else {
+                    return;
+                }
             }
-        }
 
-        const ends = checkNumberEnding(count);
-        currCount = `${count}${ends}`;
+            const ends = checkNumberEnding(count);
+            const currCount = `${count}${ends}`;
 
-        const welcomeMsg = `<a:welcome:1097130355137454181> <@${member.user.id}> **Welcome to ICONIC Roleplay** <a:welcome:1097130355137454181>\n\n━━━━━━━━▣━━◤<a:dancebear:1097134582102491226>◢━━▣━━━━━━━━\n\n<a:arrow:1097132735086198864> Read our Server Rules at <#${client.welcome.RULEID}>\n\n<a:arrow:1097132735086198864> You can get our branding materials at <#${client.welcome.BRANDID}>\n\n<a:arrow:1097132735086198864> In case of any queries contact our staff at <#${client.welcome.CHATID}>\n\n<a:arrow:1097132735086198864> Thanks for joining here\n\n━━━━━━━━▣━━◤<a:dancebear:1097134582102491226>◢━━▣━━━━━━━━\n\n<a:party:1097134575764914296> You are the ${currCount.toString()} member of ICONIC Roleplay Community <a:party:1097134575764914296>`;
-        return await client.channels.cache.get(client.welcome.CHANID).send({ content: welcomeMsg, files: [attachment] });
-
+            const welcomeMsg = `<a:welcome:1097130355137454181> <@${member.user.id}> **Welcome to ICONIC Roleplay** <a:welcome:1097130355137454181>\n\n━━━━━━━━▣━━◤<a:dancebear:1097134582102491226>◢━━▣━━━━━━━━\n\n<a:arrow:1097132735086198864> Read our Server Rules at <#${client.welcome.RULEID}>\n\n<a:arrow:1097132735086198864> You can get our branding materials at <#${client.welcome.BRANDID}>\n\n<a:arrow:1097132735086198864> In case of any queries contact our staff at <#${client.welcome.CHATID}>\n\n<a:arrow:1097132735086198864> Thanks for joining here\n\n━━━━━━━━▣━━◤<a:dancebear:1097134582102491226>◢━━▣━━━━━━━━\n\n<a:party:1097134575764914296> You are the ${currCount.toString()} member of ICONIC Roleplay Community <a:party:1097134575764914296>`;
+            return await client.channels.cache.get(client.welcome.CHANID).send({ content: welcomeMsg, files: [attachment] });
+        });
     }
 };

@@ -43,5 +43,10 @@
     "RESTART": {
         "CHAN": "",
         "VISAROLE": ""
+    },
+
+    "VCUPDATE": {
+        "GUILDID": "",
+        "VCCHAN": ""
     }
 }
