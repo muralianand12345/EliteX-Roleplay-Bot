@@ -5,7 +5,6 @@ const {
     ButtonStyle,
 } = require("discord.js");
 
-
 module.exports = {
     name: 'crashre',
     description: "Crash Report Form",
