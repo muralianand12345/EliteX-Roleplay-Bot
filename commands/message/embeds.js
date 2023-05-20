@@ -22,14 +22,15 @@ module.exports = {
         message.delete()
 
         const embed = new EmbedBuilder()
-        .setColor('Green')
-        .setDescription('Verify Embed Test')
+        .setColor('#FFC0CB')
+        .setTitle('EMS Application')
+        .setDescription('`Thank you for your interest in joining our EMS team! Click the button below to proceed with your application.`')
 
         const button = new ActionRowBuilder()
         .addComponents(
             new ButtonBuilder()
-            .setCustomId('server-verify')
-            .setLabel('Verify')
+            .setCustomId('apply-ice')
+            .setLabel('APPLY')
             .setStyle(ButtonStyle.Success)
         )
 

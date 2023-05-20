@@ -15,9 +15,9 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
 
-        const DroleID = "1097108007793467472";
-        const AroleID = "1097094147879489537";
-        const BroleID = "1097094124471062579";
+        const DroleID = "1058684181254783016";
+        const AroleID = "1058684219041255504";
+        const BroleID = "1072658590575366235";
 
         const Drole = await interaction.guild.roles.cache.find(x => x.id === DroleID);
         const Arole = await interaction.guild.roles.cache.find(x => x.id === AroleID);
@@ -181,7 +181,12 @@ module.exports = {
 
             collector.on('end', async (collected) => {
                 if (collected.size < 1) {
-
+                    interaction.editReply({
+                        content: 'Session expired! Click button and claim again.',
+                        embeds: [],
+                        components: [],
+                        ephemeral: true
+                    });
                 }
             });
         }
