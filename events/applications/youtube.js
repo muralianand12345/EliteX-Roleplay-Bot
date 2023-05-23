@@ -25,7 +25,8 @@ module.exports = {
         }
 
         function extractVideoId(link) {
-            const youtubeRegex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([^"&?/\s]{11})/;
+            const youtubeRegex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([^"&?/\s]{11})/;
+
             const match = link.match(youtubeRegex);
             if (match) {
                 return match[1];
@@ -44,7 +45,7 @@ module.exports = {
             return false;
         }
 
-        const youtubeLinkRegex = /(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{11})/g;
+        const youtubeLinkRegex = /(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/live\/)([\w-]{11})/g;
         const youtubeLinks = message.content.match(youtubeLinkRegex);
         const allLinks = message.content.match(/(https?:\/\/[^\s]+)/g);
 

@@ -170,9 +170,9 @@ module.exports = {
                     time: 30000
                 });
 
-                collector.on('collect', i => {
+                collector.on('collect', async (i) => {
                     if (i.user.id === interaction.user.id) {
-                        if (msg.deletable) {
+                        if (msg && msg.deletable) {
                             msg.delete().then(async () => {
                                 const embed = new EmbedBuilder()
                                     .setColor('#206694')
@@ -208,32 +208,159 @@ module.exports = {
                                 ticketDoc.msgPannelID = opened.id;
                                 ticketDoc.ticketStatus = true;
                                 await ticketDoc.save();
+                            }).catch(async (error) => {
+                                console.error('Error deleting the message:', error);
+                                if (msg.channel.deletable) {
+                                    await msg.channel.delete()
+                                        .then(() => {
+                                            const user = client.users.cache.get(i.user.id);
+                                            if (user) {
+                                                user.send('Ticket Closed! | Reopen Again | Ticket Bugged');
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            // Channel deletion failed, handle the error
+                                            console.error('Error deleting the channel:', error);
+                                        });
+                                } else {
+                                    console.log('The channel is not deletable.');
+                                }
                             });
                         }
 
                         if (i.values[0] == 'Ooc') {
-                            c.edit({
+                            await c.edit({
                                 parent: ticketParents.oocPar
+                            }).catch(async (error) => {
+                                if (error.code == 50035) {
+                                    await c.send(`OOC category has **TOO many pending tickets**! Try again later.`)
+                                        .then(() => {
+                                            setTimeout(async () => {
+                                                if (c.deletable) {
+
+                                                    const deletableTicket = await ticketModel.findOne({
+                                                        ticketID: c.id
+                                                    }).catch(err => console.log(err));
+                                                    await await deletableTicket.deleteOne();
+
+                                                    await c.delete().catch(err => {
+                                                        console.error(err);
+                                                    });
+                                                }
+                                            }, 5000);
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                        });
+                                }
                             });
                         }
                         if (i.values[0] == 'Bugs') {
-                            c.edit({
+                            await c.edit({
                                 parent: ticketParents.bugPar
+                            }).catch(async (error) => {
+                                if (error.code == 50035) {
+                                    await c.send(`Bugs category has **TOO many pending tickets**! Try again later.`)
+                                        .then(() => {
+                                            setTimeout(async () => {
+                                                if (c.deletable) {
+
+                                                    const deletableTicket = await ticketModel.findOne({
+                                                        ticketID: c.id
+                                                    }).catch(err => console.log(err));
+                                                    await await deletableTicket.deleteOne();
+
+                                                    await c.delete().catch(err => {
+                                                        console.error(err);
+                                                    });
+                                                }
+                                            }, 5000);
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                        });
+                                }
                             });
                         }
                         if (i.values[0] == 'Supporters') {
-                            c.edit({
+                            await c.edit({
                                 parent: ticketParents.suppPar
+                            }).catch(async (error) => {
+                                if (error.code == 50035) {
+                                    await c.send(`Supporters category has **TOO many pending tickets**! Try again later.`)
+                                        .then(() => {
+                                            setTimeout(async () => {
+                                                if (c.deletable) {
+
+                                                    const deletableTicket = await ticketModel.findOne({
+                                                        ticketID: c.id
+                                                    }).catch(err => console.log(err));
+                                                    await await deletableTicket.deleteOne();
+
+                                                    await c.delete().catch(err => {
+                                                        console.error(err);
+                                                    });
+                                                }
+                                            }, 5000);
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                        });
+                                }
                             });
                         }
                         if (i.values[0] == 'Character') {
-                            c.edit({
+                            await c.edit({
                                 parent: ticketParents.charPar
+                            }).catch(async (error) => {
+                                if (error.code == 50035) {
+                                    await c.send(`Character category has **TOO many pending tickets**! Try again later.`)
+                                        .then(() => {
+                                            setTimeout(async () => {
+                                                if (c.deletable) {
+
+                                                    const deletableTicket = await ticketModel.findOne({
+                                                        ticketID: c.id
+                                                    }).catch(err => console.log(err));
+                                                    await await deletableTicket.deleteOne();
+
+                                                    await c.delete().catch(err => {
+                                                        console.error(err);
+                                                    });
+                                                }
+                                            }, 5000);
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                        });
+                                }
                             });
                         }
                         if (i.values[0] == 'Others') {
-                            c.edit({
+                            await c.edit({
                                 parent: ticketParents.otherPar
+                            }).catch(async (error) => {
+                                if (error.code == 50035) {
+                                    await c.send(`Others category has **TOO many pending tickets**! Try again later.`)
+                                        .then(() => {
+                                            setTimeout(async () => {
+                                                if (c.deletable) {
+
+                                                    const deletableTicket = await ticketModel.findOne({
+                                                        ticketID: c.id
+                                                    }).catch(err => console.log(err));
+                                                    await await deletableTicket.deleteOne();
+
+                                                    await c.delete().catch(err => {
+                                                        console.error(err);
+                                                    });
+                                                }
+                                            }, 5000);
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                        });
+                                }
                             });
                         }
                     }
@@ -243,9 +370,9 @@ module.exports = {
                 collector.on('end', async (collected) => {
                     if (collected.size < 1) {
                         c.send(`No category selected. Closing the ticket ...`).then(() => {
-                            setTimeout(() => {
+                            setTimeout(async () => {
                                 if (c.deletable) {
-                                    c.delete();
+                                    await c.delete().catch(err => { return console.error(err) });
                                 }
                             }, 5000);
                         });

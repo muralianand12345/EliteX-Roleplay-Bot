@@ -51,29 +51,22 @@ module.exports = {
                 embeds: [embed]
             });
 
+            const Replyembed = new EmbedBuilder().setColor('#ED4245');
             await client.users.cache.get(interaction.user.id).send({
                 embeds: [embed]
             }).catch(error => {
                 if (error.code == 50007) {
-                    const logembed = new EmbedBuilder()
-                        .setColor('#ED4245')
-                        .setDescription(`Unable to DM`);
+                    Replyembed.addFields({ name: 'Error', value: 'Unable to DM user!'});
 
-                    return interaction.reply({
-                        embeds: [logembed],
-                        ephemeral: true
-                    });
                 } else {
                     console.error(error);
                 }
             }).then(() => {
 
-                const donembed = new EmbedBuilder()
-                    .setColor("#57F287")
-                    .setDescription('Ticket has been logged successfully');
+                Replyembed.addFields({ name: 'Success', value: 'Ticket Logged Successfully!'});
 
                 interaction.reply({
-                    embeds: [donembed],
+                    embeds: [Replyembed],
                     ephemeral: true
                 });
             });
