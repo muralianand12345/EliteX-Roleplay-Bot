@@ -1,5 +1,6 @@
 const {
-    Events
+    Events,
+    ComponentType
 } = require('discord.js');
 
 module.exports = {
@@ -28,6 +29,7 @@ module.exports = {
                 interaction.reply({ content: "Access Denied!", ephemeral: true });
             } else {
                 await Roles(interaction.user.id, 'add', CRoleID);
+                interaction.reply({ content: "verified!", ephemeral: true });
             }
         }
     }

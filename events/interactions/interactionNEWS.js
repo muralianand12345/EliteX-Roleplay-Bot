@@ -22,62 +22,62 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
 
-        var EMSEmbed = new EmbedBuilder();
+        var TaxiEmbed = new EmbedBuilder();
         var button = new ActionRowBuilder()
 
-        if (interaction.customId == "apply-ice") {
+        if (interaction.customId == "apply-news") {
 
             if (cooldown.has(interaction.user.id)) {
                 return interaction.reply({ content: `You are on a cooldown!`, ephemeral: true });
             } else {
 
-                const emsModal = new ModalBuilder()
-                    .setCustomId('ems-modal')
-                    .setTitle('ICE Application Form');
+                const TaxiModal = new ModalBuilder()
+                    .setCustomId('news-modal')
+                    .setTitle('Iconic Media Application Form');
 
-                const CharName = new TextInputBuilder()
-                    .setCustomId('ems-charname')
+                const FormQ1 = new TextInputBuilder()
+                    .setCustomId('news-charname')
                     .setLabel('Character Name and IC phone number')
                     .setPlaceholder('Name - Phone Number')
                     .setStyle(TextInputStyle.Short)
                     .setMaxLength(100)
                     .setRequired(true);
 
-                const RealAge = new TextInputBuilder()
-                    .setCustomId('ems-realage')
+                const FormQ2 = new TextInputBuilder()
+                    .setCustomId('news-realage')
                     .setLabel('Real Age')
                     .setStyle(TextInputStyle.Short)
                     .setMaxLength(100)
                     .setRequired(true);
 
-                const FitDoc = new TextInputBuilder()
-                    .setCustomId('ems-firdoc')
-                    .setLabel('Why you think you are best fit for doctor?')
-                    .setStyle(TextInputStyle.Short)
-                    .setMaxLength(100)
-                    .setRequired(true);
-
-                const WorkingHrs = new TextInputBuilder()
-                    .setCustomId('ems-working')
-                    .setLabel('How many hours can you put in per day?')
-                    .setStyle(TextInputStyle.Short)
-                    .setRequired(true);
-
-                const Experience = new TextInputBuilder()
-                    .setCustomId('ems-experience')
-                    .setLabel('Do you have any previous experience?')
+                const FormQ3 = new TextInputBuilder()
+                    .setCustomId('news-hours')
+                    .setLabel('How many hours you can spend in a day?')
                     .setStyle(TextInputStyle.Paragraph)
                     .setMaxLength(1000)
                     .setRequired(true);
 
-                const firstActionRow = new ActionRowBuilder().addComponents(CharName);
-                const secondActionRow = new ActionRowBuilder().addComponents(RealAge);
-                const thirdActionRow = new ActionRowBuilder().addComponents(FitDoc);
-                const fourthActionRow = new ActionRowBuilder().addComponents(WorkingHrs);
-                const fivethActionRow = new ActionRowBuilder().addComponents(Experience);
+                const FormQ4 = new TextInputBuilder()
+                    .setCustomId('news-experience')
+                    .setLabel('Do you have any previous experience?')
+                    .setStyle(TextInputStyle.Short)
+                    .setRequired(true);
 
-                emsModal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fivethActionRow);
-                await interaction.showModal(emsModal);
+                const FormQ5 = new TextInputBuilder()
+                    .setCustomId('news-wish')
+                    .setLabel('Why do you wish to be a journalist?')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setMaxLength(1000)
+                    .setRequired(true);
+
+                const firstActionRow = new ActionRowBuilder().addComponents(FormQ1);
+                const secondActionRow = new ActionRowBuilder().addComponents(FormQ2);
+                const thirdActionRow = new ActionRowBuilder().addComponents(FormQ3);
+                const fourthActionRow = new ActionRowBuilder().addComponents(FormQ4);
+                const fivethActionRow = new ActionRowBuilder().addComponents(FormQ5);
+
+                TaxiModal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fivethActionRow);
+                await interaction.showModal(TaxiModal);
 
                 cooldown.set(interaction.user.id);
                 setTimeout(() => {
@@ -86,40 +86,40 @@ module.exports = {
             }
         }
 
-        if (interaction.customId == "ems-modal") {
+        if (interaction.customId == "news-modal") {
 
-            const EMSCharName = interaction.fields.getTextInputValue('ems-charname');
-            const EMSRealAge = interaction.fields.getTextInputValue('ems-realage');
-            const EMSFitDoc = interaction.fields.getTextInputValue('ems-firdoc');
-            const EMSWorking = interaction.fields.getTextInputValue('ems-working');
-            const EMSExp = interaction.fields.getTextInputValue('ems-experience');
+            const Ques1 = interaction.fields.getTextInputValue('news-charname');
+            const Ques2 = interaction.fields.getTextInputValue('news-realage');
+            const Ques3 = interaction.fields.getTextInputValue('news-hours');
+            const Ques4 = interaction.fields.getTextInputValue('news-experience');
+            const Ques5 = interaction.fields.getTextInputValue('news-wish');
 
-            EMSEmbed.setColor('Red')
+            TaxiEmbed.setColor('Red')
                 .setDescription(`Submitted By <@${interaction.user.id}>`)
                 .addFields(
-                    { name: 'Char Name', value: `${EMSCharName}` },
-                    { name: 'Real Age', value: `${EMSRealAge}` },
-                    { name: 'Fit Doctor', value: `${EMSFitDoc}` },
-                    { name: 'Working', value: `${EMSWorking}` },
-                    { name: 'Experience', value: `${EMSExp}` }
+                    { name: 'Char Name', value: `${Ques1}` },
+                    { name: 'Real Age', value: `${Ques2}` },
+                    { name: 'How many hours you can spend in a day?', value: `${Ques3}` },
+                    { name: 'Do you have any previous experience?', value: `${Ques4}` },
+                    { name: 'Why do you wish to be a journalist?', value: `${Ques5}` }
                 )
                 .setFooter({ text: `${interaction.user.id}` });
             button.addComponents(
                 new ButtonBuilder()
-                    .setCustomId('ems-accept')
+                    .setCustomId('news-accept')
                     .setLabel('Accept')
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId('ems-reject')
+                    .setCustomId('news-reject')
                     .setLabel('Reject')
                     .setStyle(ButtonStyle.Danger)
             )
 
-            await client.channels.cache.get(client.jobs.EMS.SUBMIT).send({
-                embeds: [EMSEmbed],
+            await client.channels.cache.get(client.jobs.MEDIA.SUBMIT).send({
+                embeds: [TaxiEmbed],
                 components: [button]
             }).then(async (msg) => {
-                return interaction.reply({ content: 'Your ICE Form recieved successfully!', ephemeral: true });
+                return interaction.reply({ content: 'Your Iconic Media Form recieved successfully!', ephemeral: true });
             });
         }
 
@@ -135,19 +135,19 @@ module.exports = {
             await client.channels.cache.get(client.jobs.LOG.CHANID).send({ embeds: [logembed] });
         }
 
-        if (interaction.customId == "ems-accept") {
+        if (interaction.customId == "news-accept") {
 
             const originalEmbed = interaction.message.embeds[0];
             const userId = originalEmbed.footer.text;
-            const chan = client.channels.cache.get(client.jobs.EMS.ACCCHAN);
-            const JobName = client.jobs.EMS.NAME;
+            const chan = client.channels.cache.get(client.jobs.MEDIA.ACCCHAN);
+            const JobName = client.jobs.MEDIA.NAME;
 
             const userMember = interaction.guild.members.cache.get(userId);
             if (!userMember) {
                 return interaction.reply({ content: 'No user!', ephemeral: true });
             }
 
-            const role = interaction.guild.roles.cache.get(client.jobs.EMS.INTERVIEW);
+            const role = interaction.guild.roles.cache.get(client.jobs.MEDIA.INTERVIEW);
             if (!role) {
                 return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
             }
@@ -158,7 +158,7 @@ module.exports = {
             } else {
                 await userMember.roles.add(role);
                 await RoleLog(JobName, 'Accepted', userMember.id, interaction.user.id);
-                var MsgContent = `<@${userId}>, **Congratulations on being selected for an EMS interview! We are excited to learn more about you and discuss your potential role in our EMS team. Please contact us to schedule the interview at your earliest convenience.**`;
+                var MsgContent = `<@${userId}>, **Congratulations on being selected for an Iconic Media interview! We are excited to learn more about you and discuss your potential role in our Iconic Media team. Please contact us to schedule the interview at your earliest convenience.**`;
                 await chan.send(`${MsgContent}`);
                 interaction.reply({ content: `Interview Role Added and Accepted! <@${userMember.id}>`, ephemeral: true });
             }
@@ -166,19 +166,19 @@ module.exports = {
             await interaction.message.delete();
         }
 
-        if (interaction.customId == "ems-reject") {
+        if (interaction.customId == "news-reject") {
 
             const originalEmbed = interaction.message.embeds[0];
             const userId = originalEmbed.footer.text;
-            const chan = client.channels.cache.get(client.jobs.EMS.ACCCHAN);
-            const JobName = client.jobs.EMS.NAME;
+            const chan = client.channels.cache.get(client.jobs.MEDIA.ACCCHAN);
+            const JobName = client.jobs.MEDIA.NAME;
 
             const userMember = interaction.guild.members.cache.get(userId);
             if (!userMember) {
                 return interaction.reply({ content: 'No user!', ephemeral: true });
             }
 
-            const role = interaction.guild.roles.cache.get(client.jobs.EMS.INTERVIEW);
+            const role = interaction.guild.roles.cache.get(client.jobs.MEDIA.INTERVIEW);
             if (!role) {
                 return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
             }
@@ -189,7 +189,7 @@ module.exports = {
             } else {
                 await userMember.roles.remove(role);
                 await RoleLog(JobName, 'Rejected', userMember.id, interaction.user.id);
-                var MsgContent = `<@${userId}>, **Thank you for your interest in the EMS. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**`;
+                var MsgContent = `<@${userId}>, **Thank you for your interest in the Iconic Media. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**`;
                 await chan.send(`${MsgContent}`);
                 interaction.reply({ content: `Interview Role Removed and Rejected! <@${userMember.id}>`, ephemeral: true });
             }

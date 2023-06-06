@@ -13,6 +13,20 @@ module.exports = {
         const text = args.slice(1).join(" ");
         let channel;
 
+        async function logEmbedSend(command, channelId, userId, msg) {
+            const logEmbed = new EmbedBuilder()
+                .setColor('Blue')
+                .setDescription(`Command \`+editmsg ${command} ${msg}\``)
+                .addFields(
+                    { name: 'Client', value: `<@${userId}>` },
+                    { name: 'Target Channel', value: `<#${channelId}>` },
+                )
+
+            await client.channels.cache.get(client.config.MSG.LOG.CHAN).send({
+                embeds: [logEmbed]
+            });
+        }
+
         try {
             const fetchedMessage = await message.channel.messages.fetch(messageId);
             channel = fetchedMessage.channel;
@@ -25,6 +39,7 @@ module.exports = {
 
         try {
             const fetchedMessage = await channel.messages.fetch(messageId);
+            await logEmbedSend('editmessage', channel.id, message.author.id, text);
             await fetchedMessage.edit(text);
         } catch (error) {
             console.log(`Error: ${error}`);

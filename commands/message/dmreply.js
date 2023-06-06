@@ -34,6 +34,12 @@ module.exports = {
 
         return await userDM.send({ content: Message }).then(async () => {
             client.channels.cache.get(client.config.DMREPLY.REPLY).send({ embeds: [logembed] });
+        }).catch(err=>{
+            if (err.code === 50007) {
+                return message.reply({
+                    content: 'Unable to DM user!',
+                });
+            }
         });
     }
 };

@@ -67,13 +67,13 @@ module.exports = {
         async function logEmbedSend(command, channelId, userId, msg) {
             const logEmbed = new EmbedBuilder()
                 .setColor('Blue')
-                .setDescription(`Command \`/msg ${command} ${msg}\``)
+                .setDescription(`Command \`/editmsg ${command} ${msg}\``)
                 .addFields(
                     { name: 'Client', value: `<@${userId}>` },
                     { name: 'Message ID', value: `${channelId}` },
                 )
 
-            await client.channels.cache.get('1059443607112790016').send({
+            await client.channels.cache.get(client.config.MSG.LOG.CHAN).send({
                 embeds: [logEmbed]
             });
         }

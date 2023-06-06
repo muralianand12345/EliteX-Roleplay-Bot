@@ -89,7 +89,7 @@ module.exports = {
                     { name: 'Target Channel', value: `<#${channelId}>` },
                 )
 
-            await client.channels.cache.get('1059443607112790016').send({
+            await client.channels.cache.get(client.config.MSG.LOG.CHAN).send({
                 embeds: [logEmbed]
             });
         }

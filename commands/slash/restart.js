@@ -8,8 +8,8 @@ const wait = require('util').promisify(setTimeout);
 
 module.exports = {
     cooldown: 10000,
-    userPerms: [],
-    botPerms: [],
+    userPerms: ['Administrator'],
+    botPerms: ['Administrator'],
 
     data: new SlashCommandBuilder()
         .setName('restart')

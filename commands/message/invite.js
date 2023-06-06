@@ -17,6 +17,14 @@ module.exports = {
         const commandName = `MESS_INVITE`;
         client.std_log.error(client, commandName, message.author.id, message.channel.id);
 
+        const boostLvl = message.guild.premiumTier;
+        var inviteLink;
+        if (boostLvl.toString() === "3") {
+            inviteLink = "https://discord.gg/iconicrp";
+        } else {
+            inviteLink = "https://discord.gg/8pEzKpqFgK";
+        }
+        
         await message.delete();
 
         const embed = new EmbedBuilder()
@@ -24,10 +32,10 @@ module.exports = {
             .setAuthor({
                 name: 'ICONIC Roleplay',
                 iconURL: 'https://cdn.discordapp.com/attachments/1097420467532472340/1099594273176965191/Artboard_2.png',
-                url: 'https://discord.gg/8pEzKpqFgK'
+                url: inviteLink
             })
-            .setTitle('https://discord.gg/8pEzKpqFgK')
-            .setURL('https://discord.gg/8pEzKpqFgK')
+            .setTitle(inviteLink)
+            .setURL(inviteLink)
             .setDescription('**Tamil Community Roleplay Server**')
             .setThumbnail('https://cdn.discordapp.com/attachments/1097420467532472340/1099666661990219887/Logo.gif')
             .setFooter({

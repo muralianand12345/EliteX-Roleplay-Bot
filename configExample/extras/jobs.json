@@ -1,0 +1,37 @@
+{
+    "LOG": {
+        "CHANID": ""
+    },
+    "PD": {
+        "ACCCHAN": "",
+        "NAME": "PD",
+        "ROLEID": "",
+        "HO": "",
+        "INTERVIEW": "",
+        "SUBMIT": ""
+    },
+    "EMS": {
+        "ACCCHAN": "",
+        "NAME": "EMS",
+        "ROLEID": "",
+        "HO": "",
+        "INTERVIEW": "",
+        "SUBMIT": ""
+    },
+    "TAXI": {
+        "ACCCHAN": "",
+        "NAME": "IPTC",
+        "ROLEID": "",
+        "HO": "",
+        "INTERVIEW": "",
+        "SUBMIT": ""
+    },
+    "MEDIA": {
+        "ACCCHAN": "",
+        "NAME": "ICONIC MEDIA",
+        "ROLEID": "",
+        "HO": "",
+        "INTERVIEW": "",
+        "SUBMIT": ""
+    }
+}

@@ -33,11 +33,11 @@ module.exports = {
             });
         }
 
-        if (roleID.includes('1096856106749394994')) {
+        if (roleID.includes('1017410239869505558')) {
             return blacklistembed();
-        } else if (roleID.includes('1096863473792716961')) {
+        } else if (roleID.includes('784794493580476438')) {
             return blacklistembed();
-        } else if (roleID.includes('1097089385771569282')) {
+        } else if (roleID.includes('1017410017957249044')) {
             return blacklistembed();
         }
 

@@ -7,6 +7,7 @@ const {
     ButtonStyle,
     PermissionFlagsBits
 } = require('discord.js');
+const wait = require('util').promisify(setTimeout);
 
 module.exports = {
     cooldown: 10000,
@@ -62,13 +63,20 @@ module.exports = {
         const appNo = await interaction.options.getNumber("application-id");
         const user = await interaction.options.getUser("user-name");
 
+        const userMember = interaction.guild.members.cache.get(user.id);
+        if (userMember.roles.cache.has(client.visa.VISA.ROLEID1)) return await interaction.reply({ content: "The user already has VISA Holder Role!", ephemeral: true });
+        if (!userMember.roles.cache.has(client.visa.VISA.ROLEID2)) return await interaction.reply({ content: "The user has no Community Role!", ephemeral: true });
+        
+        if (user.id === client.user.id) return await interaction.reply({ content: "Men ... you cannot give me visa! 😂", ephemeral: true });
+        if (user.bot) return await interaction.reply({ content: "Cannot mention other bots.", ephemeral: true });
+
         if (options === 'form-accepted') {
             
             await interaction.deferReply({ ephemeral: true });
 
             const vpChan = client.channels.cache.get(client.visa.ACCEPTED.VPCHAN);
             await vpChan.send({
-                content: `**Application No: ${appNo.toString()}**, <@${user.id}> Your Server Whitelist form has been Accepted. **Welcome to ICONIC Roleplay**. Contact Immigration Officers to attend your voice process / Everyday there will be Voice Process.`
+                content: `**Application No: ${appNo.toString()}** | Congratulations, <@${user.id}>! Your server whitelist form has been accepted, and we are pleased to welcome you to ICONIC Roleplay. To continue with your registration, please contact our Immigration Officers to attend the mandatory voice process, which takes place daily.`
             }).then(async (msg) => {
 
                 await Roles(user, 'add', client.visa.ACCEPTED.ROLEID);
@@ -132,7 +140,7 @@ module.exports = {
             const vpChan = client.channels.cache.get(client.visa.REJECTED.REJCHAN);
 
             await vpChan.send({
-                content: `**Application No: ${appNo.toString()}**, <@${user.id}> Your Server Whitelist form has been **Rejected**.\n\`\`\`${reason}\`\`\``
+                content: `**Application No: ${appNo.toString()}** | <@${user.id}> Your Server Whitelist form has been **Rejected**.\n\`\`\`${reason}\`\`\``
             }).then(async (msg) => {
 
                 var msgLink = msg.url;
@@ -192,7 +200,7 @@ module.exports = {
             const vpChan = client.channels.cache.get(client.visa.VISA.VISACHAN);
 
             await vpChan.send({
-                content: `**Application No: ${appNo.toString()}**, <@${user.id}> **Congratulations on your acceptance to Iconic Roleplay! We're thrilled to have you as part of our community and can't wait to see what kind of exciting roleplaying experiences you'll bring to the table. Welcome aboard!**\n\n**If you have any questions or concerns, don't hesitate to tag our moderators or admins. We are here to ensure your experience is as enjoyable as possible.**\nPlease do visit ⁠<#1097103352640307210> and verify your age 😇\n\n**----------------------------------------------**`
+                content: `**Application No: ${appNo.toString()}** | <@${user.id}> **Congratulations on your acceptance to Iconic Roleplay! We're thrilled to have you as part of our community and can't wait to see what kind of exciting roleplaying experiences you'll bring to the table. Welcome aboard!**\n\n**If you have any questions or concerns, don't hesitate to tag our moderators or admins. We are here to ensure your experience is as enjoyable as possible.**\nPlease do visit ⁠<#1097103352640307210> and verify your age 😇\n\n**----------------------------------------------**`
 
             }).then(async (msg) => {
 
@@ -258,16 +266,11 @@ module.exports = {
         } else if (options === 'visa-onhold') {
 
             await interaction.deferReply({ ephemeral: true });
-            
-            const reason = interaction.options.getString("rejected-reason") || null;
-            if (!reason) {
-                return await interaction.editReply({ content: 'Visa Denied Reason Missing!', ephemeral: true });
-            }
 
             const vpChan = client.channels.cache.get(client.visa.HOLD.HOLDCHAN);
 
             await vpChan.send({
-                content: `**Application No: ${appNo.toString()}**, Dear <@${user.id}>  Thank you for taking your time in attending the voice process. We kindly request you to read the rules as your answers were not satisfying and attend the voice process once again.\n\`\`\`${reason}\`\`\``
+                content: `**Application No: ${appNo.toString()}** | Dear <@${user.id}>, Thank you for participating in the voice process, we appreciate your time and effort! We kindly ask you to take a moment to review the rules, as we want to ensure that you have a great Role Play experience. Once you've done that, please feel free to attend the voice process again - we're excited to hear your improved answers and help you get started on your Role Play journey.`
             }).then(async (msg) => {
 
                 var msgLink = msg.url;

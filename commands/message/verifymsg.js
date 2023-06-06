@@ -34,7 +34,7 @@ module.exports = {
             .addComponents(
                 new ButtonBuilder()
                     .setCustomId('verify-button')
-                    .setLabel('Form')
+                    .setLabel('Verify Here')
                     .setStyle(ButtonStyle.Primary),
             );
 

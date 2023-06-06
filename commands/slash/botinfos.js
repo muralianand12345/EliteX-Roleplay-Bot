@@ -34,7 +34,7 @@ module.exports = {
         const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setLabel("Tusket Roleplay")
+                    .setLabel("Iconic Roleplay")
                     .setStyle(ButtonStyle.Link)
                     .setURL("https://discord.gg/8pEzKpqFgK")
             );
@@ -92,7 +92,7 @@ module.exports = {
                 },
                 {
                     name: 'Developers',
-                    value: `\`\`\`Murali Anand & Raghava\`\`\``,
+                    value: `\`\`\`Murali Anand\`\`\``,
                     inline: false,
                 },
 

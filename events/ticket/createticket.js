@@ -9,7 +9,10 @@ const {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    StringSelectMenuBuilder
+    StringSelectMenuBuilder,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle
 } = require("discord.js");
 
 const ticketModel = require('../../events/models/ticket.js');
@@ -24,7 +27,7 @@ module.exports = {
         const errChan = client.config.ERR_LOG.CHAN_ID;
         const errorSend = client.channels.cache.get(errChan);
 
-        if (!interaction.isButton()) return;
+        //if (!interaction.isButton()) return;
 
         if (interaction.customId == "open-ticket") {
 
@@ -127,7 +130,7 @@ module.exports = {
                                     value: 'Ooc',
                                     emoji: '📝',
                                 },
-                                {
+                                /*{
                                     label: 'BUGS',
                                     value: 'Bugs',
                                     emoji: '🐛',
@@ -141,7 +144,7 @@ module.exports = {
                                     label: 'CHARACTER ISSUE',
                                     value: 'Character',
                                     emoji: '🪲',
-                                },
+                                },*/
                                 {
                                     label: 'OTHERS',
                                     value: 'Others',
@@ -172,63 +175,52 @@ module.exports = {
 
                 collector.on('collect', async (i) => {
                     if (i.user.id === interaction.user.id) {
-                        if (msg && msg.deletable) {
-                            msg.delete().then(async () => {
-                                const embed = new EmbedBuilder()
-                                    .setColor('#206694')
-                                    .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
-                                    .setDescription(`<@!${interaction.user.id}> Created a ticket ${i.values[0]}`)
-                                    .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
-                                    .setTimestamp();
-
-                                const row = new ActionRowBuilder()
-                                    .addComponents(
-                                        new ButtonBuilder()
-                                            .setCustomId('close-ticket')
-                                            .setLabel('Close Ticket')
-                                            .setEmoji('899745362137477181')
-                                            .setStyle(ButtonStyle.Danger),
-                                        new ButtonBuilder()
-                                            .setCustomId('transcript-ticket')
-                                            .setLabel('Transcript')
-                                            .setEmoji('📜')
-                                            .setStyle(ButtonStyle.Primary),
-                                    );
-
-                                const opened = await c.send({
-                                    content: `**Your Ticket Has Been Created!**`,
-                                    embeds: [embed],
-                                    components: [row]
-                                });
-
-                                opened.pin().then(() => {
-                                    opened.channel.bulkDelete(1);
-                                });
-
-                                ticketDoc.msgPannelID = opened.id;
-                                ticketDoc.ticketStatus = true;
-                                await ticketDoc.save();
-                            }).catch(async (error) => {
-                                console.error('Error deleting the message:', error);
-                                if (msg.channel.deletable) {
-                                    await msg.channel.delete()
-                                        .then(() => {
-                                            const user = client.users.cache.get(i.user.id);
-                                            if (user) {
-                                                user.send('Ticket Closed! | Reopen Again | Ticket Bugged');
-                                            }
-                                        })
-                                        .catch((error) => {
-                                            // Channel deletion failed, handle the error
-                                            console.error('Error deleting the channel:', error);
-                                        });
-                                } else {
-                                    console.log('The channel is not deletable.');
-                                }
-                            });
-                        }
 
                         if (i.values[0] == 'Ooc') {
+
+                            const oocModal = new ModalBuilder()
+                                .setCustomId('ticket-ooc-modal')
+                                .setTitle('Ticket Details');
+
+                            const oocDate = new TextInputBuilder()
+                                .setCustomId('ooc-date')
+                                .setLabel('Date and Time of the Scenario:')
+                                .setPlaceholder('Approximate Time is also acceptable')
+                                .setStyle(TextInputStyle.Short)
+                                .setRequired(true);
+                            const oocAgainst = new TextInputBuilder()
+                                .setCustomId('ooc-against')
+                                .setLabel('Ticket Raised Against:')
+                                .setStyle(TextInputStyle.Short)
+                                .setRequired(false);
+                            const oocDetails = new TextInputBuilder()
+                                .setCustomId('ooc-details')
+                                .setLabel('Ticket raised because of:')
+                                .setStyle(TextInputStyle.Paragraph)
+                                .setMaxLength(1000)
+                                .setRequired(true);
+                            const oocProof = new TextInputBuilder()
+                                .setCustomId('ooc-proof')
+                                .setLabel('Proof')
+                                .setPlaceholder('Yes/No')
+                                .setStyle(TextInputStyle.Short)
+                                .setRequired(false);
+                            const oocRules = new TextInputBuilder()
+                                .setCustomId('ooc-rules')
+                                .setLabel('RP Rules Breaked (Fail RP)')
+                                .setPlaceholder('Power Gaming/Fear RP/Meta Gaming/Fear RP')
+                                .setStyle(TextInputStyle.Short)
+                                .setRequired(true);
+
+                            const firstActionRow = new ActionRowBuilder().addComponents(oocDate);
+                            const secondActionRow = new ActionRowBuilder().addComponents(oocAgainst);
+                            const thirdActionRow = new ActionRowBuilder().addComponents(oocDetails);
+                            const fourthActionRow = new ActionRowBuilder().addComponents(oocProof);
+                            const fivethActionRow = new ActionRowBuilder().addComponents(oocRules);
+
+                            oocModal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fivethActionRow);
+                            await i.showModal(oocModal);
+
                             await c.edit({
                                 parent: ticketParents.oocPar
                             }).catch(async (error) => {
@@ -255,7 +247,7 @@ module.exports = {
                                 }
                             });
                         }
-                        if (i.values[0] == 'Bugs') {
+                        /*if (i.values[0] == 'Bugs') {
                             await c.edit({
                                 parent: ticketParents.bugPar
                             }).catch(async (error) => {
@@ -335,8 +327,45 @@ module.exports = {
                                         });
                                 }
                             });
-                        }
+                        }*/
                         if (i.values[0] == 'Others') {
+
+                            const othersModal = new ModalBuilder()
+                                .setCustomId('ticket-others-modal')
+                                .setTitle('Ticket Details');
+
+                            const othersDate = new TextInputBuilder()
+                                .setCustomId('others-date')
+                                .setLabel('Date and Time:')
+                                .setPlaceholder('Approximate Time is also acceptable')
+                                .setStyle(TextInputStyle.Short)
+                                .setRequired(true);
+                            const othersDetails = new TextInputBuilder()
+                                .setCustomId('others-details')
+                                .setLabel('Ticket raised because of:')
+                                .setPlaceholder('Items lost/Name Change/Bugs')
+                                .setStyle(TextInputStyle.Short)
+                                .setRequired(true);
+                            const othersItems = new TextInputBuilder()
+                                .setCustomId('others-items')
+                                .setLabel('If Items Lost, Mention Them')
+                                .setStyle(TextInputStyle.Short)
+                                .setRequired(false);
+                            const othersProof = new TextInputBuilder()
+                                .setCustomId('others-proof')
+                                .setLabel('Proof')
+                                .setPlaceholder('Yes/No')
+                                .setStyle(TextInputStyle.Short)
+                                .setRequired(false);
+
+                            const firstActionRow = new ActionRowBuilder().addComponents(othersDate);
+                            const secondActionRow = new ActionRowBuilder().addComponents(othersDetails);
+                            const thirdActionRow = new ActionRowBuilder().addComponents(othersItems);
+                            const fourthActionRow = new ActionRowBuilder().addComponents(othersProof);
+
+                            othersModal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow);
+                            await i.showModal(othersModal);
+
                             await c.edit({
                                 parent: ticketParents.otherPar
                             }).catch(async (error) => {
@@ -363,9 +392,65 @@ module.exports = {
                                 }
                             });
                         }
+
+                        if (msg && msg.deletable) {
+                            msg.delete().then(async () => {
+
+                                const embed = new EmbedBuilder()
+                                    .setColor('#206694')
+                                    .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
+                                    .setDescription(`<@!${interaction.user.id}> Created a ticket ${i.values[0]}`)
+                                    .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
+                                    .setTimestamp();
+
+                                const row = new ActionRowBuilder()
+                                    .addComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId('close-ticket')
+                                            .setLabel('Close Ticket')
+                                            .setEmoji('899745362137477181')
+                                            .setStyle(ButtonStyle.Danger),
+                                        new ButtonBuilder()
+                                            .setCustomId('transcript-ticket')
+                                            .setLabel('Transcript')
+                                            .setEmoji('📜')
+                                            .setStyle(ButtonStyle.Primary),
+                                    );
+
+                                const opened = await c.send({
+                                    content: `**Your Ticket Has Been Created!**`,
+                                    embeds: [embed],
+                                    components: [row]
+                                });
+
+                                opened.pin().then(() => {
+                                    opened.channel.bulkDelete(1);
+                                });
+
+                                ticketDoc.msgPannelID = opened.id;
+                                ticketDoc.ticketStatus = true;
+                                await ticketDoc.save();
+                            }).catch(async (error) => {
+                                console.error('Error deleting the message:', error);
+                                if (msg.channel.deletable) {
+                                    await msg.channel.delete()
+                                        .then(() => {
+                                            const user = client.users.cache.get(i.user.id);
+                                            if (user) {
+                                                user.send('Ticket Closed! | Reopen Again | Ticket Bugged');
+                                            }
+                                        })
+                                        .catch((error) => {
+                                            // Channel deletion failed, handle the error
+                                            console.error('Error deleting the channel:', error);
+                                        });
+                                } else {
+                                    console.log('The channel is not deletable.');
+                                }
+                            });
+                        }
                     }
                 });
-
 
                 collector.on('end', async (collected) => {
                     if (collected.size < 1) {
@@ -390,6 +475,44 @@ module.exports = {
                     }
                 });
             });
+        }
+
+        if (interaction.customId == "ticket-ooc-modal") {
+            const Date = interaction.fields.getTextInputValue('ooc-date');
+            const Against = interaction.fields.getTextInputValue('ooc-against') || "Name Unknown";
+            const Rules = interaction.fields.getTextInputValue('ooc-rules');
+            const Proof = interaction.fields.getTextInputValue('ooc-proof') || "No Proof";
+            const Details = interaction.fields.getTextInputValue('ooc-details');
+
+            const embed = new EmbedBuilder()
+                .setDescription(`<@${interaction.user.id}> **| OOC Ticket Details**`)
+                .addFields(
+                    { name: '**Date and Time:**', value: `\`\`\`${Date}\`\`\`` },
+                    { name: '**OOC Against:**', value: `\`\`\`${Against}\`\`\`` },
+                    { name: '**Rules Breaked:**', value: `\`\`\`${Rules}\`\`\`` },
+                    { name: '**Ticket Raised Because Of:**', value: `\`\`\`${Details}\`\`\`` },
+                    { name: '**Proof/Evidence:**', value: `\`\`\`${Proof}\`\`\`` }
+                )
+            await interaction.channel.send({ embeds: [embed] });
+            interaction.reply({ content: "Detail Submitted!", ephemeral: true });
+        }
+
+        if (interaction.customId == "ticket-others-modal") {
+            const Date = interaction.fields.getTextInputValue('others-date');
+            const Details = interaction.fields.getTextInputValue('others-details');
+            const Items = interaction.fields.getTextInputValue('others-items') || "No Item Lost";
+            const Proof = interaction.fields.getTextInputValue('others-proof') || "No Proof";
+
+            const embed = new EmbedBuilder()
+                .setDescription(`<@${interaction.user.id}> **| Others Ticket Details**`)
+                .addFields(
+                    { name: '**Date and Time:**', value: `\`\`\`${Date}\`\`\`` },
+                    { name: '**Ticket Raised Because Of:**', value: `\`\`\`${Details}\`\`\`` },
+                    { name: '**Items Lost:**', value: `\`\`\`${Items}\`\`\`` },
+                    { name: '**Proof/Evidence:**', value: `\`\`\`${Proof}\`\`\`` }
+                )
+            await interaction.channel.send({ embeds: [embed] });
+            interaction.reply({ content: "Detail Submitted!", ephemeral: true });
         }
     }
 };

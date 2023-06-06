@@ -5,6 +5,7 @@ const {
     ButtonStyle,
 } = require("discord.js");
 
+
 module.exports = {
 	name: 'ageverify',
 	description: "Age verification form",
@@ -16,7 +17,7 @@ module.exports = {
 		const commandName = `MESS_AGEVERIFY`;
 		client.std_log.error(client, commandName, message.author.id, message.channel.id);
 
-        const chanid = "1100398444243337356";
+        const chanid = "1097103370222841947";
         await message.delete();
 
         const embed = new EmbedBuilder()

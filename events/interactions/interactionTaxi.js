@@ -22,21 +22,21 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
 
-        var EMSEmbed = new EmbedBuilder();
+        var TaxiEmbed = new EmbedBuilder();
         var button = new ActionRowBuilder()
 
-        if (interaction.customId == "apply-ice") {
+        if (interaction.customId == "apply-taxi") {
 
             if (cooldown.has(interaction.user.id)) {
                 return interaction.reply({ content: `You are on a cooldown!`, ephemeral: true });
             } else {
 
-                const emsModal = new ModalBuilder()
-                    .setCustomId('ems-modal')
-                    .setTitle('ICE Application Form');
+                const TaxiModal = new ModalBuilder()
+                    .setCustomId('taxi-modal')
+                    .setTitle('IPTC Application Form');
 
                 const CharName = new TextInputBuilder()
-                    .setCustomId('ems-charname')
+                    .setCustomId('taxi-charname')
                     .setLabel('Character Name and IC phone number')
                     .setPlaceholder('Name - Phone Number')
                     .setStyle(TextInputStyle.Short)
@@ -44,40 +44,40 @@ module.exports = {
                     .setRequired(true);
 
                 const RealAge = new TextInputBuilder()
-                    .setCustomId('ems-realage')
+                    .setCustomId('taxi-realage')
                     .setLabel('Real Age')
                     .setStyle(TextInputStyle.Short)
                     .setMaxLength(100)
                     .setRequired(true);
 
-                const FitDoc = new TextInputBuilder()
-                    .setCustomId('ems-firdoc')
-                    .setLabel('Why you think you are best fit for doctor?')
-                    .setStyle(TextInputStyle.Short)
-                    .setMaxLength(100)
+                const TaxiHire = new TextInputBuilder()
+                    .setCustomId('taxi-hire')
+                    .setLabel('Why should we hire you?')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setMaxLength(1000)
                     .setRequired(true);
 
                 const WorkingHrs = new TextInputBuilder()
-                    .setCustomId('ems-working')
+                    .setCustomId('taxi-working')
                     .setLabel('How many hours can you put in per day?')
                     .setStyle(TextInputStyle.Short)
                     .setRequired(true);
 
                 const Experience = new TextInputBuilder()
-                    .setCustomId('ems-experience')
-                    .setLabel('Do you have any previous experience?')
+                    .setCustomId('taxi-experience')
+                    .setLabel('What are your Strength and Weakness?')
                     .setStyle(TextInputStyle.Paragraph)
                     .setMaxLength(1000)
                     .setRequired(true);
 
                 const firstActionRow = new ActionRowBuilder().addComponents(CharName);
                 const secondActionRow = new ActionRowBuilder().addComponents(RealAge);
-                const thirdActionRow = new ActionRowBuilder().addComponents(FitDoc);
+                const thirdActionRow = new ActionRowBuilder().addComponents(TaxiHire);
                 const fourthActionRow = new ActionRowBuilder().addComponents(WorkingHrs);
                 const fivethActionRow = new ActionRowBuilder().addComponents(Experience);
 
-                emsModal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fivethActionRow);
-                await interaction.showModal(emsModal);
+                TaxiModal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fivethActionRow);
+                await interaction.showModal(TaxiModal);
 
                 cooldown.set(interaction.user.id);
                 setTimeout(() => {
@@ -86,40 +86,40 @@ module.exports = {
             }
         }
 
-        if (interaction.customId == "ems-modal") {
+        if (interaction.customId == "taxi-modal") {
 
-            const EMSCharName = interaction.fields.getTextInputValue('ems-charname');
-            const EMSRealAge = interaction.fields.getTextInputValue('ems-realage');
-            const EMSFitDoc = interaction.fields.getTextInputValue('ems-firdoc');
-            const EMSWorking = interaction.fields.getTextInputValue('ems-working');
-            const EMSExp = interaction.fields.getTextInputValue('ems-experience');
+            const TaxiCharName = interaction.fields.getTextInputValue('taxi-charname');
+            const TaxiRealAge = interaction.fields.getTextInputValue('taxi-realage');
+            const TaxiTaxiHire = interaction.fields.getTextInputValue('taxi-hire');
+            const TaxiWorking = interaction.fields.getTextInputValue('taxi-working');
+            const TaxiExp = interaction.fields.getTextInputValue('taxi-experience');
 
-            EMSEmbed.setColor('Red')
+            TaxiEmbed.setColor('Red')
                 .setDescription(`Submitted By <@${interaction.user.id}>`)
                 .addFields(
-                    { name: 'Char Name', value: `${EMSCharName}` },
-                    { name: 'Real Age', value: `${EMSRealAge}` },
-                    { name: 'Fit Doctor', value: `${EMSFitDoc}` },
-                    { name: 'Working', value: `${EMSWorking}` },
-                    { name: 'Experience', value: `${EMSExp}` }
+                    { name: 'Char Name', value: `${TaxiCharName}` },
+                    { name: 'Real Age', value: `${TaxiRealAge}` },
+                    { name: 'Why should we Hire', value: `${TaxiTaxiHire}` },
+                    { name: 'Working', value: `${TaxiWorking}` },
+                    { name: 'Strenght and Weakness', value: `${TaxiExp}` }
                 )
                 .setFooter({ text: `${interaction.user.id}` });
             button.addComponents(
                 new ButtonBuilder()
-                    .setCustomId('ems-accept')
+                    .setCustomId('taxi-accept')
                     .setLabel('Accept')
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId('ems-reject')
+                    .setCustomId('taxi-reject')
                     .setLabel('Reject')
                     .setStyle(ButtonStyle.Danger)
             )
 
-            await client.channels.cache.get(client.jobs.EMS.SUBMIT).send({
-                embeds: [EMSEmbed],
+            await client.channels.cache.get(client.jobs.TAXI.SUBMIT).send({
+                embeds: [TaxiEmbed],
                 components: [button]
             }).then(async (msg) => {
-                return interaction.reply({ content: 'Your ICE Form recieved successfully!', ephemeral: true });
+                return interaction.reply({ content: 'Your IPTC Form recieved successfully!', ephemeral: true });
             });
         }
 
@@ -135,19 +135,19 @@ module.exports = {
             await client.channels.cache.get(client.jobs.LOG.CHANID).send({ embeds: [logembed] });
         }
 
-        if (interaction.customId == "ems-accept") {
+        if (interaction.customId == "taxi-accept") {
 
             const originalEmbed = interaction.message.embeds[0];
             const userId = originalEmbed.footer.text;
-            const chan = client.channels.cache.get(client.jobs.EMS.ACCCHAN);
-            const JobName = client.jobs.EMS.NAME;
+            const chan = client.channels.cache.get(client.jobs.TAXI.ACCCHAN);
+            const JobName = client.jobs.TAXI.NAME;
 
             const userMember = interaction.guild.members.cache.get(userId);
             if (!userMember) {
                 return interaction.reply({ content: 'No user!', ephemeral: true });
             }
 
-            const role = interaction.guild.roles.cache.get(client.jobs.EMS.INTERVIEW);
+            const role = interaction.guild.roles.cache.get(client.jobs.TAXI.INTERVIEW);
             if (!role) {
                 return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
             }
@@ -158,7 +158,7 @@ module.exports = {
             } else {
                 await userMember.roles.add(role);
                 await RoleLog(JobName, 'Accepted', userMember.id, interaction.user.id);
-                var MsgContent = `<@${userId}>, **Congratulations on being selected for an EMS interview! We are excited to learn more about you and discuss your potential role in our EMS team. Please contact us to schedule the interview at your earliest convenience.**`;
+                var MsgContent = `<@${userId}>, **Congratulations on being selected for an IPTC interview! We are excited to learn more about you and discuss your potential role in our IPTC team. Please contact us to schedule the interview at your earliest convenience.**`;
                 await chan.send(`${MsgContent}`);
                 interaction.reply({ content: `Interview Role Added and Accepted! <@${userMember.id}>`, ephemeral: true });
             }
@@ -166,19 +166,19 @@ module.exports = {
             await interaction.message.delete();
         }
 
-        if (interaction.customId == "ems-reject") {
+        if (interaction.customId == "taxi-reject") {
 
             const originalEmbed = interaction.message.embeds[0];
             const userId = originalEmbed.footer.text;
-            const chan = client.channels.cache.get(client.jobs.EMS.ACCCHAN);
-            const JobName = client.jobs.EMS.NAME;
+            const chan = client.channels.cache.get(client.jobs.TAXI.ACCCHAN);
+            const JobName = client.jobs.TAXI.NAME;
 
             const userMember = interaction.guild.members.cache.get(userId);
             if (!userMember) {
                 return interaction.reply({ content: 'No user!', ephemeral: true });
             }
 
-            const role = interaction.guild.roles.cache.get(client.jobs.EMS.INTERVIEW);
+            const role = interaction.guild.roles.cache.get(client.jobs.TAXI.INTERVIEW);
             if (!role) {
                 return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
             }
@@ -189,7 +189,7 @@ module.exports = {
             } else {
                 await userMember.roles.remove(role);
                 await RoleLog(JobName, 'Rejected', userMember.id, interaction.user.id);
-                var MsgContent = `<@${userId}>, **Thank you for your interest in the EMS. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**`;
+                var MsgContent = `<@${userId}>, **Thank you for your interest in the IPTC. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**`;
                 await chan.send(`${MsgContent}`);
                 interaction.reply({ content: `Interview Role Removed and Rejected! <@${userMember.id}>`, ephemeral: true });
             }

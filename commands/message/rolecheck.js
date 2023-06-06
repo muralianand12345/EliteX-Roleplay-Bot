@@ -13,14 +13,11 @@ module.exports = {
         const commandName = `MESS_ROLECHECK`;
         client.std_log.error(client, commandName, message.author.id, message.channel.id);
 
-        const Role1ID = client.config.ROLE_CHECK.ROLE1;
-        const Role2ID = client.config.ROLE_CHECK.ROLE2;
-        const GuildId = client.config.ROLE_CHECK.GUILDID;
+        var Role1ID = args[0];
+        var Role2ID = args[1];
 
-        GuildInfo = await client.guilds.cache.get(GuildId);
-
-        var Role1 = await GuildInfo.roles.cache.find(role => role.id == Role1ID);
-        var Role2 = await GuildInfo.roles.cache.find(role => role.id == Role2ID);
+        var Role1 = await message.guild.roles.cache.find(role => role.id == Role1ID);
+        var Role2 = await message.guild.roles.cache.find(role => role.id == Role2ID);
 
         var Role1_Total = await Role1.members.map(m => m.user);
         var Role2_Total = await Role2.members.map(m => m.user);
@@ -33,6 +30,8 @@ module.exports = {
         for (var i = 0; i < Role_Total.length; i++) {
             List += `<@${Role_Total[i].id}>`;
         }
+
+        if(!List) return message.reply({ content: 'No Common Role!' });
 
         const embed = new EmbedBuilder()
         .setColor('#ED4245')

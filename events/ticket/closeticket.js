@@ -109,6 +109,11 @@ module.exports = {
                                     .setLabel('Delete ticket')
                                     .setEmoji('🗑️')
                                     .setStyle(ButtonStyle.Danger),
+                                new ButtonBuilder()
+                                    .setCustomId('delete-ticket-reason')
+                                    .setLabel('Delete with Reason')
+                                    .setEmoji('📄')
+                                    .setStyle(ButtonStyle.Danger),
                             );
 
                         chan.send({
@@ -135,17 +140,17 @@ module.exports = {
             });
 
             collector.on('end', async (collected) => {
-                if (collected.size <= 0) {  
+                if (collected.size <= 0) {
                     await interaction.editReply({
                         content: `**Closing of the canceled ticket!** (<@!${userButton}>)`,
                         components: []
-                    }).catch(async (err)=> {
+                    }).catch(async (err) => {
                         if (err.code == 10008) {
-                           await interaction.channel.send({ content: '**Ticket Cancellation Message Has Been Deleted!**'}).then((msg)=>{
-                               setTimeout(function () {
-                                   msg.delete();
-                               }, 4000);
-                           });
+                            await interaction.channel.send({ content: '**Ticket Cancellation Message Has Been Deleted!**' }).then((msg) => {
+                                setTimeout(function () {
+                                    msg.delete();
+                                }, 4000);
+                            });
                         }
                     });
                 }

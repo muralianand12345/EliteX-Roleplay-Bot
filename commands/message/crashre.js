@@ -7,14 +7,14 @@ const {
 
 
 module.exports = {
-    name: 'feedback',
-    description: "Feedback Form",
+    name: 'crashre',
+    description: "Crash Report Form",
     cooldown: 20000,
     userPerms: ['Administrator'],
     botPerms: ['Administrator'],
     run: async (client, message, args) => {
 
-        const commandName = `MESS_FEEDBACK`;
+        const commandName = `MESS_CRASHRE`;
         client.std_log.error(client, commandName, message.author.id, message.channel.id);
 
         await message.delete();
@@ -26,16 +26,15 @@ module.exports = {
                 iconURL: 'https://cdn.discordapp.com/attachments/1097420467532472340/1099594273176965191/Artboard_2.png',
                 url: 'https://discord.gg/8pEzKpqFgK'
             })
-            .setTitle('FeedBack Form')
-            .setDescription('**Click the button to write your feedback or suggestions.**')
-            .setThumbnail('https://cdn.discordapp.com/attachments/1097420467532472340/1099666661990219887/Logo.gif')
+            .setTitle('CRASH REPORT')
 
         const button = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('feedback-button')
-                    .setLabel('Form')
-                    .setStyle(ButtonStyle.Primary),
+                    .setCustomId('crashre-button')
+                    .setEmoji('💥')
+                    .setLabel('Report')
+                    .setStyle(ButtonStyle.Danger),
             );
 
         return message.channel.send({

@@ -15,9 +15,9 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
 
-        const DroleID = "1058684181254783016";
-        const AroleID = "1058684219041255504";
-        const BroleID = "1072658590575366235";
+        const DroleID = "1097108007793467472";
+        const AroleID = "1097094147879489537";
+        const BroleID = "1097094124471062579";
 
         const Drole = await interaction.guild.roles.cache.find(x => x.id === DroleID);
         const Arole = await interaction.guild.roles.cache.find(x => x.id === AroleID);
@@ -74,7 +74,7 @@ module.exports = {
                 interaction.reply({ content: "Action denied!", ephemeral: true });
             } else {
                 await interaction.member.roles.add(DroleID).then(async () => {
-                    interaction.reply({ content: "Confirmed!", ephemeral: true });
+                    interaction.reply({ content: "Confirmed! <#1097103370222841947>", ephemeral: true });
                 });
             }
         }
@@ -139,16 +139,6 @@ module.exports = {
                             )
 
                         i.reply({ embeds: [embed], components: [button], ephemeral: true });
-
-                        /*if (i.member.roles.cache?.has(AroleID)) {
-                            await i.member.roles.remove(Arole).then(() => {
-                                i.reply({ content: "Above 18 Role Removed!", ephemeral: true });
-                            });
-                        } else {
-                            await i.member.roles.add(Arole).then(() => {
-                                i.reply({ content: "Above 18 Role Added!", ephemeral: true });
-                            });
-                        }*/
                     }
 
                     if (i.values[0] == 'below-18') {
@@ -165,16 +155,6 @@ module.exports = {
                             )
 
                         i.reply({ embeds: [embed], components: [button], ephemeral: true });
-
-                        /*if (i.member.roles.cache?.has(BroleID)) {
-                            await i.member.roles.remove(Brole).then(() => {
-                                i.reply({ content: "Below 18 Role Removed!", ephemeral: true });
-                            });
-                        } else {
-                            await i.member.roles.add(Brole).then(() => {
-                                i.reply({ content: "Below 18 Role Added!", ephemeral: true });
-                            });
-                        }*/
                     }
                 }
             });

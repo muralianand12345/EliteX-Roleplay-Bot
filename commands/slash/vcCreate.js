@@ -27,6 +27,11 @@ module.exports = {
                 .setDescription('Category/Parent where VC to be created!')
                 .setRequired(true)
         )
+        .addChannelOption(option =>
+            option.setName('vc-log')
+                .setDescription('Logs VC create')
+                .setRequired(true)
+        )
         .addStringOption(option =>
             option.setName('vc-name')
                 .setDescription('VC name to start with')
@@ -90,14 +95,16 @@ module.exports = {
             });
         }
 
-        const vcName = await interaction.options.getString("vc-name") || "";
+        const vcLog = await interaction.options.getChannel("vc-log");
+        const vcName = await interaction.options.getString("vc-name");
 
         if (!vcName) {
             var newData = dateSetupData({
                 guildID: interaction.guild.id,
                 vcID: vcChan.id,
                 parentID: vcParent.id,
-                name: null
+                name: null,
+                logID: vcLog.id
             });
             await newData.save();
         } else {
@@ -105,11 +112,11 @@ module.exports = {
                 guildID: interaction.guild.id,
                 vcID: vcChan.id,
                 parentID: vcParent.id,
-                name: vcName
+                name: vcName,
+                logID: vcLog.id
             });
             await newData.save();
         }
-
 
         const embed = new EmbedBuilder()
             .setColor("#57F287")

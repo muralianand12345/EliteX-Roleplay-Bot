@@ -1,3 +1,7 @@
+const {
+    EmbedBuilder
+} = require("discord.js");
+
 module.exports = {
     name: 'msg',
     description: "Sends user DM reply",
@@ -11,37 +15,38 @@ module.exports = {
 
         var chan = message.mentions.channels.first();
         var msg;
-        
+
+        async function logEmbedSend(command, channelId, userId, msg) {
+            const logEmbed = new EmbedBuilder()
+                .setColor('Blue')
+                .setDescription(`Command \`+msg ${command} ${msg}\``)
+                .addFields(
+                    { name: 'Client', value: `<@${userId}>` },
+                    { name: 'Target Channel', value: `<#${channelId}>` },
+                )
+
+            await client.channels.cache.get(client.config.MSG.LOG.CHAN).send({
+                embeds: [logEmbed]
+            });
+        }
+
         if (!chan) {
             chan = message.channel;
             msg = args.join(" ");
-            console.log(msg)
-            console.log(chan)
             //return message.reply({ content: 'Channel name is not specified or tagged!'});
         } else {
             msg = args.slice(1).join(" ");
-            console.log(msg)
         }
 
-        console.log(msg)
-        console.log(chan)
+        if (!msg) return message.reply({ content: 'No message!' });
 
         try {
-            await message.delete();
-
-            const MAX_MESSAGE_LENGTH = 500;
-            if (msg.length <= MAX_MESSAGE_LENGTH) {
-                await chan.send({ content: msg });
-            } else {
-                const chunks = msg.match(/.{1,500}/g);
-
-                for (const chunk of chunks) {
-                    await chan.send({ content: chunk });
-                }
-            }
+            await chan.send({ content: `${msg}` });
+            await logEmbedSend('message', chan.id, message.author.id, msg);
         } catch (error) {
             console.error(error);
             message.reply({ content: 'An error occurred while sending the message. Please try again later.' });
         }
+        await message.delete();
     }
 }

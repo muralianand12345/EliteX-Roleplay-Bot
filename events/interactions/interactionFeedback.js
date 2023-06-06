@@ -36,11 +36,15 @@ module.exports = {
                 const IcName = new TextInputBuilder()
                     .setCustomId('feedback-icname')
                     .setLabel('What is your IC name?')
+                    .setMaxLength(30)
+                    .setMinLength(3)
                     .setStyle(TextInputStyle.Short);
 
                 const Feedback = new TextInputBuilder()
                     .setCustomId('feedback-content')
                     .setLabel('Your feedback or suggestions!')
+                    .setMaxLength(1000)
+                    .setMinLength(20)
                     .setStyle(TextInputStyle.Paragraph);
 
 
@@ -80,4 +84,4 @@ module.exports = {
             });
         }
     }
-}
+};
