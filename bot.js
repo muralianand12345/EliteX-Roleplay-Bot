@@ -59,8 +59,8 @@ for (const file of extrasFiles) {
     const property = path.basename(file, '.json');
     client[property] = require(path.join(extrasDir, file));
 }
-module.exports = client;
 
+client.setMaxListeners(20);
 //Handler File Read
 fs.readdirSync('./handlers').filter((dir) => {
     let files = fs.readdirSync(`./handlers/${dir}`).filter((file) => file.endsWith(".js"));

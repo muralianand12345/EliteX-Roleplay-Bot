@@ -26,7 +26,8 @@
         "DATE": true, 
         "NICKNAME": true,
         "AUTOTICKET": true,
-        "VISADM": true
+        "VISADM": true,
+        "STREAM": false
     },
 
     "ROLE_CHECK": {
