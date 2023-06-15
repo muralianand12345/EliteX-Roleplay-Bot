@@ -415,6 +415,11 @@ module.exports = {
                                             .setLabel('Transcript')
                                             .setEmoji('📜')
                                             .setStyle(ButtonStyle.Primary),
+                                        new ButtonBuilder()
+                                            .setCustomId('claim-ticket')
+                                            .setLabel('Claim')
+                                            .setEmoji('🔒')
+                                            .setStyle(ButtonStyle.Secondary),
                                     );
 
                                 const opened = await c.send({
@@ -457,7 +462,7 @@ module.exports = {
                         c.send(`No category selected. Closing the ticket ...`).then(() => {
                             setTimeout(async () => {
                                 if (c.deletable) {
-                                    await c.delete().catch(err => { return console.error(err) });
+                                    await c.delete().catch(err => { return console.error(err); });
                                 }
                             }, 5000);
                         });
@@ -492,7 +497,7 @@ module.exports = {
                     { name: '**Rules Breaked:**', value: `\`\`\`${Rules}\`\`\`` },
                     { name: '**Ticket Raised Because Of:**', value: `\`\`\`${Details}\`\`\`` },
                     { name: '**Proof/Evidence:**', value: `\`\`\`${Proof}\`\`\`` }
-                )
+                );
             await interaction.channel.send({ embeds: [embed] });
             interaction.reply({ content: "Detail Submitted!", ephemeral: true });
         }
@@ -510,7 +515,7 @@ module.exports = {
                     { name: '**Ticket Raised Because Of:**', value: `\`\`\`${Details}\`\`\`` },
                     { name: '**Items Lost:**', value: `\`\`\`${Items}\`\`\`` },
                     { name: '**Proof/Evidence:**', value: `\`\`\`${Proof}\`\`\`` }
-                )
+                );
             await interaction.channel.send({ embeds: [embed] });
             interaction.reply({ content: "Detail Submitted!", ephemeral: true });
         }

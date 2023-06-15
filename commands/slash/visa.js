@@ -62,8 +62,8 @@ module.exports = {
         const options = interaction.options.getString("type");
         const appNo = await interaction.options.getNumber("application-id");
         const user = await interaction.options.getUser("user-name");
-
-        const userMember = interaction.guild.members.cache.get(user.id);
+        
+         const userMember = interaction.guild.members.cache.get(user.id);
         if (userMember.roles.cache.has(client.visa.VISA.ROLEID1)) return await interaction.reply({ content: "The user already has VISA Holder Role!", ephemeral: true });
         if (!userMember.roles.cache.has(client.visa.VISA.ROLEID2)) return await interaction.reply({ content: "The user has no Community Role!", ephemeral: true });
         

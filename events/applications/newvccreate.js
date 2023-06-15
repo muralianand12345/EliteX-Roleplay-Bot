@@ -39,7 +39,11 @@ module.exports = {
                 .setAuthor({ name: `${Process}` })
                 .setDescription(`User: <@${UserID}>`);
 
-            await logChan.send({ embeds: [logembed] });
+            if (logChan) {
+                await logChan.send({ embeds: [logembed] });
+            } else {
+                console.error("logChan is undefined");
+            }
         }
 
         let User = client.users.cache.get(newState.id);
@@ -62,45 +66,48 @@ module.exports = {
         }
 
         if (targetChannelId && oldState.channel?.id === targetChannelId) {
-            var logChan = client.channels.cache.get(vcCreateCounts.logID);
             const channelToUpdate = oldState.guild.channels.cache.get(targetChannelId);
-            if (channelToUpdate) {
-                await mutex.lock();
+            if (vcCreateCounts && vcCreateCounts.logID) {
+                var logChan = client.channels.cache.get(vcCreateCounts.logID);
 
-                try {
-                    const cooldownKey = `${oldState.guild.id}-${oldState.id}`;
-                    if (cooldowns.has(cooldownKey) || channelToUpdate.members.size === 0) {
-                        await vcCreateModel.findOneAndRemove({
-                            guildID: oldState.guild.id,
-                            vcID: targetChannelId,
-                        });
+                if (channelToUpdate) {
+                    await mutex.lock();
 
-                        await EmbedLog('Red', 'Channel deleted', oldState.id, logChan);
+                    try {
+                        const cooldownKey = `${oldState.guild.id}-${oldState.id}`;
+                        if (cooldowns.has(cooldownKey) || channelToUpdate.members.size === 0) {
+                            await vcCreateModel.findOneAndRemove({
+                                guildID: oldState.guild.id,
+                                vcID: targetChannelId,
+                            });
 
-                        await channelToUpdate.delete().catch((err) => {
-                            console.error(`Error deleting channel: ${err}`);
-                        });
+                            await EmbedLog('Red', 'Channel deleted', oldState.id, logChan);
 
-                        await vcCreateModel.findOneAndRemove({
-                            guildID: oldState.guild.id,
-                            userID: oldState.id,
-                        });
-                        cooldowns.add(cooldownKey);
-                        setTimeout(() => {
-                            cooldowns.delete(cooldownKey);
-                        }, 5000);
-                    } else {
-                        //console.log(`Skipping channel deletion: ${channelToUpdate.name} (${channelToUpdate.id}) due to active members`);
+                            await channelToUpdate.delete().catch((err) => {
+                                console.error(`Error deleting channel: ${err}`);
+                            });
+
+                            await vcCreateModel.findOneAndRemove({
+                                guildID: oldState.guild.id,
+                                userID: oldState.id,
+                            });
+                            cooldowns.add(cooldownKey);
+                            setTimeout(() => {
+                                cooldowns.delete(cooldownKey);
+                            }, 5000);
+                        } else {
+                            //console.log(`Skipping channel deletion: ${channelToUpdate.name} (${channelToUpdate.id}) due to active members`);
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    } finally {
+                        mutex.unlock();
                     }
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    mutex.unlock();
                 }
             }
         }
 
-        if (vcCreateCounts) {
+        if (vcCreateCounts && vcCreateCounts.logID) {
             if (newState.channel?.id === vcCreateCounts.vcID) {
                 var vcChecknew = await vcCreateModel.findOne({
                     guildID: newState.guild.id,
@@ -115,40 +122,43 @@ module.exports = {
                     type: ChannelType.GuildVoice
                 });
 
-                try {
-                    await mutex.lock();
+                if (newChannel) {
+                    try {
+                        var logChan = client.channels.cache.get(vcCreateCounts.logID);
+                        await mutex.lock();
 
-                    await newState.setChannel(newChannel);
+                        await newState.setChannel(newChannel);
 
-                    await EmbedLog('Green', 'Channel Created', newState.id, logChan);
+                        await EmbedLog('Green', 'Channel Created', newState.id, logChan);
 
-                    if (vcChecknew) {
-                        await vcCreateModel.findOneAndRemove({
-                            guildID: newState.guild.id,
-                            userID: newState.id
-                        });
+                        if (vcChecknew) {
+                            await vcCreateModel.findOneAndRemove({
+                                guildID: newState.guild.id,
+                                userID: newState.id
+                            });
 
-                        var vcAdd = new vcCreateModel({
-                            guildID: newState.guild.id,
-                            vcID: newState.channel.id,
-                            userID: newState.id
-                        });
-                        await vcAdd.save();
-                    } else {
-                        var vcAdd = new vcCreateModel({
-                            guildID: newState.guild.id,
-                            vcID: newState.channel.id,
-                            userID: newState.id
-                        });
-                        await vcAdd.save();
+                            var vcAdd = new vcCreateModel({
+                                guildID: newState.guild.id,
+                                vcID: newState.channel.id,
+                                userID: newState.id
+                            });
+                            await vcAdd.save();
+                        } else {
+                            var vcAdd = new vcCreateModel({
+                                guildID: newState.guild.id,
+                                vcID: newState.channel.id,
+                                userID: newState.id
+                            });
+                            await vcAdd.save();
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        await newChannel.delete();
+                    } finally {
+                        mutex.unlock();
                     }
-                } catch (err) {
-                    console.error(err);
-                    await newChannel.delete();
-                } finally {
-                    mutex.unlock();
                 }
             }
         }
     }
-}
+};

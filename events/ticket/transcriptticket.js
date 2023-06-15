@@ -40,10 +40,16 @@ module.exports = {
                     console.log(err);
                 }
             });
+            var userId;
+            if (ticketDoc) {
+                userId = ticketDoc.userID;
+            } else {
+                userId = "null-ticketbug";
+            }
 
             const embed = new EmbedBuilder()
                 .setAuthor({ name: 'Ticket Transcript', iconURL: client.config.EMBED.IMAGE })
-                .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketDoc.userID}> and logged by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](http://${serverAdd}/transcript-${chan.id}.html)`)
+                .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${userId}> and logged by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](http://${serverAdd}/transcript-${chan.id}.html)`)
                 .setColor('#E67E22')
                 .setTimestamp();
 
