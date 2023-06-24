@@ -1,4 +1,5 @@
 {
+    "GOVTCOOL": "",
     "LOG": {
         "CHANID": ""
     },
@@ -8,7 +9,8 @@
         "ROLEID": "",
         "HO": "",
         "INTERVIEW": "",
-        "SUBMIT": ""
+        "SUBMIT": "",
+        "FTO": ""
     },
     "EMS": {
         "ACCCHAN": "",

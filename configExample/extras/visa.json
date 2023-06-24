@@ -25,6 +25,7 @@
         "ROLEID2": ""
     },
     "HOLD": {
+        "ROLEID": "",
         "HOLDCHAN": "",
         "RULECHAN": "",
         "LOGCHAN": ""
@@ -33,6 +34,7 @@
         "LOGCHAN": "",
         "TAGCHAN": "",
         "GUILDID": "",
-        "VERIFY": ""
+        "VERIFY": "",
+        "REPLY": ""
     }
 }

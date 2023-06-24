@@ -18,24 +18,18 @@
     },
 
     "EMBED": {
-        "IMAGE": "https://cdn.discordapp.com/attachments/1096858331110457485/1097144237176389682/dDrogT3Hn5RV4Pu88w6h1nO4oubjd5xghGR6LEnYUOxgD8UUkuPteIqqK7XzUlZr8xfsDdpxgHGKRCSLYijggSgvCSieyPvAoW3z0E4OzZhM86P8ByzqDcIqf784AAAAASUVORK5CYII.png",
+        "IMAGE": "https://cdn.discordapp.com/attachments/1096858331110457485/1099401752488452137/FInal-logo-word-mark.jpg",
         "FOOTTEXT": "Iconic Roleplay"
     },
 
     "ENABLE": {
-        "DATE": true, 
-        "NICKNAME": true,
-        "AUTOTICKET": true,
-        "VISADM": true,
-        "STREAM": false
+        "DATE": false, 
+        "NICKNAME": false,
+        "AUTOTICKET": false,
+        "VISADM": false,
+        "DARKCHAT": false
     },
 
-    "ROLE_CHECK": {
-        "ROLE1": "",
-        "ROLE2": "",
-        "GUILDID": ""
-    },
-    
     "DMREPLY": {
         "DM": "",
         "REPLY": ""
@@ -48,6 +42,16 @@
 
     "YT": {
         "CHANID": ""
-    }
+    },
 
+    "MSG": {
+        "LOG": {
+            "CHAN": ""
+        }
+    },
+
+    "DARKCHAT": {
+        "CHAN": "",
+        "LOG": ""
+    }
 }
