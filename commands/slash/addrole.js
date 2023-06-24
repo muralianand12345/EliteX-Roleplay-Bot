@@ -156,7 +156,12 @@ module.exports = {
                 if (!roleinter) {
                     return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
                 }
+                const rolecool = interaction.guild.roles.cache.get(client.jobs.GOVTCOOL);
+                if (!rolecool) {
+                    return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
+                }
                 if (userMember.roles.cache.has(role.id)) {
+                    await userMember.roles.add(rolecool);
                     await userMember.roles.remove(role);
                     await userMember.roles.remove(roleinter);
                     await RoleLog(JobName, option, userMember.id, interaction.user.id);
@@ -214,7 +219,12 @@ module.exports = {
                 if (!roleinter) {
                     return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
                 }
+                const rolecool = interaction.guild.roles.cache.get(client.jobs.GOVTCOOL);
+                if (!rolecool) {
+                    return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
+                }
                 if (userMember.roles.cache.has(role.id)) {
+                    await userMember.roles.add(rolecool);
                     await userMember.roles.remove(role);
                     await userMember.roles.remove(roleinter);
                     await RoleLog(JobName, option, userMember.id, interaction.user.id);
@@ -272,7 +282,12 @@ module.exports = {
                 if (!roleinter) {
                     return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
                 }
+                const rolecool = interaction.guild.roles.cache.get(client.jobs.GOVTCOOL);
+                if (!rolecool) {
+                    return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
+                }
                 if (userMember.roles.cache.has(role.id)) {
+                    await userMember.roles.add(rolecool);
                     await userMember.roles.remove(role);
                     await userMember.roles.remove(roleinter);
                     await RoleLog(JobName, option, userMember.id, interaction.user.id);

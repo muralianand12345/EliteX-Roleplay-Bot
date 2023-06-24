@@ -62,16 +62,17 @@ module.exports = {
         const options = interaction.options.getString("type");
         const appNo = await interaction.options.getNumber("application-id");
         const user = await interaction.options.getUser("user-name");
-        
-         const userMember = interaction.guild.members.cache.get(user.id);
+
+        const userMember = interaction.guild.members.cache.get(user.id);
+        if (!userMember) return await interaction.reply({ content: "User not found! (Maybe left the server)", ephemeral: true });
         if (userMember.roles.cache.has(client.visa.VISA.ROLEID1)) return await interaction.reply({ content: "The user already has VISA Holder Role!", ephemeral: true });
         if (!userMember.roles.cache.has(client.visa.VISA.ROLEID2)) return await interaction.reply({ content: "The user has no Community Role!", ephemeral: true });
-        
+
         if (user.id === client.user.id) return await interaction.reply({ content: "Men ... you cannot give me visa! 😂", ephemeral: true });
         if (user.bot) return await interaction.reply({ content: "Cannot mention other bots.", ephemeral: true });
 
         if (options === 'form-accepted') {
-            
+
             await interaction.deferReply({ ephemeral: true });
 
             const vpChan = client.channels.cache.get(client.visa.ACCEPTED.VPCHAN);
@@ -210,7 +211,7 @@ module.exports = {
                 await Roles(user, 'remove', client.visa.ACCEPTED.ROLEID);
                 await Roles(user, 'remove', client.visa.VISA.ROLEID2);
                 await Roles(user, 'remove', client.visa.HOLD.ROLEID);
-                
+
                 const DMembed = new EmbedBuilder()
                     .setColor('#0000FF')
                     .setThumbnail(client.visa.LOGO)
@@ -307,7 +308,7 @@ module.exports = {
                         console.error(error);
                     }
                 });
-                
+
                 await interaction.editReply({ content: "Sent!", ephemeral: true });
 
                 const logembed = new EmbedBuilder()

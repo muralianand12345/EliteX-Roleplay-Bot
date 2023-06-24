@@ -42,6 +42,8 @@ const handle = new Errorhandler(client, {
     stats: true,
 });
 
+client.setMaxListeners(20);
+
 const config = require('./config/main/config.json');
 const Discord = require('discord.js');
 const std_log = require('./logs/std_log.js');
@@ -60,7 +62,6 @@ for (const file of extrasFiles) {
     client[property] = require(path.join(extrasDir, file));
 }
 
-client.setMaxListeners(20);
 //Handler File Read
 fs.readdirSync('./handlers').filter((dir) => {
     let files = fs.readdirSync(`./handlers/${dir}`).filter((file) => file.endsWith(".js"));
