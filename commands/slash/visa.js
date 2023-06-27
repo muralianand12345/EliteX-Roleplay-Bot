@@ -1,13 +1,11 @@
 const {
     SlashCommandBuilder,
     EmbedBuilder,
-    ChannelType,
     ButtonBuilder,
     ActionRowBuilder,
     ButtonStyle,
     PermissionFlagsBits
 } = require('discord.js');
-const wait = require('util').promisify(setTimeout);
 
 module.exports = {
     cooldown: 10000,
@@ -50,36 +48,30 @@ module.exports = {
         async function Roles(user, role, roleId) {
             const info = await interaction.guild.members.fetch(user.id);
             const roleInfo = await interaction.guild.roles.cache.find(x => x.id === roleId);
-
             if (role === 'add') {
                 await info.roles.add(roleInfo);
             } else if (role === 'remove') {
                 await info.roles.remove(roleInfo);
             }
-
         }
 
         const options = interaction.options.getString("type");
         const appNo = await interaction.options.getNumber("application-id");
         const user = await interaction.options.getUser("user-name");
-
         const userMember = interaction.guild.members.cache.get(user.id);
+
         if (!userMember) return await interaction.reply({ content: "User not found! (Maybe left the server)", ephemeral: true });
         if (userMember.roles.cache.has(client.visa.VISA.ROLEID1)) return await interaction.reply({ content: "The user already has VISA Holder Role!", ephemeral: true });
         if (!userMember.roles.cache.has(client.visa.VISA.ROLEID2)) return await interaction.reply({ content: "The user has no Community Role!", ephemeral: true });
-
         if (user.id === client.user.id) return await interaction.reply({ content: "Men ... you cannot give me visa! 😂", ephemeral: true });
         if (user.bot) return await interaction.reply({ content: "Cannot mention other bots.", ephemeral: true });
 
         if (options === 'form-accepted') {
 
-            await interaction.deferReply({ ephemeral: true });
-
             const vpChan = client.channels.cache.get(client.visa.ACCEPTED.VPCHAN);
             await vpChan.send({
                 content: `**Application No: ${appNo.toString()}** | Congratulations, <@${user.id}>! Your server whitelist form has been accepted, and we are pleased to welcome you to ICONIC Roleplay. To continue with your registration, please contact our Immigration Officers to attend the mandatory voice process, which takes place daily.`
             }).then(async (msg) => {
-
                 await Roles(user, 'add', client.visa.ACCEPTED.ROLEID);
                 var msgLink = msg.url;
 
@@ -88,7 +80,6 @@ module.exports = {
                     .setThumbnail(client.visa.LOGO)
                     .setTitle(`Iconic Voice Process`)
                     .setDescription(`<@${user.id}>, your **Voice Process Application** has been accepted 😊! Kindly join the <#${client.visa.ACCEPTED.WAITING_HALL}>`)
-
                 const DMbutton = new ActionRowBuilder()
                     .addComponents(
                         new ButtonBuilder()
@@ -97,25 +88,15 @@ module.exports = {
                             .setStyle(ButtonStyle.Link)
                             .setURL(msgLink)
                     )
-
-                client.users.cache.get(user.id).send({
-                    embeds: [DMembed],
-                    components: [DMbutton]
-                }).catch(error => {
+                client.users.cache.get(user.id).send({ embeds: [DMembed], components: [DMbutton] }).catch(error => {
                     if (error.code == 50007) {
                         const logembed = new EmbedBuilder()
                             .setColor('#000000')
                             .setDescription(`Unable to DM <@${user.id}> (VP Form Accept)`)
-
-                        return client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({
-                            embeds: [logembed]
-                        });
-                    } else {
-                        console.error(error);
-                    }
+                        return client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
+                    } else { console.error(error); }
                 });
-
-                await interaction.editReply({ content: "Sent!", ephemeral: true });
+                await interaction.reply({ content: "Sent!", ephemeral: true });
 
                 const logembed = new EmbedBuilder()
                     .setColor('#00FF00')
@@ -124,22 +105,15 @@ module.exports = {
                         { name: 'User', value: `<@${interaction.user.id}>` },
                         { name: 'Client', value: `<@${user.id}>` }
                     )
-                return client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({
-                    embeds: [logembed]
-                });
+                return client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
             });
 
         } else if (options === 'form-denied') {
 
-            await interaction.deferReply({ ephemeral: true });
             const reason = interaction.options.getString("rejected-reason") || null;
-
-            if (!reason) {
-                return await interaction.editReply({ content: 'Visa Denied Reason Missing!', ephemeral: true });
-            }
-
+            if (!reason) return await interaction.reply({ content: 'Visa Denied Reason Missing!', ephemeral: true });
+            
             const vpChan = client.channels.cache.get(client.visa.REJECTED.REJCHAN);
-
             await vpChan.send({
                 content: `**Application No: ${appNo.toString()}** | <@${user.id}> Your Server Whitelist form has been **Rejected**.\n\`\`\`${reason}\`\`\``
             }).then(async (msg) => {
@@ -153,7 +127,6 @@ module.exports = {
                     .setThumbnail(client.visa.LOGO)
                     .setTitle(`Iconic Voice Process`)
                     .setDescription(`<@${user.id}>, your **Voice Process Application** has been rejected 😓! Kindly reapply after 48 hours <#${client.visa.REJECTED.APPLYCHAN}>\nServer Rules: <#${client.visa.REJECTED.RULECHAN}>`)
-
                 const DMbutton = new ActionRowBuilder()
                     .addComponents(
                         new ButtonBuilder()
@@ -163,25 +136,16 @@ module.exports = {
                             .setURL(msgLink)
                     )
 
-                client.users.cache.get(user.id).send({
-                    embeds: [DMembed],
-                    components: [DMbutton]
-                }).catch(error => {
+                client.users.cache.get(user.id).send({ embeds: [DMembed], components: [DMbutton] }).catch(error => {
                     if (error.code == 50007) {
                         const logembed = new EmbedBuilder()
                             .setColor('#000000')
                             .setDescription(`Unable to DM <@${user.id}> (VP Form Rejected)`)
-
-                        return client.channels.cache.get(client.visa.REJECTED.LOGCHAN).send({
-                            embeds: [logembed]
-                        });
-                    } else {
-                        console.error(error);
-                    }
+                        return client.channels.cache.get(client.visa.REJECTED.LOGCHAN).send({ embeds: [logembed] });
+                    } else { console.error(error); }
                 });
             });
-
-            await interaction.editReply({ content: "Sent!", ephemeral: true });
+            await interaction.reply({ content: "Sent!", ephemeral: true });
 
             const logembed = new EmbedBuilder()
                 .setColor('#00FF00')
@@ -190,23 +154,15 @@ module.exports = {
                     { name: 'User', value: `<@${interaction.user.id}>` },
                     { name: 'Client', value: `<@${user.id}>` }
                 )
-            return client.channels.cache.get(client.visa.REJECTED.LOGCHAN).send({
-                embeds: [logembed]
-            });
+            return client.channels.cache.get(client.visa.REJECTED.LOGCHAN).send({ embeds: [logembed] });
 
         } else if (options === 'visa-accepted') {
 
-            await interaction.deferReply({ ephemeral: true });
-
             const vpChan = client.channels.cache.get(client.visa.VISA.VISACHAN);
-
             await vpChan.send({
                 content: `**Application No: ${appNo.toString()}** | <@${user.id}> **Congratulations on your acceptance to Iconic Roleplay! We're thrilled to have you as part of our community and can't wait to see what kind of exciting roleplaying experiences you'll bring to the table. Welcome aboard!**\n\n**If you have any questions or concerns, don't hesitate to tag our moderators or admins. We are here to ensure your experience is as enjoyable as possible.**\nPlease do visit ⁠<#1097103352640307210> and verify your age 😇\n\n**----------------------------------------------**`
-
             }).then(async (msg) => {
-
                 var msgLink = msg.url;
-
                 await Roles(user, 'add', client.visa.VISA.ROLEID1);
                 await Roles(user, 'remove', client.visa.ACCEPTED.ROLEID);
                 await Roles(user, 'remove', client.visa.VISA.ROLEID2);
@@ -217,40 +173,29 @@ module.exports = {
                     .setThumbnail(client.visa.LOGO)
                     .setTitle(`Iconic Voice Process`)
                     .setDescription(`<@${user.id}>, Congratulations 🎊! Your **Visa has been approved**, Thanks for attending the Voice Process.\nFor further queries regarding login and connectivity, contact staffs in <#${client.visa.VISA.HELPCHAN}>`)
-
                 const DMbutton = new ActionRowBuilder()
                     .addComponents(
-                        /*new ButtonBuilder()
-                            .setLabel(`Connect Iconic Roleplay`)
+                        new ButtonBuilder()
+                            .setLabel(`FiveM Iconic Roleplay`)
                             .setEmoji('🔗')
                             .setStyle(ButtonStyle.Link)
                             .setURL(client.visa.CONNECT)
-                            .setDisabled(true),*/
+                            .setDisabled(true),
                         new ButtonBuilder()
                             .setLabel(`Message`)
                             .setEmoji('📑')
                             .setStyle(ButtonStyle.Link)
                             .setURL(msgLink)
                     )
-
-                client.users.cache.get(user.id).send({
-                    embeds: [DMembed],
-                    components: [DMbutton]
-                }).catch(error => {
+                client.users.cache.get(user.id).send({ embeds: [DMembed], components: [DMbutton] }).catch(error => {
                     if (error.code == 50007) {
                         const logembed = new EmbedBuilder()
                             .setColor('#000000')
                             .setDescription(`Unable to DM <@${user.id}> (Visa Approved)`)
-
-                        return client.channels.cache.get(client.visa.VISA.LOGCHAN).send({
-                            embeds: [logembed]
-                        });
-                    } else {
-                        console.error(error);
-                    }
+                        return client.channels.cache.get(client.visa.VISA.LOGCHAN).send({ embeds: [logembed] });
+                    } else { console.error(error); }
                 });
-
-                await interaction.editReply({ content: "Sent!", ephemeral: true });
+                await interaction.reply({ content: "Sent!", ephemeral: true });
 
                 const logembed = new EmbedBuilder()
                     .setColor('#00FF00')
@@ -259,21 +204,15 @@ module.exports = {
                         { name: 'User', value: `<@${interaction.user.id}>` },
                         { name: 'Client', value: `<@${user.id}>` }
                     )
-                return client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({
-                    embeds: [logembed]
-                });
+                return client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
             });
 
         } else if (options === 'visa-onhold') {
 
-            await interaction.deferReply({ ephemeral: true });
-
             const vpChan = client.channels.cache.get(client.visa.HOLD.HOLDCHAN);
-
             await vpChan.send({
                 content: `**Application No: ${appNo.toString()}** | Dear <@${user.id}>, Thank you for participating in the voice process, we appreciate your time and effort! We kindly ask you to take a moment to review the rules, as we want to ensure that you have a great Role Play experience. Once you've done that, please feel free to attend the voice process again - we're excited to hear your improved answers and help you get started on your Role Play journey.`
             }).then(async (msg) => {
-
                 var msgLink = msg.url;
                 await Roles(user, 'add', client.visa.HOLD.ROLEID);
 
@@ -282,7 +221,6 @@ module.exports = {
                     .setThumbnail(client.visa.LOGO)
                     .setTitle(`Iconic Voice Process`)
                     .setDescription(`<@${user.id}>, Your visa application is **on Hold** 😔. Kindly read the rules <#${client.visa.HOLD.RULECHAN}> and attend the next voice process.`)
-
                 const DMbutton = new ActionRowBuilder()
                     .addComponents(
                         new ButtonBuilder()
@@ -291,25 +229,16 @@ module.exports = {
                             .setStyle(ButtonStyle.Link)
                             .setURL(msgLink)
                     )
-
-                client.users.cache.get(user.id).send({
-                    embeds: [DMembed],
-                    components: [DMbutton]
-                }).catch(error => {
+                client.users.cache.get(user.id).send({ embeds: [DMembed], components: [DMbutton] }).catch(error => {
                     if (error.code == 50007) {
                         const logembed = new EmbedBuilder()
                             .setColor('#000000')
                             .setDescription(`Unable to DM <@${user.id}> (VP On Hold)`)
 
-                        return client.channels.cache.get(client.visa.HOLD.LOGCHAN).send({
-                            embeds: [logembed]
-                        });
-                    } else {
-                        console.error(error);
-                    }
+                        return client.channels.cache.get(client.visa.HOLD.LOGCHAN).send({ embeds: [logembed] });
+                    } else { console.error(error); }
                 });
-
-                await interaction.editReply({ content: "Sent!", ephemeral: true });
+                await interaction.reply({ content: "Sent!", ephemeral: true });
 
                 const logembed = new EmbedBuilder()
                     .setColor('#00FF00')
@@ -318,9 +247,7 @@ module.exports = {
                         { name: 'User', value: `<@${interaction.user.id}>` },
                         { name: 'Client', value: `<@${user.id}>` }
                     )
-                return client.channels.cache.get(client.visa.HOLD.LOGCHAN).send({
-                    embeds: [logembed]
-                });
+                return client.channels.cache.get(client.visa.HOLD.LOGCHAN).send({ embeds: [logembed] });
             });
 
         } else {

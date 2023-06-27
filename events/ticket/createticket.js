@@ -436,7 +436,6 @@ module.exports = {
                                 ticketDoc.ticketStatus = true;
                                 await ticketDoc.save();
                             }).catch(async (error) => {
-                                console.error('Error deleting the message:', error);
                                 if (msg.channel.deletable) {
                                     await msg.channel.delete()
                                         .then(() => {
@@ -452,6 +451,7 @@ module.exports = {
                                 } else {
                                     console.log('The channel is not deletable.');
                                 }
+                                console.error('Error deleting the message:', error);
                             });
                         }
                     }

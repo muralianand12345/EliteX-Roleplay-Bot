@@ -23,23 +23,25 @@ module.exports = {
                 if (!channel) return console.log(`Channel not found with ID ${channelId}`);
                 const thread = channel.threads.cache.find(x => x.id === modMailData.threadID);
 
-                await thread.send({ content: `**${message.author.username}**: ${message.content}` }).then(() => {
-                    message.react('✅');
-                }).catch((err) => {
-                    message.react('❌');
-                    console.error(err);
-                });
-
-                if (message.attachments) {
-                    await message.attachments.forEach(async (value, key) => {
-                        var media = value['url'];
-                        await thread.send({ content: `${media}` }).then(() => {
-                            message.react('✅');
-                        }).catch((err) => {
-                            message.react('❌');
-                            console.error(err);
-                        });
+                if (thread) {
+                    await thread.send({ content: `**${message.author.username}**: ${message.content}` }).then(() => {
+                        message.react('✅');
+                    }).catch((err) => {
+                        message.react('❌');
+                        console.error(err);
                     });
+
+                    if (message.attachments) {
+                        await message.attachments.forEach(async (value, key) => {
+                            var media = value['url'];
+                            await thread.send({ content: `${media}` }).then(() => {
+                                message.react('✅');
+                            }).catch((err) => {
+                                message.react('❌');
+                                console.error(err);
+                            });
+                        });
+                    }
                 }
             }
         }
