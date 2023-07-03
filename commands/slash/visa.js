@@ -56,15 +56,15 @@ module.exports = {
         }
 
         const options = interaction.options.getString("type");
-        const appNo = await interaction.options.getNumber("application-id");
-        const user = await interaction.options.getUser("user-name");
-        const userMember = interaction.guild.members.cache.get(user.id);
+        const appNo = interaction.options.getNumber("application-id");
+        const user = interaction.options.getUser("user-name");
+        const userMember = await interaction.guild.members.cache.get(user.id);
 
-        if (!userMember) return await interaction.reply({ content: "User not found! (Maybe left the server)", ephemeral: true });
-        if (userMember.roles.cache.has(client.visa.VISA.ROLEID1)) return await interaction.reply({ content: "The user already has VISA Holder Role!", ephemeral: true });
-        if (!userMember.roles.cache.has(client.visa.VISA.ROLEID2)) return await interaction.reply({ content: "The user has no Community Role!", ephemeral: true });
-        if (user.id === client.user.id) return await interaction.reply({ content: "Men ... you cannot give me visa! 😂", ephemeral: true });
-        if (user.bot) return await interaction.reply({ content: "Cannot mention other bots.", ephemeral: true });
+        if (!userMember) return interaction.reply({ content: "User not found! (Maybe left the server)", ephemeral: true });
+        if (userMember.roles.cache.has(client.visa.VISA.ROLEID1)) return interaction.reply({ content: "The user already has VISA Holder Role!", ephemeral: true });
+        if (!userMember.roles.cache.has(client.visa.VISA.ROLEID2)) return interaction.reply({ content: "The user has no Community Role!", ephemeral: true });
+        if (user.id === client.user.id) return interaction.reply({ content: "Men ... you cannot give me visa! 😂", ephemeral: true });
+        if (user.bot) return interaction.reply({ content: "Cannot mention other bots.", ephemeral: true });
 
         if (options === 'form-accepted') {
 
@@ -93,10 +93,9 @@ module.exports = {
                         const logembed = new EmbedBuilder()
                             .setColor('#000000')
                             .setDescription(`Unable to DM <@${user.id}> (VP Form Accept)`)
-                        return client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
+                        client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
                     } else { console.error(error); }
                 });
-                await interaction.reply({ content: "Sent!", ephemeral: true });
 
                 const logembed = new EmbedBuilder()
                     .setColor('#00FF00')
@@ -105,13 +104,14 @@ module.exports = {
                         { name: 'User', value: `<@${interaction.user.id}>` },
                         { name: 'Client', value: `<@${user.id}>` }
                     )
-                return client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
+                client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
+                return interaction.reply({ content: "Sent!", ephemeral: true });
             });
 
         } else if (options === 'form-denied') {
 
             const reason = interaction.options.getString("rejected-reason") || null;
-            if (!reason) return await interaction.reply({ content: 'Visa Denied Reason Missing!', ephemeral: true });
+            if (!reason) return interaction.reply({ content: 'Visa Denied Reason Missing!', ephemeral: true });
             
             const vpChan = client.channels.cache.get(client.visa.REJECTED.REJCHAN);
             await vpChan.send({
@@ -141,11 +141,10 @@ module.exports = {
                         const logembed = new EmbedBuilder()
                             .setColor('#000000')
                             .setDescription(`Unable to DM <@${user.id}> (VP Form Rejected)`)
-                        return client.channels.cache.get(client.visa.REJECTED.LOGCHAN).send({ embeds: [logembed] });
+                        client.channels.cache.get(client.visa.REJECTED.LOGCHAN).send({ embeds: [logembed] });
                     } else { console.error(error); }
                 });
             });
-            await interaction.reply({ content: "Sent!", ephemeral: true });
 
             const logembed = new EmbedBuilder()
                 .setColor('#00FF00')
@@ -154,7 +153,8 @@ module.exports = {
                     { name: 'User', value: `<@${interaction.user.id}>` },
                     { name: 'Client', value: `<@${user.id}>` }
                 )
-            return client.channels.cache.get(client.visa.REJECTED.LOGCHAN).send({ embeds: [logembed] });
+            client.channels.cache.get(client.visa.REJECTED.LOGCHAN).send({ embeds: [logembed] });
+            return interaction.reply({ content: "Sent!", ephemeral: true });
 
         } else if (options === 'visa-accepted') {
 
@@ -187,16 +187,16 @@ module.exports = {
                             .setStyle(ButtonStyle.Link)
                             .setURL(msgLink)
                     )
+                
                 client.users.cache.get(user.id).send({ embeds: [DMembed], components: [DMbutton] }).catch(error => {
                     if (error.code == 50007) {
                         const logembed = new EmbedBuilder()
                             .setColor('#000000')
                             .setDescription(`Unable to DM <@${user.id}> (Visa Approved)`)
-                        return client.channels.cache.get(client.visa.VISA.LOGCHAN).send({ embeds: [logembed] });
+                        client.channels.cache.get(client.visa.VISA.LOGCHAN).send({ embeds: [logembed] });
                     } else { console.error(error); }
                 });
-                await interaction.reply({ content: "Sent!", ephemeral: true });
-
+                
                 const logembed = new EmbedBuilder()
                     .setColor('#00FF00')
                     .setDescription('VISA-ACCEPTED')
@@ -204,8 +204,9 @@ module.exports = {
                         { name: 'User', value: `<@${interaction.user.id}>` },
                         { name: 'Client', value: `<@${user.id}>` }
                     )
-                return client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
+                client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
             });
+            return interaction.reply({ content: "Sent!", ephemeral: true });
 
         } else if (options === 'visa-onhold') {
 
@@ -235,10 +236,9 @@ module.exports = {
                             .setColor('#000000')
                             .setDescription(`Unable to DM <@${user.id}> (VP On Hold)`)
 
-                        return client.channels.cache.get(client.visa.HOLD.LOGCHAN).send({ embeds: [logembed] });
+                        client.channels.cache.get(client.visa.HOLD.LOGCHAN).send({ embeds: [logembed] });
                     } else { console.error(error); }
                 });
-                await interaction.reply({ content: "Sent!", ephemeral: true });
 
                 const logembed = new EmbedBuilder()
                     .setColor('#00FF00')
@@ -247,11 +247,12 @@ module.exports = {
                         { name: 'User', value: `<@${interaction.user.id}>` },
                         { name: 'Client', value: `<@${user.id}>` }
                     )
-                return client.channels.cache.get(client.visa.HOLD.LOGCHAN).send({ embeds: [logembed] });
+                client.channels.cache.get(client.visa.HOLD.LOGCHAN).send({ embeds: [logembed] });
+                return interaction.reply({ content: "Sent!", ephemeral: true });
             });
 
         } else {
-            return await interaction.reply({ content: '**Internal Error** | Contact Developer', ephemeral: true });
+            return interaction.reply({ content: '**Internal Error** | Contact Developer', ephemeral: true });
         }
     }
 }

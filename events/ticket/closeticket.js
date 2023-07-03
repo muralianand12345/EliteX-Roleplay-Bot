@@ -73,10 +73,21 @@ module.exports = {
                 collector.on('collect', async (i) => {
                     if (i.customId == 'confirm-close') {
 
-                        await i.update({
-                            content: `Ticket closed by <@!${i.user.id}>`,
-                            components: []
-                        });
+                        await i.deferUpdate();
+
+                        try {
+                            await i.editReply({
+                                content: `Ticket closed by <@!${i.user.id}>`,
+                                components: []
+                            });
+                        } catch (error) {
+                            if (error.code == 10062) {
+                                const followUpContent = 'An error occurred while closing the ticket. Please try again.';
+                                await interaction.followUp({ content: followUpContent });
+                            } else {
+                                console.error(`An error occurred while editing the reply: ${error}`);
+                            }
+                        }
 
                         chan.edit({
                             name: `ticket-closed`,
