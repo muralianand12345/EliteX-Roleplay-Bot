@@ -1,27 +1,23 @@
-const {
-    EmbedBuilder
-} = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 
 module.exports = {
     name: 'rmrole',
-    description: "Removes Specific role from all users",
+    description: "Removes specific role from all users",
     cooldown: 1000,
     userPerms: ['Administrator'],
     botPerms: ['Administrator'],
     run: async (client, message, args) => {
-
         const commandName = `MESS_RMROLE`;
         client.std_log.error(client, commandName, message.author.id, message.channel.id);
 
         var roleID = args.join(" ");
         await message.delete();
 
-        //blacklist role
-
+        // Blacklist role
         function blacklistembed() {
             const ReplyEmbed = new EmbedBuilder()
                 .setColor("#ED4245")
-                .setDescription('Black Listed Role');
+                .setDescription('Blacklisted Role');
 
             return message.channel.send({
                 embeds: [ReplyEmbed],
@@ -33,19 +29,19 @@ module.exports = {
             });
         }
 
-        if (roleID.includes('1017410239869505558')) {
-            return blacklistembed();
-        } else if (roleID.includes('784794493580476438')) {
-            return blacklistembed();
-        } else if (roleID.includes('1017410017957249044')) {
+        const roleIDs = [
+            '1096863473792716961',
+            '1096856106749394994',
+            '1099268792086970378'
+        ];
+
+        if (roleIDs.includes(roleID)) {
             return blacklistembed();
         }
 
-        await message.guild.members.fetch();
-        let roleInfo = await message.guild.roles.cache.find(x => x.id === roleID);
+        const roleInfo = message.guild.roles.cache.get(roleID);
 
-        if (roleInfo == undefined) {
-
+        if (!roleInfo) {
             const ReplyEmbed = new EmbedBuilder()
                 .setColor("#ED4245")
                 .setDescription('Role does not exist!');
@@ -60,16 +56,17 @@ module.exports = {
             });
         }
 
-        //var List;
-        await message.guild.members.cache.forEach(async (member) => {
-            await member.roles.remove(roleID);
-            //List += `<@${member.id}>`;
-        });
-        
-        /*const embed = new EmbedBuilder()
-            .setColor('#ED4245')
-            .setDescription(`**Common Roles:** ${List.substring(9)}`);
+        const members = message.guild.members.cache;
+        const batchSize = 10;
+        let delay = 1000;
 
-        return message.channel.send({ embeds: [embed] });*/
+        const memberArray = Array.from(members.values());
+        for (let i = 0; i < memberArray.length; i += batchSize) {
+            const batch = memberArray.slice(i, i + batchSize);
+            await Promise.all(batch.map(async (member) => {
+                await member.roles.remove(roleID).catch(console.error);
+            }));
+            await new Promise((resolve) => setTimeout(resolve, delay));
+        }
     }
 };

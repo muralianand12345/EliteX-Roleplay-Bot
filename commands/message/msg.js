@@ -2,10 +2,9 @@ module.exports = {
     name: 'msg',
     description: "Sends user DM reply",
     cooldown: 1000,
-    userPerms: ['ModerateMembers'],
+    userPerms: ['ManageEvents'],
     botPerms: ['Administrator'],
     run: async (client, message, args) => {
-
         const commandName = `MESS_MESSAGE`;
         client.std_log.error(client, commandName, message.author.id, message.channel.id);
 
@@ -15,8 +14,6 @@ module.exports = {
         if (!chan) {
             chan = message.channel;
             msg = args.join(" ");
-            console.log(msg)
-            console.log(chan)
             //return message.reply({ content: 'Channel name is not specified or tagged!'});
         } else {
             msg = args.slice(1).join(" ");

@@ -1,13 +1,14 @@
 var colors = require('colors/safe');
 const fs = require('fs');
 const { 
+    Events,
     REST, 
     Routes 
 } = require('discord.js');
 require("dotenv").config();
 
 module.exports = {
-    name: 'ready',
+    name: Events.ClientReady,
     execute(client) {
         const clientID = process.env.CLIENT_ID;
         const Token = process.env.TOKEN;

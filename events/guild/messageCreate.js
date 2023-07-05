@@ -1,4 +1,5 @@
 const {
+    Events,
     EmbedBuilder,
     Collection,
     PermissionsBitField
@@ -7,7 +8,7 @@ const cooldown = new Collection();
 const ms = require('ms');
 
 module.exports = {
-    name: 'messageCreate',
+    name: Events.MessageCreate,
     execute: async (message, client) => {
         const botReply = [
             "Hello! How can I help you?",

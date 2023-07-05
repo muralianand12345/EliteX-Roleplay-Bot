@@ -1,9 +1,12 @@
 var express = require('express');
 var app = express(); 
 require("dotenv").config();
+const {
+    Events
+} = require('discord.js');
 
 module.exports = {
-    name: 'ready',
+    name: Events.ClientReady,
     async execute(client) {
         const Port = process.env.PORT;
 

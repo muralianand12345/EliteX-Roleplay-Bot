@@ -1,14 +1,15 @@
 const fs = require('fs');
 
 const {
-    Collection
+    Collection,
+    Events
 } = require('discord.js');
 
 const messageCommands = new Collection();
 const slashCommands = new Collection();
 
 module.exports = {
-    name: 'ready',
+    name: Events.ClientReady,
     execute(client) {
 
         const messageCommandFiles = fs.readdirSync('./commands/message').filter(file => file.endsWith('.js'));

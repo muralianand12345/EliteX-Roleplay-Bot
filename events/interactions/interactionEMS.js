@@ -16,6 +16,8 @@ const {
     ButtonStyle
 } = require("discord.js");
 
+const roleModel = require('../../events/models/roleremove.js');
+
 const cooldown = new Collection();
 
 module.exports = {
@@ -156,6 +158,14 @@ module.exports = {
             if (userMember.roles.cache.has(role.id)) {
                 interaction.reply({ content: 'The user already has the role', ephemeral: true });
             } else {
+                const expirationDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                const newRoleData = new roleModel({
+                    userId: userMember.id,
+                    roleId: role.id,
+                    expirationDate: expirationDate,
+                    guildId: interaction.guild.id
+                });
+                await newRoleData.save();
                 await userMember.roles.add(role);
                 await RoleLog(JobName, 'Accepted', userMember.id, interaction.user.id);
                 var MsgContent = `<@${userId}>, **Congratulations on being selected for an EMS interview! We are excited to learn more about you and discuss your potential role in our EMS team. Please contact us to schedule the interview at your earliest convenience.**`;

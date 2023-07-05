@@ -3,6 +3,8 @@ const {
     EmbedBuilder
 } = require('discord.js');
 
+const roleModel = require('../../events/models/roleremove.js');
+
 module.exports = {
     cooldown: 2000,
 
@@ -86,6 +88,14 @@ module.exports = {
                 if (userMember.roles.cache.has(role.id)) {
                     return interaction.reply({ content: 'The user already has the role', ephemeral: true });
                 } else {
+                    const expirationDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                    const newRoleData = new roleModel({
+                        userId: userMember.id,
+                        roleId: role.id,
+                        expirationDate: expirationDate,
+                        guildId: interaction.guild.id
+                    });
+                    await newRoleData.save();
                     await userMember.roles.add(role);
                     await RoleLog(JobName, option, userMember.id, interaction.user.id);
                     await chan.send({ content: `${userContentAcc}` });
@@ -102,7 +112,7 @@ module.exports = {
             }
 
 
-        } else if (interaction.member.roles.cache.has(client.jobs.EMS.HO)) {
+        } /*else if (interaction.member.roles.cache.has(client.jobs.EMS.HO)) {
 
             const option = await interaction.options.getString("option");
             const JobName = client.jobs.EMS.NAME;
@@ -132,7 +142,7 @@ module.exports = {
                 await chan.send({ content: `<@${userMember.id}>, **Unfortunately your form for the EMS application has been rejected as the form was not filled properly.**` });
                 return interaction.reply({ content: `Interview Rejected! <@${userMember.id}>`, ephemeral: true });
             }
-        } else {
+        }*/ else {
             return interaction.reply({ content: 'You Are Not Authorized!', ephemeral: true });
         }
     }

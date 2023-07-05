@@ -53,5 +53,9 @@
     "DARKCHAT": {
         "CHAN": "",
         "LOG": ""
+    },
+
+    "CFX": {
+        "CHAN" : ""
     }
 }

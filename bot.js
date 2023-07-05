@@ -20,12 +20,13 @@ const client = new Client({
         GatewayIntentBits.DirectMessageTyping,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildVoiceStates
     ],
     partials: [
         Partials.Channel,
         Partials.Message,
-        Partials.Reaction
+        Partials.Reaction,
+        Partials.User
     ],
     shards: 'auto',
     fetchAllMembers: true
