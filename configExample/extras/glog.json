@@ -1,0 +1,11 @@
+{
+    "GUILDID": "",
+    "MEMBER": {
+        "ROLE": "",
+        "NICK": ""
+    },
+    "MESSAGE": {
+        "UPDATE": "",
+        "DELETE": ""
+    }
+}

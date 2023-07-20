@@ -23,10 +23,11 @@ module.exports = {
             { name: `#tamilcommunityrp`, type: ActivityType.Competing },
             { name: `${fs.readdirSync(ticketLogDir).length} Tickets!`, type: ActivityType.Watching }
         ];
-
+        client.user.setStatus('invisible');
         let i = 0;
         setInterval(() => {
             if (i >= activities.length) i = 0;
+            //client.user.setPresence({ activities: [{ name: activities[i] }], status: 'invisible' });
             client.user.setActivity(activities[i]);
             i++;
         }, 5000);

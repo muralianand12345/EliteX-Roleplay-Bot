@@ -154,7 +154,6 @@ module.exports = {
                 return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
             }
 
-
             if (userMember.roles.cache.has(role.id)) {
                 interaction.reply({ content: 'The user already has the role', ephemeral: true });
             } else {

@@ -21,6 +21,8 @@ module.exports = {
         try {
             if (interaction.customId == "close-ticket") {
 
+                await interaction.deferReply();
+
                 const IdData = await ticketData.findOne({
                     ticketGuildID: interaction.guild.id
                 }).catch(err => console.log(err));
@@ -60,7 +62,7 @@ module.exports = {
                             .setStyle(ButtonStyle.Secondary),
                     );
 
-                const verif = await interaction.reply({
+                const verif = await interaction.editReply({
                     content: 'Are you sure you want to close the ticket?',
                     components: [row]
                 });
@@ -73,77 +75,85 @@ module.exports = {
                 collector.on('collect', async (i) => {
                     if (i.customId == 'confirm-close') {
 
-                        await i.deferUpdate();
+                        if (!i) {
+                            await interaction.editReply({ content: `Error Occured! Try again...`, components: [] });
+                            return collector.stop();
+                            
+                        } else {
 
-                        try {
-                            await i.editReply({
-                                content: `Ticket closed by <@!${i.user.id}>`,
-                                components: []
-                            });
-                        } catch (error) {
-                            if (error.code == 10062) {
-                                const followUpContent = 'An error occurred while closing the ticket. Please try again.';
-                                await interaction.followUp({ content: followUpContent });
-                            } else {
-                                console.error(`An error occurred while editing the reply: ${error}`);
+                            await i.deferUpdate();
+
+                            try {
+                                await i.editReply({
+                                    content: `Ticket closed by <@!${i.user.id}>`,
+                                    components: []
+                                });
+                            } catch (error) {
+                                if (error.code == 10062) {
+                                    const followUpContent = 'An error occurred while closing the ticket. Please try again.';
+                                    console.log(`Error 86 | ${followUpContent}`);
+                                    await interaction.followUp({ content: followUpContent });
+                                } else {
+                                    console.error(`An error occurred while editing the reply: ${error}`);
+                                }
                             }
-                        }
 
-                        chan.edit({
-                            name: `ticket-closed`,
-                            parent: closeTicket,
-                            permissionOverwrites: [
-                                {
-                                    id: ticketDoc.userID,
-                                    deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-                                },
-                                {
-                                    id: IdData.ticketSupportID,
-                                    allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-                                },
-                                {
-                                    id: interaction.guild.roles.everyone,
-                                    deny: [PermissionFlagsBits.ViewChannel],
-                                },
-                            ],
-                        }).then(async () => {
-                            const embed = new EmbedBuilder()
-                                .setColor('#206694')
-                                .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
-                                .setDescription('```Ticket Supporters, Delete After Verifying```')
-                                .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
-                                .setTimestamp();
+                            chan.edit({
+                                name: `ticket-closed`,
+                                parent: closeTicket,
+                                permissionOverwrites: [
+                                    {
+                                        id: ticketDoc.userID,
+                                        deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                                    },
+                                    {
+                                        id: IdData.ticketSupportID,
+                                        allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                                    },
+                                    {
+                                        id: interaction.guild.roles.everyone,
+                                        deny: [PermissionFlagsBits.ViewChannel],
+                                    },
+                                ],
+                            }).then(async () => {
+                                const embed = new EmbedBuilder()
+                                    .setColor('#206694')
+                                    .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
+                                    .setDescription('```Ticket Supporters, Delete After Verifying```')
+                                    .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
+                                    .setTimestamp();
 
-                            const row = new ActionRowBuilder()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setCustomId('delete-ticket')
-                                        .setLabel('Delete ticket')
-                                        .setEmoji('🗑️')
-                                        .setStyle(ButtonStyle.Danger),
-                                    new ButtonBuilder()
-                                        .setCustomId('delete-ticket-reason')
-                                        .setLabel('Delete with Reason')
-                                        .setEmoji('📄')
-                                        .setStyle(ButtonStyle.Danger),
-                                );
+                                const row = new ActionRowBuilder()
+                                    .addComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId('delete-ticket')
+                                            .setLabel('Delete ticket')
+                                            .setEmoji('🗑️')
+                                            .setStyle(ButtonStyle.Danger),
+                                        new ButtonBuilder()
+                                            .setCustomId('delete-ticket-reason')
+                                            .setLabel('Delete with Reason')
+                                            .setEmoji('📄')
+                                            .setStyle(ButtonStyle.Danger),
+                                    );
 
-                            chan.send({
-                                embeds: [embed],
-                                components: [row]
+                                chan.send({
+                                    embeds: [embed],
+                                    components: [row]
+                                });
+
+                                ticketDoc.msgPannelID = null;
+                                ticketDoc.ticketStatus = false;
+                                await ticketDoc.save();
                             });
 
-                            ticketDoc.msgPannelID = null;
-                            ticketDoc.ticketStatus = false;
-                            await ticketDoc.save();
-                        });
-
-                        collector.stop();
+                            collector.stop();
+                        }
                     }
 
                     if (i.customId == 'no') {
 
-                        await i.update({
+                        await i.editReply({
                             content: `**Ticket closure cancelled!** (<@${i.user.id}>)`,
                             components: []
                         });

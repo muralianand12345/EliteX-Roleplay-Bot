@@ -66,6 +66,8 @@ module.exports = {
         if (user.id === client.user.id) return interaction.reply({ content: "Men ... you cannot give me visa! 😂", ephemeral: true });
         if (user.bot) return interaction.reply({ content: "Cannot mention other bots.", ephemeral: true });
 
+        await interaction.deferReply({ ephemeral: true });
+
         if (options === 'form-accepted') {
 
             const vpChan = client.channels.cache.get(client.visa.ACCEPTED.VPCHAN);
@@ -105,14 +107,14 @@ module.exports = {
                         { name: 'Client', value: `<@${user.id}>` }
                     )
                 client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
-                return interaction.reply({ content: "Sent!", ephemeral: true });
+                return await interaction.editReply({ content: "Sent!", ephemeral: true });
             });
 
         } else if (options === 'form-denied') {
 
             const reason = interaction.options.getString("rejected-reason") || null;
             if (!reason) return interaction.reply({ content: 'Visa Denied Reason Missing!', ephemeral: true });
-            
+
             const vpChan = client.channels.cache.get(client.visa.REJECTED.REJCHAN);
             await vpChan.send({
                 content: `**Application No: ${appNo.toString()}** | <@${user.id}> Your Server Whitelist form has been **Rejected**.\n\`\`\`${reason}\`\`\``
@@ -154,7 +156,7 @@ module.exports = {
                     { name: 'Client', value: `<@${user.id}>` }
                 )
             client.channels.cache.get(client.visa.REJECTED.LOGCHAN).send({ embeds: [logembed] });
-            return interaction.reply({ content: "Sent!", ephemeral: true });
+            return await interaction.editReply({ content: "Sent!", ephemeral: true });
 
         } else if (options === 'visa-accepted') {
 
@@ -175,19 +177,19 @@ module.exports = {
                     .setDescription(`<@${user.id}>, Congratulations 🎊! Your **Visa has been approved**, Thanks for attending the Voice Process.\nFor further queries regarding login and connectivity, contact staffs in <#${client.visa.VISA.HELPCHAN}>`)
                 const DMbutton = new ActionRowBuilder()
                     .addComponents(
-                        new ButtonBuilder()
+                        /*new ButtonBuilder()
                             .setLabel(`FiveM Iconic Roleplay`)
                             .setEmoji('🔗')
                             .setStyle(ButtonStyle.Link)
                             .setURL(client.visa.CONNECT)
-                            .setDisabled(true),
+                            .setDisabled(true),*/
                         new ButtonBuilder()
                             .setLabel(`Message`)
                             .setEmoji('📑')
                             .setStyle(ButtonStyle.Link)
                             .setURL(msgLink)
                     )
-                
+
                 client.users.cache.get(user.id).send({ embeds: [DMembed], components: [DMbutton] }).catch(error => {
                     if (error.code == 50007) {
                         const logembed = new EmbedBuilder()
@@ -196,7 +198,7 @@ module.exports = {
                         client.channels.cache.get(client.visa.VISA.LOGCHAN).send({ embeds: [logembed] });
                     } else { console.error(error); }
                 });
-                
+
                 const logembed = new EmbedBuilder()
                     .setColor('#00FF00')
                     .setDescription('VISA-ACCEPTED')
@@ -205,8 +207,9 @@ module.exports = {
                         { name: 'Client', value: `<@${user.id}>` }
                     )
                 client.channels.cache.get(client.visa.ACCEPTED.LOGCHAN).send({ embeds: [logembed] });
+                return await interaction.editReply({ content: "Sent!", ephemeral: true });
             });
-            return interaction.reply({ content: "Sent!", ephemeral: true });
+
 
         } else if (options === 'visa-onhold') {
 
@@ -248,7 +251,7 @@ module.exports = {
                         { name: 'Client', value: `<@${user.id}>` }
                     )
                 client.channels.cache.get(client.visa.HOLD.LOGCHAN).send({ embeds: [logembed] });
-                return interaction.reply({ content: "Sent!", ephemeral: true });
+                return await interaction.editReply({ content: "Sent!", ephemeral: true });
             });
 
         } else {

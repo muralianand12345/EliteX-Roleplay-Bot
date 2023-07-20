@@ -1,5 +1,5 @@
 const {
-    EmbedBuilder, 
+    EmbedBuilder,
     ButtonBuilder,
     ActionRowBuilder,
     ButtonStyle
@@ -22,19 +22,20 @@ module.exports = {
         message.delete()
 
         const embed = new EmbedBuilder()
-        .setColor('#FFC0CB')
-        .setTitle('Iconic Media (NEWS)')
-        .setDescription('`Thank you for your interest in joining our Iconic Media! Click the button below to proceed with your application.`')
+            .setColor('#FFC0CB')
+            .setAuthor({ name: 'Resignation Form' })
+            .setTitle('ICare Emergency Services (ICE)')
+            .setDescription('`Click the button to enter your resignation.`');
 
         const button = new ActionRowBuilder()
-        .addComponents(
-            new ButtonBuilder()
-            .setCustomId('apply-news')
-            .setLabel('APPLY')
-            .setStyle(ButtonStyle.Success)
-        )
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('ice-resignation-button')
+                    .setLabel('Submit')
+                    .setStyle(ButtonStyle.Success)
+            )
 
-        await message.channel.send({ 
+        await message.channel.send({
             embeds: [embed],
             components: [button]
         });
