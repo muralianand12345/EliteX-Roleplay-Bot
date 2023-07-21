@@ -8,9 +8,11 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
 
-        //if (!interaction.isButton()) return;
+        if (!interaction.isButton()) return;
 
         if (interaction.customId && interaction.customId.startsWith("vote-button-")) {
+
+            await interaction.deferReply({ ephemeral: true });
 
             const voting = await votingModel.findOne({
                 messageId: interaction.message.id,
@@ -18,7 +20,7 @@ module.exports = {
             });
 
             if (!voting) {
-                return await interaction.reply({ content: "Voting has expired.", ephemeral: true });
+                return await interaction.editReply({ content: "Voting has expired.", ephemeral: true });
             }
 
             const vote = {
@@ -29,7 +31,7 @@ module.exports = {
             if (voting.voteType === 'once') {
                 const hasVoted = voting.votes.some(v => v.userId === interaction.user.id);
                 if (hasVoted) {
-                    await interaction.reply({ content: 'You have already voted in this poll.', ephemeral: true });
+                    await interaction.editReply({ content: 'You have already voted in this poll.', ephemeral: true });
                     return;
                 }
             }
@@ -37,21 +39,21 @@ module.exports = {
             if (voting.voteType === 'multi') {
                 const hasVoted = voting.votes.some(v => v.userId === interaction.user.id && v.buttonId === interaction.customId);
                 if (hasVoted) {
-                    await interaction.reply({ content: 'You have already voted for this option.', ephemeral: true });
+                    await interaction.editReply({ content: 'You have already voted for this option.', ephemeral: true });
                     return;
                 }
 
                 voting.votes.push(vote);
                 await voting.save();
 
-                await interaction.reply({ content: "Thank you for your vote!", ephemeral: true });
+                await interaction.editReply({ content: "Thank you for your vote!", ephemeral: true });
                 return;
             }
 
             voting.votes.push(vote);
             await voting.save();
 
-            await interaction.reply({ content: "Thank you for your vote!", ephemeral: true });
+            await interaction.editReply({ content: "Thank you for your vote!", ephemeral: true });
         }
     }
 };

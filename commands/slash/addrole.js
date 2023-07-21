@@ -29,17 +29,19 @@ module.exports = {
         const commandName = "ADDROLE";
         client.std_log.error(client, commandName, interaction.user.id, interaction.channel.id);
 
+        await interaction.deferReply({ ephemeral: true });
+
         const userGR = interaction.options.getUser('gr-user');
-        if (userGR.bot) return interaction.reply({ content: 'Cannot give role to a bot!', ephemeral: true });
+        if (userGR.bot) return interaction.editReply({ content: 'Cannot give role to a bot!', ephemeral: true });
 
         const userMember = interaction.guild.members.cache.get(userGR.id);
-        if (!userMember) return interaction.reply({ content: 'No such user!', ephemeral: true });
+        if (!userMember) return interaction.editReply({ content: 'No such user!', ephemeral: true });
 
-        if (userMember.user.bot) return interaction.reply({ content: 'The specified user is a bot!', ephemeral: true });
+        if (userMember.user.bot) return interaction.editReply({ content: 'The specified user is a bot!', ephemeral: true });
 
         const visaHolderRole = client.visa.VISA.ROLEID1;
         if (!userMember.roles.cache.has(visaHolderRole)) {
-            return interaction.reply({ content: "The user has no Visa Holder Role!", ephemeral: true });
+            return interaction.editReply({ content: "The user has no Visa Holder Role!", ephemeral: true });
         }
 
         async function RoleLog(job, type, toUserId, fromUserId) {
@@ -83,32 +85,32 @@ module.exports = {
         
         const selectedRole = Object.values(roleMap).find(role => interaction.member.roles.cache.has(role.HO));
 
-        if (!selectedRole) return interaction.reply({ content: 'You do not have the necessary role to use this command!', ephemeral: true });
+        if (!selectedRole) return interaction.editReply({ content: 'You do not have the necessary role to use this command!', ephemeral: true });
         const rolecool = interaction.guild.roles.cache.get(client.jobs.GOVTCOOL);
-        if (!rolecool) return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
+        if (!rolecool) return interaction.editReply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
 
         const grOption = interaction.options.getString('gr-option');
         const targetRole = roleMap[selectedRole.NAME];
 
         if (grOption === 'gr-interview') {
-            if (userMember.roles.cache.has(targetRole.ROLEID)) return interaction.reply({ content: "The user has the Job role", ephemeral: true });
-            if (userMember.roles.cache.has(client.jobs.GOVTCOOL)) return interaction.reply({ content: "The user has a Govt Job cooldown", ephemeral: true });
-            if (userMember.roles.cache.has(targetRole.INTERVIEW)) return interaction.reply({ content: "The user already has the Interview Role.", ephemeral: true });
+            if (userMember.roles.cache.has(targetRole.ROLEID)) return interaction.editReply({ content: "The user has the Job role", ephemeral: true });
+            if (userMember.roles.cache.has(client.jobs.GOVTCOOL)) return interaction.editReply({ content: "The user has a Govt Job cooldown", ephemeral: true });
+            if (userMember.roles.cache.has(targetRole.INTERVIEW)) return interaction.editReply({ content: "The user already has the Interview Role.", ephemeral: true });
 
             await RoleLog(targetRole.NAME, "Interview", userMember.id, interaction.user.id);
             await userMember.roles.add(targetRole.INTERVIEW);
 
-            return interaction.reply({ content: `Added Interview Role to <@${userMember.id}>!`, ephemeral: true });
+            return interaction.editReply({ content: `Added Interview Role to <@${userMember.id}>!`, ephemeral: true });
         } else if (grOption === 'gr-job') {
-            if (userMember.roles.cache.has(client.jobs.GOVTCOOL)) return interaction.reply({ content: "The user has a Govt Job cooldown", ephemeral: true });
-            if (userMember.roles.cache.has(targetRole.ROLEID)) return interaction.reply({ content: "The user already has the Job Role!", ephemeral: true });
+            if (userMember.roles.cache.has(client.jobs.GOVTCOOL)) return interaction.editReply({ content: "The user has a Govt Job cooldown", ephemeral: true });
+            if (userMember.roles.cache.has(targetRole.ROLEID)) return interaction.editReply({ content: "The user already has the Job Role!", ephemeral: true });
             if (userMember.roles.cache.has(targetRole.INTERVIEW)) {
                 await RoleLog(targetRole.NAME, "Job Role", userMember.id, interaction.user.id);
                 await userMember.roles.add(targetRole.ROLEID);
                 await userMember.roles.remove(targetRole.INTERVIEW);
-                return interaction.reply({ content: `Added Job Role to <@${userMember.id}>!`, ephemeral: true });
+                return interaction.editReply({ content: `Added Job Role to <@${userMember.id}>!`, ephemeral: true });
             } else {
-                return interaction.reply({ content: "The user no Interview role!", ephemeral: true });
+                return interaction.editReply({ content: "The user no Interview role!", ephemeral: true });
             }
             
         } else if (grOption === 'gr-remove') {
@@ -126,9 +128,9 @@ module.exports = {
                 await userMember.roles.remove(targetRole.INTERVIEW);
                 await userMember.roles.add(rolecool);
                 await RoleLog(targetRole.NAME, "Role Removal", userMember.id, interaction.user.id);
-                return interaction.reply({ content: `Removed Role from <@${userMember.id}>!`, ephemeral: true });
+                return interaction.editReply({ content: `Removed Role from <@${userMember.id}>!`, ephemeral: true });
             } else {
-                return interaction.reply({ content: `The user has no Job Role`, ephemeral: true });
+                return interaction.editReply({ content: `The user has no Job Role`, ephemeral: true });
             }
         }
     },

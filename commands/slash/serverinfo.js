@@ -19,7 +19,8 @@ module.exports = {
         client.std_log.error(client, commandName, interaction.user.id, interaction.channel.id);
 
         const guild = interaction.guild;
-        const owner = await guild.fetchOwner();
+        //const owner = await guild.fetchOwner();
+        const owner = `Kailaasa | UURP | TNRP | ELITEX | TRP`;
         const channels = await guild.channels.fetch();
         const roles = await guild.roles.fetch();
 

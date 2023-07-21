@@ -90,6 +90,8 @@ module.exports = {
 
         if (interaction.customId == "taxi-modal") {
 
+            await interaction.deferReply({ ephemeral: true });
+
             const TaxiCharName = interaction.fields.getTextInputValue('taxi-charname');
             const TaxiRealAge = interaction.fields.getTextInputValue('taxi-realage');
             const TaxiTaxiHire = interaction.fields.getTextInputValue('taxi-hire');
@@ -121,7 +123,7 @@ module.exports = {
                 embeds: [TaxiEmbed],
                 components: [button]
             }).then(async (msg) => {
-                return interaction.reply({ content: 'Your IPTC Form recieved successfully!', ephemeral: true });
+                return interaction.editReply({ content: 'Your IPTC Form recieved successfully!', ephemeral: true });
             });
         }
 
@@ -139,6 +141,8 @@ module.exports = {
 
         if (interaction.customId == "taxi-accept") {
 
+            await interaction.deferReply({ ephemeral: true });
+
             const originalEmbed = interaction.message.embeds[0];
             const userId = originalEmbed.footer.text;
             const chan = client.channels.cache.get(client.jobs.TAXI.ACCCHAN);
@@ -146,16 +150,16 @@ module.exports = {
 
             const userMember = interaction.guild.members.cache.get(userId);
             if (!userMember) {
-                return interaction.reply({ content: 'No user!', ephemeral: true });
+                return interaction.editReply({ content: 'No user!', ephemeral: true });
             }
 
             const role = interaction.guild.roles.cache.get(client.jobs.TAXI.INTERVIEW);
             if (!role) {
-                return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
+                return interaction.editReply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
             }
 
             if (userMember.roles.cache.has(role.id)) {
-                interaction.reply({ content: 'The user already has the role', ephemeral: true });
+                interaction.editReply({ content: 'The user already has the role', ephemeral: true });
             } else {
                 const expirationDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
                 const newRoleData = new roleModel({
@@ -169,13 +173,15 @@ module.exports = {
                 await RoleLog(JobName, 'Accepted', userMember.id, interaction.user.id);
                 var MsgContent = `<@${userId}>, **Congratulations on being selected for an IPTC interview! We are excited to learn more about you and discuss your potential role in our IPTC team. Please contact us to schedule the interview at your earliest convenience.**`;
                 await chan.send(`${MsgContent}`);
-                interaction.reply({ content: `Interview Role Added and Accepted! <@${userMember.id}>`, ephemeral: true });
+                interaction.editReply({ content: `Interview Role Added and Accepted! <@${userMember.id}>`, ephemeral: true });
             }
 
             await interaction.message.delete();
         }
 
         if (interaction.customId == "taxi-reject") {
+
+            await interaction.deferReply({ ephemeral: true });
 
             const originalEmbed = interaction.message.embeds[0];
             const userId = originalEmbed.footer.text;
@@ -184,23 +190,23 @@ module.exports = {
 
             const userMember = interaction.guild.members.cache.get(userId);
             if (!userMember) {
-                return interaction.reply({ content: 'No user!', ephemeral: true });
+                return interaction.editReply({ content: 'No user!', ephemeral: true });
             }
 
             const role = interaction.guild.roles.cache.get(client.jobs.TAXI.INTERVIEW);
             if (!role) {
-                return interaction.reply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
+                return interaction.editReply({ content: 'The specified role does not exist in this guild.', ephemeral: true });
             }
 
 
             if (userMember.roles.cache.has(role.id)) {
-                interaction.reply({ content: 'The user already has the role', ephemeral: true });
+                interaction.editReply({ content: 'The user already has the role', ephemeral: true });
             } else {
                 await userMember.roles.remove(role);
                 await RoleLog(JobName, 'Rejected', userMember.id, interaction.user.id);
                 var MsgContent = `<@${userId}>, **Thank you for your interest in the IPTC. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**`;
                 await chan.send(`${MsgContent}`);
-                interaction.reply({ content: `Interview Role Removed and Rejected! <@${userMember.id}>`, ephemeral: true });
+                interaction.editReply({ content: `Interview Role Removed and Rejected! <@${userMember.id}>`, ephemeral: true });
             }
 
             await interaction.message.delete();
