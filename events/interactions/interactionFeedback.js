@@ -23,8 +23,7 @@ module.exports = {
         var FeedbackEmbed = new EmbedBuilder();
 
         if (interaction.customId == "feedback-button") {
-
-
+            
             if (cooldown.has(interaction.user.id)) {
                 return interaction.reply({ content: `You are on a cooldown!`, ephemeral: true });
             } else {

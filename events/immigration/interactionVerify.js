@@ -19,8 +19,8 @@ module.exports = {
 
         }
 
-        const CRoleID = "1096856106749394994";
-        const VRoleID = "1096863473792716961";
+        const CRoleID = client.immigration.VERIFY.CROLE;
+        const VRoleID = client.immigration.VERIFY.VROLE;
 
         if (interaction.customId == "verify-button") {
             if (interaction.member.roles.cache?.has(VRoleID)) {

@@ -17,7 +17,7 @@ module.exports = {
 		const commandName = `MESS_AGEVERIFY`;
 		client.std_log.error(client, commandName, message.author.id, message.channel.id);
 
-        const chanid = "1097103370222841947";
+        const chanid = client.immigration.AGE.CHANID;
         await message.delete();
 
         const embed = new EmbedBuilder()
@@ -27,7 +27,7 @@ module.exports = {
         const button = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('age-button')
+                    .setCustomId('disclaimer-button')
                     .setEmoji('✔️')
                     .setStyle(ButtonStyle.Success),
             );

@@ -24,15 +24,13 @@ module.exports = {
             }
         }
 
+        const BroleID = client.immigration.AGE.BROLE;
+        const Brole = await interaction.guild.roles.cache.find(x => x.id === BroleID);
+
+        const AroleID = client.immigration.AGE.AROLE;
+        const Arole = await interaction.guild.roles.cache.find(x => x.id === AroleID);
 
         if (interaction.customId == "below-button-verify") {
-
-            const AroleID = "1097094147879489537";
-            const BroleID = "1097094124471062579";
-
-            const Arole = await interaction.guild.roles.cache.find(x => x.id === AroleID);
-            const Brole = await interaction.guild.roles.cache.find(x => x.id === BroleID);
-
             if (interaction.member.roles.cache?.has(BroleID)) {
                 await interaction.member.roles.remove(Brole).then(() => {
                     interaction.reply({ content: "Below 18 Role Removed!", ephemeral: true });
@@ -42,19 +40,10 @@ module.exports = {
                     interaction.reply({ content: "Below 18 Role Added!", ephemeral: true });
                 });
             }
-
             return await interaction.member.roles.remove(Drole);
-
         }
 
         if (interaction.customId == "above-button-verify") {
-
-            const AroleID = "1097094147879489537";
-            const BroleID = "1097094124471062579";
-
-            const Arole = await interaction.guild.roles.cache.find(x => x.id === AroleID);
-            const Brole = await interaction.guild.roles.cache.find(x => x.id === BroleID);
-
             if (interaction.member.roles.cache?.has(AroleID)) {
                 await interaction.member.roles.remove(Arole).then(() => {
                     interaction.reply({ content: "Above 18 Role Removed!", ephemeral: true });
@@ -67,11 +56,6 @@ module.exports = {
         }
 
         if (interaction.customId == "disclaimer-button") {
-            const AroleID = "1097094147879489537";
-            const BroleID = "1097094124471062579";
-
-            const Arole = await interaction.guild.roles.cache.find(x => x.id === AroleID);
-            const Brole = await interaction.guild.roles.cache.find(x => x.id === BroleID);
 
             if (!Arole || !Brole) return interaction.reply({ content: "Error Occured! Try Again. || Error Code: Role-26", ephemeral: true });
             const Abool = await hasRole(interaction.member, AroleID);

@@ -8,7 +8,7 @@ module.exports = {
     name: Events.GuildMemberUpdate,
     async execute(oldMember, newMember, client) {
 
-        if (oldMember.guild.id == client.glog.GUILDID) return;
+        if (oldMember.guild.id !== client.glog.GUILDID) return;
 
         //Role Log
         if (oldMember.roles.cache.size > newMember.roles.cache.size) {

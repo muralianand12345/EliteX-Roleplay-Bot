@@ -91,6 +91,7 @@ module.exports = {
                     {
                         id: interaction.user.id,
                         allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                        deny: [PermissionFlagsBits.MentionEveryone]
                     },
                     {
                         id: IdData.ticketSupportID,
