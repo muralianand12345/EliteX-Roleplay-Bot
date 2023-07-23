@@ -14,7 +14,7 @@ module.exports = {
 
         if (!interaction) return console.error('No interaction!');
         if (!interaction.type === InteractionType.ApplicationCommand) return;
-        if (!interaction.member || !interaction.guild) return console.error('No User or Guild found!');
+        //if (!interaction.member || !interaction.guild) return console.error('No User or Guild found!');
         const command = client.slashCommands.get(interaction.commandName);
         if (!command) return;
 

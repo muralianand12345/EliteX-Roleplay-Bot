@@ -1,0 +1,15 @@
+{
+    "VERIFY": {
+        "CROLE": "",
+        "VROLE": ""
+    },
+    "AGE": {
+        "CHANID": "",
+        "AROLE": "",
+        "BROLE": ""
+    },
+    "VPDM": {
+        "VPCHAN": "",
+        "ROLE": ""
+    }
+}

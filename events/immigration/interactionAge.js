@@ -15,6 +15,10 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
 
+        if (!interaction.isButton() && !interaction.isSelectMenu()) return;
+        if (!interaction.guild) return;
+        if (interaction.guild.id !== client.visa.GUILDID) return;
+        
         async function hasRole(userMem, roleId) {
             const hasRole = userMem.roles.cache.has(roleId);
             if (hasRole) {

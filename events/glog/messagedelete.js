@@ -7,6 +7,7 @@ module.exports = {
     name: Events.MessageDelete,
     async execute(message, client) {
 
+        if (!message.guild) return;
         if (message.guild.id !== client.glog.GUILDID) return;
         if (message.author == null) return;
         if (message.author.bot) return;
