@@ -21,7 +21,8 @@ module.exports = {
             )
             .setTimestamp();
 
-        client.channels.cache.get(client.glog.MESSAGE.DELETE).send({
+        await client.glogger.glog("Iconic Message Log", logEmbed);
+        return await client.channels.cache.get(client.glog.MESSAGE.DELETE).send({
             embeds: [logEmbed]
         });
     }

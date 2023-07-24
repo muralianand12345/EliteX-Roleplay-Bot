@@ -20,7 +20,7 @@ const client = new Client({
         GatewayIntentBits.DirectMessageTyping,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMessageReactions,
-        GatewayIntentBits.GuildVoiceStates
+        GatewayIntentBits.GuildVoiceStates,
     ],
     partials: [
         Partials.Channel,
@@ -46,10 +46,12 @@ client.setMaxListeners(20);
 const config = require('./config/main/config.json');
 const Discord = require('discord.js');
 const std_log = require('./logs/std_log.js');
+const glogger = require('./logs/glogger.js');
 
 client.discord = Discord;
 client.config = config;
 client.std_log = std_log;
+client.glogger = glogger;
 client.handle = handle;
 
 //extras configurations

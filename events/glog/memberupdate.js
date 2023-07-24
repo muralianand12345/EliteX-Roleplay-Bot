@@ -23,6 +23,7 @@ module.exports = {
                     );
                 }
             });
+            await client.glogger.glog("Iconic Role Log", roleEmbed);
             return await client.channels.cache.get(client.glog.MEMBER.ROLE).send({
                 embeds: [roleEmbed]
             });
@@ -38,6 +39,7 @@ module.exports = {
                     );
                 }
             });
+            await client.glogger.glog("Iconic Role Log", roleEmbed);
             return await client.channels.cache.get(client.glog.MEMBER.ROLE).send({
                 embeds: [roleEmbed]
             });
@@ -54,6 +56,7 @@ module.exports = {
                 .setDescription(`**"${newMember.nickname}" Nickname Added**`)
                 .setTimestamp()
 
+            await client.glogger.glog("Iconic Nickname Log", nickEmbed);
             return await nicknameChan.send({
                 embeds: [nickEmbed]
             });
@@ -65,6 +68,7 @@ module.exports = {
                 .setDescription(`**"${oldMember.nickname}" Nickname Removed**`)
                 .setTimestamp()
 
+            await client.glogger.glog("Iconic Nickname Log", nickEmbed);
             return await nicknameChan.send({
                 embeds: [nickEmbed]
             });
@@ -79,6 +83,7 @@ module.exports = {
                 )
                 .setTimestamp()
 
+            await client.glogger.glog("Iconic Nickname Log", nickEmbed);
             return await nicknameChan.send({
                 embeds: [nickEmbed]
             });

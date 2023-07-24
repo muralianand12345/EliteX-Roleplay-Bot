@@ -73,16 +73,12 @@ module.exports = {
                 });
 
                 collector.on('collect', async (i) => {
+                    await i.deferUpdate();
                     if (i.customId == 'confirm-close') {
-
                         if (!i) {
                             await interaction.editReply({ content: `Error Occured! Try again...`, components: [] });
                             return collector.stop();
-                            
                         } else {
-
-                            await i.deferUpdate();
-
                             try {
                                 await i.editReply({
                                     content: `Ticket closed by <@!${i.user.id}>`,
