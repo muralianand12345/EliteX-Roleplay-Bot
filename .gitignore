@@ -1,7 +1,5 @@
-config
 .env
 node_modules
 package-lock.json
-developmentFolder
-ticket-logs
-testfolder
+
+/src/config

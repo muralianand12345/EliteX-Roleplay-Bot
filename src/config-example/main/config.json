@@ -1,0 +1,60 @@
+{
+    "INFO": {
+        "OWNER_ID": "678402714765361182",
+        "PREFIX": "-"
+    },
+
+    "MESSAGE": {
+		"COOLDOWN_MESSAGE": "You are on `<duration>` cooldown!" 
+	},
+
+    "ERR_LOG": {
+        "CHAN_ID": "",
+        "ERR_TAG":"<@678402714765361182>"
+    },
+
+    "STD_LOG": {
+        "CHAN_ID": ""
+    },
+
+    "EMBED": {
+        "IMAGE": "https://cdn.discordapp.com/attachments/1096858331110457485/1099401752488452137/FInal-logo-word-mark.jpg",
+        "FOOTTEXT": "Iconic Roleplay"
+    },
+
+    "ENABLE": {
+        "DATE": false, 
+        "NICKNAME": false,
+        "AUTOTICKET": true,
+        "DARKCHAT": false
+    },
+
+    "DMREPLY": {
+        "DM": "",
+        "REPLY": ""
+    },
+
+    "RESTART": {
+        "CHAN": "",
+        "VISAROLE": ""
+    },
+
+    "YT": {
+        "CHANID": ""
+    },
+
+    "MSG": {
+        "LOG": {
+            "CHAN": ""
+        }
+    },
+
+    "DARKCHAT": {
+        "CHAN": "",
+        "LOG": ""
+    },
+
+    "CFX": {
+        "CHAN" : ""
+    }
+}
