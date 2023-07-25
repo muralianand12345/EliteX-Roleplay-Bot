@@ -1,10 +1,3 @@
-const {
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} = require("discord.js");
-
 module.exports = {
     name: 'emsrole',
     description: "EMS Role Count",

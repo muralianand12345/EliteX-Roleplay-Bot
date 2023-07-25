@@ -5,10 +5,8 @@ module.exports = {
 	userPerms: ['Administrator'],
 	botPerms: ['Administrator'],
 	run: async (client, message, args) => {
-
 		const commandName = `MESS_REPORT`;
 		client.std_log.error(client, commandName, message.author.id, message.channel.id);
-
         client.handle.report(client , message); 
 	}
 };

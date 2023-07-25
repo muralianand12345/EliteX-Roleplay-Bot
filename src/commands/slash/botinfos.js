@@ -5,9 +5,6 @@ const {
     ButtonBuilder,
     ButtonStyle
 } = require("discord.js");
-const moment = require("moment");
-const fs = require('fs');
-require("moment-duration-format");
 
 module.exports = {
     cooldown: 10000,
@@ -76,7 +73,7 @@ module.exports = {
                 },
                 {
                     name: 'Discord',
-                    value: `\`\`\`DiscordJS ${discordpackage.version}\`\`\``,
+                    value: `\`\`\`DiscordJS ${discordpackage}\`\`\``,
                     inline: true,
                 },
                 {
@@ -84,11 +81,6 @@ module.exports = {
                     value: `\`\`\`${days}d ${hours}h ${minutes}m ${seconds}s\`\`\``,
                     inline: true,
                 },
-                /*{
-                    name: 'Total Tickets Handled',
-                    value: `\`\`\`${fs.readdirSync(ticketLogDir).length}\`\`\``,
-                    inline: true,
-                },*/
                 {
                     name: 'Developers',
                     value: `\`\`\`Murali Anand\`\`\``,

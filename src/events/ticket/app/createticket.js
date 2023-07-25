@@ -31,13 +31,15 @@ module.exports = {
 
         if (interaction.customId == "open-ticket") {
 
+            await interaction.deferReply({ ephemeral: true });
+
             var ticketCheck = await ticketModel.findOne({
                 guildID: interaction.guild.id,
                 userID: interaction.user.id
             }).catch(err => console.log(err));
 
             if (ticketCheck) {
-                await interaction.reply({
+                await interaction.editReply({
                     content: '**You have already created a ticket! Kindly Contact any Ticket Supporters if not!**',
                     ephemeral: true
                 });
@@ -77,7 +79,7 @@ module.exports = {
 
             var mainTicket;
             if (!ticketParents) {
-                return await interaction.reply({ content: 'Setup is incomplete :(', ephemeral: true });
+                return await interaction.editReply({ content: 'Setup is incomplete :(', ephemeral: true });
 
             } else if (ticketParents) {
                 mainTicket = ticketParents.mainPar;
@@ -104,7 +106,7 @@ module.exports = {
                 ],
                 type: ChannelType.GuildText,
             }).then(async c => {
-                await interaction.reply({
+                await interaction.editReply({
                     content: `Ticket created! <#${c.id}>`,
                     ephemeral: true
                 }).catch(error => {

@@ -1,10 +1,8 @@
 const {
     SlashCommandBuilder,
     EmbedBuilder,
-    ChannelType,
     PermissionFlagsBits
 } = require('discord.js');
-const wait = require('util').promisify(setTimeout);
 
 module.exports = {
     cooldown: 10000,

@@ -62,6 +62,28 @@ module.exports = {
                             .setStyle(ButtonStyle.Secondary),
                     );
 
+                const editoriginalButton = new ActionRowBuilder()
+                    .addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('close-ticket')
+                            .setLabel('Close Ticket')
+                            .setEmoji('899745362137477181')
+                            .setStyle(ButtonStyle.Danger)
+                            .setDisabled(true),
+                        new ButtonBuilder()
+                            .setCustomId('transcript-ticket')
+                            .setLabel('Transcript')
+                            .setEmoji('📜')
+                            .setStyle(ButtonStyle.Primary)
+                            .setDisabled(true),
+                        new ButtonBuilder()
+                            .setCustomId('claim-ticket')
+                            .setLabel('Claim')
+                            .setEmoji('🔒')
+                            .setStyle(ButtonStyle.Secondary)
+                            .setDisabled(true),
+                    );
+
                 const verif = await interaction.editReply({
                     content: 'Are you sure you want to close the ticket?',
                     components: [row]
@@ -80,6 +102,7 @@ module.exports = {
                             return collector.stop();
                         } else {
                             try {
+                                await interaction.message.edit({ components: [editoriginalButton] })
                                 await i.editReply({
                                     content: `Ticket closed by <@!${i.user.id}>`,
                                     components: []

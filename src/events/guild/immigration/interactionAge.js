@@ -15,7 +15,7 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
 
-        if (!interaction.isButton() && !interaction.isSelectMenu()) return;
+        if (!interaction.isButton() && !interaction.isStringSelectMenu()) return;
         if (!interaction.guild) return;
         if (interaction.guild.id !== client.visa.GUILDID) return;
         

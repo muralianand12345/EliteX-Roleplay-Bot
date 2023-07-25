@@ -23,11 +23,13 @@ module.exports = {
 
         if (interaction.customId == "delete-ticket") {
 
+            await interaction.deferReply({ ephemeral: true });
+
             if (buttonCooldown.has(interaction.user.id)) {
                 const replyEmbed = new EmbedBuilder()
                     .setColor('#ED4245')
                     .setDescription("Interaction not registered! (Button Spam Dedected!)")
-                interaction.reply({ embeds: [replyEmbed], ephemeral: true });
+                await interaction.editReply({ embeds: [replyEmbed], ephemeral: true });
             } else {
                 buttonCooldown.add(interaction.user.id);
 
@@ -36,7 +38,7 @@ module.exports = {
                 }).catch(err => console.log(err));
 
                 if (!ticketDoc) {
-                    return interaction.reply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing ||" });
+                    return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
                 }
 
                 var IdData = await ticketData.findOne({
@@ -47,8 +49,9 @@ module.exports = {
                 const chan = guild.channels.cache.get(interaction.channelId);
                 if (chan == null) return;
 
-                interaction.reply({
-                    content: 'Saving Messages and Deleting the channel ...'
+                await interaction.editReply({
+                    content: 'Saving Messages and Deleting the channel ...',
+                    ephemeral: true
                 });
 
                 //Ticket Logs
@@ -124,11 +127,13 @@ module.exports = {
 
         if (interaction.customId == "ticket-reason-modal") {
 
+            await interaction.deferReply({ ephemeral: true });
+
             if (buttonCooldown.has(interaction.user.id)) {
                 const replyEmbed = new EmbedBuilder()
                     .setColor('#ED4245')
                     .setDescription("Interaction not registered! (Button Spam Dedected!)")
-                interaction.reply({ embeds: [replyEmbed], ephemeral: true });
+                await interaction.editReply({ embeds: [replyEmbed], ephemeral: true });
             } else {
 
                 buttonCooldown.add(interaction.user.id);
@@ -140,7 +145,7 @@ module.exports = {
                 }).catch(err => console.log(err));
 
                 if (!ticketDoc) {
-                    return interaction.reply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing ||" });
+                    return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
                 }
 
                 var IdData = await ticketData.findOne({
@@ -151,8 +156,9 @@ module.exports = {
                 const chan = guild.channels.cache.get(interaction.channelId);
                 if (chan == null) return;
 
-                interaction.reply({
-                    content: 'Saving Messages and Deleting the channel ...'
+                await interaction.editReply({
+                    content: 'Saving Messages and Deleting the channel ...',
+                    ephemeral: true
                 });
 
                 const htmlCode = await discordTranscripts.createTranscript(chan, {
