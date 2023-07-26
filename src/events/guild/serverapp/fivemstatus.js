@@ -1,16 +1,17 @@
-const { Events, EmbedBuilder } = require('discord.js');
+const { Events, EmbedBuilder, WebhookClient } = require('discord.js');
 const cfx = require('cfx-api');
+require("dotenv").config();
 
 module.exports = {
     name: Events.ClientReady,
     async execute(client) {
         let embedMessage;
-
+        const Web = process.env.FIVEMWEB;
+        const webhookClient = new WebhookClient({ url: Web });
         async function updateEmbed() {
-
             try {
                 const status = await cfx.fetchStatus();
-                if (!status) return console.error('ERROR | CFX Status 13');
+                if (!status) return;
 
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: 'Iconic RP', iconURL: 'https://cdn.discordapp.com/attachments/1099720199588040824/1099784792821743686/ic_logo.png', url: 'https://discord.gg/iconicrp' })
@@ -25,7 +26,7 @@ module.exports = {
                     embed.setTimestamp();
 
                     const components = await status.fetchComponents();
-                    if (!components) return console.error('ERROR | CFX Status 28');
+                    if (!components) return;
                     for (let component of components) {
                         if (component.status !== 'operational') {
                             embed.addFields({ name: `${component.name}`, value: `\`\`\`${component.status}\`\`\`` });
@@ -59,7 +60,11 @@ module.exports = {
                 }
                 
             } catch (err) {
-                console.error('ERROR | CFX 43')
+                await webhookClient.send({
+                    content: `\`\`\`${err}\`\`\``,
+                    username: 'FiveM API',
+                    avatarURL: "https://www.setra.com/hubfs/Sajni/crc_error.jpg",
+                });
             }
         }
 

@@ -44,7 +44,6 @@ module.exports = {
                     interaction.reply({ content: "Below 18 Role Added!", ephemeral: true });
                 });
             }
-            return await interaction.member.roles.remove(Drole);
         }
 
         if (interaction.customId == "above-button-verify") {
