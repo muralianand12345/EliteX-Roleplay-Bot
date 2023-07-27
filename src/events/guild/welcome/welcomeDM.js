@@ -24,9 +24,9 @@ module.exports = {
             .setTitle(`Welcome to Iconic RP`)
             .setDescription(`**<@${userID}>, we are delighted to have you among us. On behalf of Iconic RP Team, we would like to extend our warmest welcome!**`)
             .setFields(
-                { name: "Step 1: Verify Here", value: `<#${client.visa.WELCOME.VERIFY}>` },
-                { name: "Step 2: Apply Form", value: `<#${client.visa.WELCOME.TAGCHAN}>` },
-                { name: "Step 3: Wait For The Reply", value: `<#${client.visa.WELCOME.REPLY}>` },
+                { name: "Step 1: Apply Form", value: `<#${client.visa.WELCOME.TAGCHAN}>` },
+                { name: "Step 2: Wait For The Reply", value: `<#${client.visa.WELCOME.REPLY}>` },
+                { name: "Step 3: Attend The VP", value: `<#${client.visa.WELCOME.VPVOICE}>` },
             )
 
         const sbutton = new ActionRowBuilder()

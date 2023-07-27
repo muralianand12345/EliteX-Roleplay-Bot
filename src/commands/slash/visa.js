@@ -113,7 +113,7 @@ module.exports = {
         } else if (options === 'form-denied') {
 
             const reason = interaction.options.getString("rejected-reason") || null;
-            if (!reason) return interaction.reply({ content: 'Visa Denied Reason Missing!', ephemeral: true });
+            if (!reason) return interaction.editReply({ content: 'Visa Denied Reason Missing!', ephemeral: true });
 
             const vpChan = client.channels.cache.get(client.visa.REJECTED.REJCHAN);
             await vpChan.send({
@@ -255,7 +255,7 @@ module.exports = {
             });
 
         } else {
-            return interaction.reply({ content: '**Internal Error** | Contact Developer', ephemeral: true });
+            return interaction.editReply({ content: '**Internal Error** | Contact Developer', ephemeral: true });
         }
     }
 }
