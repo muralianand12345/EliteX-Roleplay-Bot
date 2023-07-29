@@ -6,6 +6,7 @@ const {
     Events
 } = require('discord.js');
 require("dotenv").config();
+var colors = require('colors/safe');
 
 module.exports = {
     name: Events.ClientReady,
@@ -15,6 +16,6 @@ module.exports = {
         connect(dburl, {
             useNewUrlParser: true,
             useUnifiedTopology: true
-        }).then(console.log('Connected to MongoDB'));
+        }).then(console.log(colors.green('MongoDB Connected')));
     }
 }

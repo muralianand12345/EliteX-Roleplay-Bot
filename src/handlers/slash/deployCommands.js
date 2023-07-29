@@ -11,31 +11,35 @@ require("dotenv").config();
 module.exports = {
     name: Events.ClientReady,
     execute(client) {
-        const clientID = process.env.CLIENT_ID;
-        const Token = process.env.TOKEN;
-
-        const slashCommandsDir = path.join(__dirname, '../../commands/slash');
-
-        const slashcommands = [];
-        const slashcommandFiles = fs.readdirSync(slashCommandsDir).filter(file => file.endsWith('.js'));
-
-        for (const file of slashcommandFiles) {
-            const command = require(`${slashCommandsDir}/${file}`);
-            slashcommands.push(command.data.toJSON());
+        if (client.DEPLOY_COMMAND == true) {
+            const clientID = process.env.CLIENT_ID;
+            const Token = process.env.TOKEN;
+    
+            const slashCommandsDir = path.join(__dirname, '../../commands/slash');
+    
+            const slashcommands = [];
+            const slashcommandFiles = fs.readdirSync(slashCommandsDir).filter(file => file.endsWith('.js'));
+    
+            for (const file of slashcommandFiles) {
+                const command = require(`${slashCommandsDir}/${file}`);
+                slashcommands.push(command.data.toJSON());
+            }
+    
+            const rest = new REST({
+                version: '10'
+            }).setToken(Token);
+    
+            rest.put(Routes.applicationCommands(clientID), {
+                body: slashcommands
+            }).then(() => console.log(colors.green('Successfully registered application commands.')))
+            .catch( err => {
+                console.log(colors.red(err));
+            });
+            slashcommands.forEach( eachcommands => {
+                console.log(colors.blue(`${eachcommands.name} has been loaded`));
+            });
+        } else {
+            console.log(colors.red(`Deploy-Commands is set OFF`));
         }
-
-        const rest = new REST({
-            version: '10'
-        }).setToken(Token);
-
-        rest.put(Routes.applicationCommands(clientID), {
-            body: slashcommands
-        }).then(() => console.log(colors.green('Successfully registered application commands.')))
-        .catch( err => {
-            console.log(colors.red(err));
-        });
-        slashcommands.forEach( eachcommands => {
-            console.log(colors.blue(`${eachcommands.name} has been loaded`));
-        });    
     },
 };

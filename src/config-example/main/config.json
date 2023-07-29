@@ -4,6 +4,8 @@
         "PREFIX": "-"
     },
 
+    "DEPLOY_COMMAND": true,
+
     "MESSAGE": {
 		"COOLDOWN_MESSAGE": "You are on `<duration>` cooldown!" 
 	},
