@@ -40,8 +40,15 @@ module.exports = {
         if (user.bot) return message.reply('User cannot be a bot');
         const userMember = message.guild.members.cache.get(user.id);
 
+        var option;
         //option
-        var option = args[1].toLowerCase();
+        if (args[1]) {
+            option = args[1].toLowerCase();
+        } else {
+            option = null;
+        }
+        
+        if (option == null) return;
 
         if (option == "ooc") {
             const role1 = message.guild.roles.cache.get(client.ooc.OOC);

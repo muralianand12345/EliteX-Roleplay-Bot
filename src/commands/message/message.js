@@ -40,12 +40,26 @@ module.exports = {
 
         if (!msg) return message.reply({ content: 'No message!' });
 
-        try {
-            await chan.send({ content: `${msg}` });
-            await logEmbedSend('message', chan.id, message.author.id, msg);
-        } catch (error) {
-            console.error(error);
-            message.reply({ content: 'An error occurred while sending the message. Please try again later.' });
+        if (msg.length > 1500) {
+            const chunks = msg.match(/[\s\S]{1,1500}/g);
+
+            try {
+                for (const chunk of chunks) {
+                    await chan.send({ content: chunk });
+                }
+                await logEmbedSend('message', chan.id, message.author.id, msg);
+            } catch (error) {
+                console.error(error);
+                message.reply({ content: 'An error occurred while sending the message. Please try again later.' });
+            }
+        } else {
+            try {
+                await chan.send({ content: `${msg}` });
+                await logEmbedSend('message', chan.id, message.author.id, msg);
+            } catch (error) {
+                console.error(error);
+                message.reply({ content: 'An error occurred while sending the message. Please try again later.' });
+            }
         }
         await message.delete();
     }
