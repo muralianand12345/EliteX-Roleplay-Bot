@@ -172,7 +172,7 @@ module.exports = {
                 await ticketDoc.save();
 
                 const collector = await msg.createMessageComponentCollector({
-                    componentType: ComponentType.SelectMenu,
+                    componentType: ComponentType.StringSelect,
                     time: 30000
                 });
 

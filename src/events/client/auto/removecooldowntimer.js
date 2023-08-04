@@ -12,25 +12,16 @@ module.exports = {
             });
 
             for (const cooldownData of expiredCooldown) {
-                const guild = client.guilds.cache.get(cooldownData.guildId);
-                if (!guild) continue;
-
-                const member = guild.members.cache.get(cooldownData.userId);
-                if (!member) continue;
 
                 try {
-                    await member.roles.remove(cooldownData.roleId);
                     cooldownData.block = false;
                     cooldownData.expirationDate = null;
                     await cooldownData.save();
                 } catch (error) {
-                    console.error(
-                        `Error while removing cooldown from user ${member.user.tag} in guild ${guild.name}: ${error}`
-                    );
+                    console.error(`Error while updating cooldown data for user with ID ${cooldownData.userId}: ${error}`);
                 }
             }
         }
-
         setInterval(checkExpiredCooldown, 60 * 1000);
     }
 };

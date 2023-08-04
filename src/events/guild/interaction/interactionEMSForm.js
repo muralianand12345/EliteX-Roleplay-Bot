@@ -229,6 +229,9 @@ module.exports = {
             }
             await userMember.send({
                 content: `We have received and accepted your EMS resignation! Please arrange a meeting at your earliest convenience to discuss the next steps.`
+            }).catch(async (err)=>{
+                if (err.code == 50007) return;
+                console.error(`EMS FORM: ${err}`);
             });
             reschan.send({ content: `<@${userMember.id}>\'s resignation has been **accepted** by <@${interaction.user.id}>` });
             await interaction.message.delete();
@@ -243,6 +246,9 @@ module.exports = {
             }
             await userMember.send({
                 content: `Your EMS resignation has been reviewed and has been rejected. If you would like to discuss this further, please schedule a meeting.`
+            }).catch(async (err)=>{
+                if (err.code == 50007) return;
+                console.error(`EMS FORM: ${err}`);
             });
             reschan.send({ content: `<@${userMember.id}>\'s resignation has been **rejected** by <@${interaction.user.id}>` });
             await interaction.message.delete();
