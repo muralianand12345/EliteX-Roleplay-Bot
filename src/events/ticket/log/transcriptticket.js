@@ -38,7 +38,7 @@ module.exports = {
             });
 
             const ticketLogDir = path.join(__dirname, '../website/ticket-logs');
-            const serverAdd = `${process.env.SERVER_IP}:${process.env.PORT}`;
+            const serverAdd = `${process.env.SERVERADD}`;
             fs.writeFile(`${ticketLogDir}/transcript-${chan.id}.html`, htmlCode, function (err) {
                 if (err) {
                     console.log(err);
@@ -53,7 +53,7 @@ module.exports = {
 
             const embed = new EmbedBuilder()
                 .setAuthor({ name: 'Ticket Transcript', iconURL: client.config.EMBED.IMAGE })
-                .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${userId}> and logged by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](http://${serverAdd}/transcript-${chan.id}.html)`)
+                .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${userId}> and logged by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${serverAdd}/transcript-${chan.id}.html)`)
                 .setColor('#E67E22')
                 .setTimestamp();
 

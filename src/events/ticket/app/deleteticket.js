@@ -63,7 +63,7 @@ module.exports = {
                     poweredBy: false
                 });
 
-                const serverAdd = `${process.env.SERVER_IP}:${process.env.PORT}`;
+                const serverAdd = `${process.env.SERVERADD}`;
                 const ticketLogDir = path.join(__dirname, '../website/ticket-logs');
                 fs.writeFile(`${ticketLogDir}/transcript-${interaction.channel.id}.html`, htmlCode, function (err) {
                     if (err) {
@@ -73,7 +73,7 @@ module.exports = {
 
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: 'Logs Ticket', iconURL: client.config.EMBED.IMAGE })
-                    .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketDoc.userID}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](http://${serverAdd}/transcript-${interaction.channel.id}.html)`)
+                    .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketDoc.userID}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${serverAdd}/transcript-${interaction.channel.id}.html)`)
                     .setColor('#206694')
                     .setTimestamp();
 
@@ -169,7 +169,7 @@ module.exports = {
                     poweredBy: false
                 });
 
-                const serverAdd = `${process.env.SERVER_IP}:${process.env.PORT}`;
+                const serverAdd = `${process.env.SERVERADD}`;
                 const ticketLogDir = path.join(__dirname, '../website/ticket-logs');
                 fs.writeFile(`${ticketLogDir}/transcript-${interaction.channel.id}.html`, htmlCode, function (err) {
                     if (err) {
@@ -179,7 +179,7 @@ module.exports = {
 
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: 'Logs Ticket', iconURL: client.config.EMBED.IMAGE })
-                    .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketDoc.userID}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](http://${serverAdd}/transcript-${interaction.channel.id}.html)`)
+                    .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketDoc.userID}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${serverAdd}/transcript-${interaction.channel.id}.html)`)
                     .setColor('#206694')
                     .addFields(
                         { name: 'Reason', value: `\`\`\`${TicketReason}\`\`\`` || 'No Reason' }

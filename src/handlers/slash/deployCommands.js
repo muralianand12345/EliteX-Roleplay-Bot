@@ -11,7 +11,7 @@ require("dotenv").config();
 module.exports = {
     name: Events.ClientReady,
     execute(client) {
-        if (client.DEPLOY_COMMAND == true) {
+        if (client.config.DEPLOY_COMMAND == true) {
             const clientID = process.env.CLIENT_ID;
             const Token = process.env.TOKEN;
     
