@@ -115,40 +115,6 @@ module.exports = {
             }
         });
 
-        app.get('/getusers', checkLoggedIn, async (req, res) => {
-
-            try {
-                const guild = await client.guilds.fetch(guildId);
-                const users = [];
-
-                guild.members.cache.forEach(member => {
-                    users.push({ id: member.user.id, username: member.user.username });
-                });
-
-                res.json(users);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-                res.status(500).json({ message: 'An error occurred while fetching users' });
-            }
-        });
-
-        app.get('/getroles', checkLoggedIn, async (req, res) => {
-
-            try {
-                const guild = await client.guilds.fetch(guildId);
-                const roles = [];
-
-                guild.roles.cache.forEach(role => {
-                    roles.push({ id: role.id, name: role.name });
-                });
-
-                res.json(roles);
-            } catch (error) {
-                console.error('Error fetching roles:', error);
-                res.status(500).json({ message: 'An error occurred while fetching roles' });
-            }
-        });
-
         app.get('/logout', (req, res) => {
             // Clear the login status from the session on logout
             req.session.isLoggedIn = false;
