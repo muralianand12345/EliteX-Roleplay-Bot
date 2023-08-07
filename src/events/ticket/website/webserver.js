@@ -14,6 +14,8 @@ module.exports = {
     async execute(client) {
         const Port = process.env.PORT;
 
+        const guildId = '1115161694335930508';
+
         const ticketLogDir = path.join(__dirname, './ticket-logs');
         //app.use(require('morgan')('dev'));
         app.use(express.static(ticketLogDir));
@@ -94,23 +96,56 @@ module.exports = {
         });
 
         app.get('/getchannels', checkLoggedIn, async (req, res) => {
-            const guildId = '1115161694335930508'; // Replace with the actual guild ID
-        
+
             try {
                 const guild = await client.guilds.fetch(guildId);
                 await guild.channels.fetch(); // Ensure the cache is populated
                 const channels = [];
-        
+
                 guild.channels.cache.forEach(channel => {
-                    if (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildAnnouncement) {
+                    if (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildAnnouncement || channel.type === ChannelType.GuildVoice) {
                         channels.push({ id: channel.id, name: channel.name });
                     }
                 });
-        
+
                 res.json(channels);
             } catch (error) {
                 console.error('Error fetching channels:', error);
                 res.status(500).json({ message: 'An error occurred while fetching channels' });
+            }
+        });
+
+        app.get('/getusers', checkLoggedIn, async (req, res) => {
+
+            try {
+                const guild = await client.guilds.fetch(guildId);
+                const users = [];
+
+                guild.members.cache.forEach(member => {
+                    users.push({ id: member.user.id, username: member.user.username });
+                });
+
+                res.json(users);
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                res.status(500).json({ message: 'An error occurred while fetching users' });
+            }
+        });
+
+        app.get('/getroles', checkLoggedIn, async (req, res) => {
+
+            try {
+                const guild = await client.guilds.fetch(guildId);
+                const roles = [];
+
+                guild.roles.cache.forEach(role => {
+                    roles.push({ id: role.id, name: role.name });
+                });
+
+                res.json(roles);
+            } catch (error) {
+                console.error('Error fetching roles:', error);
+                res.status(500).json({ message: 'An error occurred while fetching roles' });
             }
         });
 
