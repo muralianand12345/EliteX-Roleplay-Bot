@@ -25,6 +25,7 @@
 
         h1 {
             font-size: 28px;
+            margin-bottom: 10px;
         }
 
         .admin-content {
@@ -119,13 +120,79 @@
             border: 1px solid #ccc;
             margin: 2px;
         }
+
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: #201444;
+            color: #ffffff;
+        }
+
+        #profile-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            flex: 1;
+        }
+
+        #profile-info img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        #profile-info span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logout-button {
+            font-size: 16px;
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+
+        .logout-button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Style for the channel select dropdown */
+        #channelSelect {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        #channelSelect option {
+            font-size: 16px;
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <h1>Admin Dashboard</h1>
-        <button class="logout-button" onclick="logout()">Logout</button>
+        <div class="header-content">
+            
+            <div>
+                <div id="profile-info"></div>
+                <h1>Admin Dashboard</h1>
+                <button class="logout-button" onclick="logout()">Logout</button>
+            </div>    
+        </div>
     </header>
     <div class="admin-content">
         <div class="admin-section">
@@ -172,6 +239,7 @@
             const messageForm = document.getElementById('messageForm');
             messageForm.addEventListener('submit', submitMessageForm);
             fetchInitialData();
+            fetchProfileInfo();
         });
 
         async function submitMessageForm(event) {
@@ -302,6 +370,25 @@
         function getChannelIdFromName(channelName) {
             const channel = availableChannels.find(channel => channel.name.toLowerCase() === channelName.toLowerCase());
             return channel ? channel.id : null;
+        }
+
+        // PROFILE --------------------------------------------
+        async function fetchProfileInfo() {
+            try {
+                const response = await fetch('/getprofile');
+                const profileInfo = await response.json();
+
+                const profileInfoDiv = document.getElementById('profile-info');
+                const avatarUrl = `https://cdn.discordapp.com/avatars/${profileInfo.discordId}/${profileInfo.discordAvatar}.png`;
+
+                profileInfoDiv.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center;">
+        <img src="${avatarUrl}" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px;">
+            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${profileInfo.discordUsername}</span>
+        </div>`;
+            } catch (error) {
+                console.error('Error fetching profile information:', error);
+            }
         }
 
     </script>

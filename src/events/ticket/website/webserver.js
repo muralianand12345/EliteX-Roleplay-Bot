@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const session = require('express-session');
 const { v4: uuidv4 } = require('uuid');
+const rateLimit = require('express-rate-limit');
 
 const AdminModal = require('../../../events/mongodb/modals/adminLogin.js');
 
@@ -14,7 +15,7 @@ module.exports = {
     async execute(client) {
         const Port = process.env.PORT;
 
-        const guildId = '1115161694335930508';
+        const guildId = client.config.GUILD_ID;
 
         const ticketLogDir = path.join(__dirname, './ticket-logs');
         //app.use(require('morgan')('dev'));
@@ -34,13 +35,21 @@ module.exports = {
 
         app.use(express.json());
 
+        //LOGIN LOGIC --------------------------------------------------------------
+
         const secretKey = uuidv4();
         app.use(session({
-            secret: secretKey, // Use the generated secret key here
+            secret: secretKey,
             resave: false,
             saveUninitialized: true,
-            cookie: { secure: false } // Set this to true if using HTTPS
+            cookie: { secure: false },
         }));
+
+        const limiter = rateLimit({
+            windowMs: 15 * 60 * 1000,
+            max: 5,
+            message: { message: 'Too many login attempts, please try again later.' }
+        });
 
         app.post('/login', async (req, res) => {
             const { username, password } = req.body;
@@ -52,12 +61,15 @@ module.exports = {
                 }
 
                 req.session.isLoggedIn = true;
+                req.session.username = user.username;
                 return res.status(200).json({ message: 'Success' });
             } catch (error) {
                 console.error('Error during authentication:', error);
-                return res.status(500).json({ message: 'Internal server error' });
+                res.redirect('/error');
             }
         });
+
+        //---------------------------------------------------------------------------
 
         function checkLoggedIn(req, res, next) {
             if (req.session.isLoggedIn) {
@@ -67,8 +79,47 @@ module.exports = {
             }
         }
 
-        app.get('/admin', checkLoggedIn, (req, res) => {
-            res.sendFile(path.join(__dirname, 'webpage', 'admin.html'));
+        // APIS ---------------------------------------------------------------------------
+
+        app.get('/getprofile', checkLoggedIn, async (req, res) => {
+
+            try {
+                const user = await AdminModal.findOne({ username: req.session.username });
+                if (!user) {
+                    return res.status(404).json({ message: 'User not found' });
+                }
+
+                const profileInfo = {
+                    discordUsername: user.discordUsername,
+                    discordId: user.discordId,
+                    discordAvatar: user.discordAvatar,
+                };
+
+                return res.status(200).json(profileInfo);
+            } catch (error) {
+                console.error('Error fetching profile information:', error);
+                return res.status(500).json({ message: 'An error occurred while fetching profile information' });
+            }
+        });
+
+        app.get('/getchannels', checkLoggedIn, async (req, res) => {
+
+            try {
+                const guild = await client.guilds.fetch(guildId);
+                await guild.channels.fetch();
+                const channels = [];
+
+                guild.channels.cache.forEach(channel => {
+                    if (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildAnnouncement || channel.type === ChannelType.GuildVoice) {
+                        channels.push({ id: channel.id, name: channel.name });
+                    }
+                });
+
+                res.json(channels);
+            } catch (error) {
+                console.error('Error fetching channels:', error);
+                res.status(500).json({ message: 'An error occurred while fetching channels' });
+            }
         });
 
         app.post('/sendmessage', checkLoggedIn, async (req, res) => {
@@ -95,34 +146,23 @@ module.exports = {
             }
         });
 
-        app.get('/getchannels', checkLoggedIn, async (req, res) => {
-
-            try {
-                const guild = await client.guilds.fetch(guildId);
-                await guild.channels.fetch(); // Ensure the cache is populated
-                const channels = [];
-
-                guild.channels.cache.forEach(channel => {
-                    if (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildAnnouncement || channel.type === ChannelType.GuildVoice) {
-                        channels.push({ id: channel.id, name: channel.name });
-                    }
-                });
-
-                res.json(channels);
-            } catch (error) {
-                console.error('Error fetching channels:', error);
-                res.status(500).json({ message: 'An error occurred while fetching channels' });
-            }
-        });
+        // ================================================================================
 
         app.get('/logout', (req, res) => {
-            // Clear the login status from the session on logout
             req.session.isLoggedIn = false;
             res.redirect('/login');
         });
 
         app.get('/login', (req, res) => {
             res.sendFile(path.join(__dirname, 'webpage', 'login.html'));
+        });
+
+        app.get('/admin', checkLoggedIn, (req, res) => {
+            res.sendFile(path.join(__dirname, 'webpage', 'admin.html'));
+        });
+
+        app.get('/error', (req, res) => {
+            res.sendFile(path.join(__dirname, 'webpage', 'error.html'));
         });
 
         app.get('/', (req, res) => {
