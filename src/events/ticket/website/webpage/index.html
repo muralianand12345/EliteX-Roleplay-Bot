@@ -1,309 +1,45 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iconic Roleplay Bot</title>
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&display=swap">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Open Sans', Arial, sans-serif;
-            background-color: #201444;
-            color: #ffffff;
-        }
-
-        header {
-            background-image: url('https://cdn.discordapp.com/attachments/1099720199588040824/1099784797280276570/icp_01.jpg');
-            background-size: cover;
-            background-position: center;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            text-align: center;
-            position: relative;
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: -1;
-        }
-
-        .logo {
-            width: 150px;
-            height: 150px;
-            background-image: url('https://cdn.discordapp.com/attachments/1099720199588040824/1099784792821743686/ic_logo.png');
-            background-size: cover;
-            background-position: center;
-            border-radius: 50%;
-            margin-bottom: 20px;
-        }
-
-        .bot-description {
-            font-size: 24px;
-            margin-bottom: 20px;
-            font-family: 'Monospace';
-            font-weight: bold;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 5px;
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-        }
-
-        .button-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .bot-link,
-        .discord-link,
-        .website-link {
-            font-size: 18px;
-            text-decoration: none;
-            color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            font-family: 'Roboto', Arial, sans-serif;
-        }
-
-        .bot-link {
-            background-color: #3498db;
-        }
-
-        .bot-link:hover {
-            background-color: #2980b9;
-        }
-
-        .discord-link {
-            background-color: #7289DA;
-        }
-
-        .discord-link:hover {
-            background-color: #5A68A5;
-        }
-
-        .website-link {
-            background-color: #27ae60;
-        }
-
-        .website-link:hover {
-            background-color: #219653;
-        }
-
-        .file-count {
-            font-size: 18px;
-            margin-top: 10px;
-            font-family: 'Roboto', Arial, sans-serif;
-        }
-
-        .file-count-box {
-            background-color: #ffffff;
-            color: #201444;
-            padding: 10px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
-        .login-box {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            background-color: rgba(32, 20, 68, 0.9);
-            color: #ffffff;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease;
-            z-index: 1;
-        }
-
-        .login-box.opened {
-            background-color: rgba(32, 20, 68, 0.95);
-        }
-
-        .login-box h2 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        .login-box form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .login-box label {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .login-box input[type="text"],
-        .login-box input[type="password"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            background-color: #ffffff;
-            color: #000;
-        }
-
-        .login-box button {
-            padding: 8px 15px;
-            background-color: #201444;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .login-box button:hover {
-            background-color: #1A0C33;
-        }
-
-        .login-button {
-            font-size: 16px;
-            background-color: #3498db;
-            color: #ffffff;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Roboto', Arial, sans-serif;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1;
-        }
-
-        .login-button:hover {
-            background-color: #2980b9;
-        }
-
-        .exit-button {
-            font-size: 20px;
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            color: #201444;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-            font-weight: bold;
-            padding: 5px;
-            border: 1px solid #201444;
-            border-radius: 3px;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .exit-button:hover {
-            color: #1A0C33;
-            opacity: 1;
-        }
-    </style>
-</head>
-
-<body>
-    <header>
-        <button class="login-button" onclick="openLoginBox()">Login</button>
-        <!-- Overlay div -->
-        <div class="overlay"></div>
-        <div class="logo"></div>
-        <div class="bot-description">
-            <p>Official ICONIC Roleplay Discord Bot</p>
-            <p>Ticket | Moderation | Logs | Voice Process | Mod Mail | Welcome | Voting Poll</p>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Iconic Roleplay Bot</title>
+        <link rel="stylesheet" href="/css/index.css">
+    </head>
+    <body>
+        <header>
+            <button class="login-button" onclick="openLoginBox()">Login</button>
+            <!-- Overlay div -->
+            <div class="overlay"></div>
+            <div class="logo"></div>
+            <div class="bot-description">
+                <p>Official ICONIC Roleplay Discord Bot</p>
+                <p>Ticket | Moderation | Logs | Voice Process | Mod Mail | Welcome | Voting Poll</p>
+            </div>
+            <div class="button-container">
+                <a class="bot-link" href="https://iconicrpbot.muralianand.in"
+                    target="_blank">Explore Iconic Roleplay Bot</a>
+                <a class="discord-link" href="https://discord.gg/iconicrp"
+                    target="_blank">Join Our Discord Server</a>
+                <a class="website-link" href="https://iconicrp.in"
+                    target="_blank">Visit Our Website</a>
+            </div>
+            <div class="file-count">
+                Total Tickets Handled So Far:
+                <span class="file-count-box" id="fileCountBox">Calculating...</span>
+            </div>
+            <script src="/js/index.js"></script>
+        </header>
+        <div class="login-box" id="loginBox">
+            <span class="exit-button" onclick="closeLoginBox()">X</span>
+            <h2>Login</h2>
+            <form onsubmit="submitLoginForm(event)">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <button type="submit">Login</button>
+            </form>
         </div>
-        <div class="button-container">
-            <a class="bot-link" href="https://iconicrpbot.muralianand.in" target="_blank">Explore Iconic Roleplay
-                Bot</a>
-            <a class="discord-link" href="https://discord.gg/iconicrp" target="_blank">Join Our Discord Server</a>
-            <a class="website-link" href="https://iconicrp.in" target="_blank">Visit Our Website</a>
-        </div>
-        <div class="file-count">
-            Total Tickets Handled So Far:
-            <span class="file-count-box" id="fileCountBox">Calculating...</span>
-        </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                fetchFileCount();
-            });
-
-            async function fetchFileCount() {
-                const response = await fetch('/filecount');
-                const data = await response.json();
-                const fileCount = data.fileCount;
-                updateFileCount(fileCount);
-            }
-
-            function updateFileCount(count) {
-                const fileCountBox = document.getElementById('fileCountBox');
-                fileCountBox.textContent = count;
-            }
-
-            function openLoginBox() {
-                const loginBox = document.getElementById('loginBox');
-                loginBox.style.display = 'block';
-            }
-
-            function closeLoginBox() {
-                const loginBox = document.getElementById('loginBox');
-                loginBox.style.display = 'none';
-            }
-
-            async function submitLoginForm(event) {
-                event.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-
-                try {
-                    const response = await fetch('/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ username, password })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        window.location.href = '/admin';
-                    } else {
-                        alert(data.message);
-                    }
-                } catch (error) {
-                    console.error('Error during login:', error);
-                    alert('An error occurred during login. Please try again later.');
-                }
-            }
-
-        </script>
-    </header>
-    <div class="login-box" id="loginBox">
-        <span class="exit-button" onclick="closeLoginBox()">X</span>
-        <h2>Login</h2>
-        <form onsubmit="submitLoginForm(event)">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <button type="submit">Login</button>
-        </form>
-    </div>
-</body>
-
+    </body>
 </html>
