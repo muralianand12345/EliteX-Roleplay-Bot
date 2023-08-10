@@ -170,3 +170,19 @@ h1 {
 #channelSelect option {
     font-size: 16px;
 }
+
+.view-log-button {
+    font-size: 16px;
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin-top: 10px;
+}
+
+.view-log-button:hover {
+    background-color: #2980b9;
+}

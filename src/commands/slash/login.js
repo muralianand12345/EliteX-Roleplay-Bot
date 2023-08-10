@@ -7,7 +7,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('login')
         .setDescription("Admin Login")
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
         .addStringOption(option =>
             option.setName('username')
                 .setDescription('Enter your admin username')

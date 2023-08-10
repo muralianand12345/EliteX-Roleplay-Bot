@@ -8,25 +8,39 @@ const path = require('path');
 const session = require('express-session');
 const { v4: uuidv4 } = require('uuid');
 const rateLimit = require('express-rate-limit');
+const cors = require('cors');
 
 const AdminModal = require('../../../events/mongodb/modals/adminLogin.js');
+const CACHE_EXPIRATION_TIME = 5 * 60 * 1000;
 
 module.exports = {
     name: Events.ClientReady,
     async execute(client) {
 
         const Port = process.env.PORT;
-        const guildId = client.config.GUILD_ID;
+        const guildId = "1096848188935241878";//client.config.GUILD_ID;
         const Web = process.env.WEBSITEMESSWEB;
 
         const webhookClient = new WebhookClient({ url: Web });
         //app.use(require('morgan')('dev'));
 
-        // CSS JS JSON -----------------------------------------------
+        // CSS JS JSON CORS -----------------------------------------------
 
         app.use(express.json());
         app.use('/css', express.static(path.join(__dirname, 'webpage', 'css')));
         app.use('/js', express.static(path.join(__dirname, 'webpage', 'js')));
+
+        // CORS ------------------------------------------------------
+
+        const corsOptions = {
+            origin: ['https://iconicticket.muralianand.in',
+                'https://muralianand.in',
+                'http://localhost:5002'],
+            methods: 'GET,POST',
+            optionsSuccessStatus: 204,
+        };
+        app.use(cors(corsOptions));
+
 
         // Ticket File Count ------------------------------------------------------
 
@@ -199,7 +213,7 @@ module.exports = {
 
                 if (message.length <= 1000) {
                     await channel.send(message);
-                    embed.addFields({ name: `Message`, value: `\`\`\`${message}\`\`\``});
+                    embed.addFields({ name: `Message`, value: `\`\`\`${message}\`\`\`` });
                 } else {
                     const chunks = message.match(/[\s\S]{1,1000}/g);
                     let accumulatedContent = '';
@@ -210,7 +224,7 @@ module.exports = {
                     const fieldChunks = accumulatedContent.match(/[\s\S]{1,1000}/g);
                     fieldChunks.forEach((fieldChunk, index) => {
                         const fieldName = index === 0 ? `Message (Part ${index + 1})` : `... (Part ${index + 1})`;
-                        embed.addFields({ name: fieldName, value: `\`\`\`${fieldChunk}\`\`\``});
+                        embed.addFields({ name: fieldName, value: `\`\`\`${fieldChunk}\`\`\`` });
                     });
                 }
                 await webhookClient.send({
@@ -231,6 +245,7 @@ module.exports = {
 
             try {
                 const messageContent = await fetchMessageContentFromDiscord(guildId, messageId);
+                console.log(`messageContent: ${messageContent}`)
 
                 if (messageContent) {
                     res.json({ messageContent });
@@ -278,6 +293,20 @@ module.exports = {
             }
         });
 
+        app.get('/getfilelist', checkLoggedIn, (req, res) => {
+            const ticketLogDir = path.join(__dirname, 'ticket-logs');
+            fs.readdir(ticketLogDir, (err, files) => {
+                if (err) {
+                    console.error('Error reading directory:', err);
+                    //res.status(500).json({ error: 'Failed to read directory.' });
+                    res.redirect('/error');
+                } else {
+                    const htmlFiles = files.filter(file => file.endsWith('.html'));
+                    res.json(htmlFiles);
+                }
+            });
+        });
+
         // ================================================================================
 
         app.get('/logout', (req, res) => {
@@ -291,6 +320,10 @@ module.exports = {
 
         app.get('/admin', checkLoggedIn, (req, res) => {
             res.sendFile(path.join(__dirname, 'webpage', 'admin.html'));
+        });
+
+        app.get('/ticket', checkLoggedIn, (req, res) => {
+            res.sendFile(path.join(__dirname, 'webpage', 'ticket.html'));
         });
 
         app.get('/error', (req, res) => {

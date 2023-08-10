@@ -243,3 +243,7 @@ async function editAndSendMessage(messageId, editedMessage) {
         return false;
     }
 }
+
+function viewTicketLog() {
+    window.location.href = '/ticket'; 
+}
