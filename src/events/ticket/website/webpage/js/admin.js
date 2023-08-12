@@ -1,10 +1,25 @@
+//Navigation Bar JS
+const navigation = document.querySelector('.navigation');
+document.addEventListener('mousemove', (event) => {
+    const mouseX = event.clientX;
+    if (mouseX <= 100) {
+        navigation.style.left = '0';
+    } else {
+        navigation.style.left = '-100px';
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchFileCount();
     const messageForm = document.getElementById('messageForm');
+    const messageEditorForm = document.getElementById('messageEditorForm');
+    const roleForm = document.getElementById('roleForm');
     messageForm.addEventListener('submit', submitMessageForm);
+    messageEditorForm.addEventListener('submit', submitMessageEditorForm);
+    messageEditorForm.addEventListener('input', updateEditedMessage);
+    roleForm.addEventListener('submit', fetchDiscordData);
     fetchInitialData();
     fetchProfileInfo();
-    setupMessageEditor();
 });
 
 const messageTextarea = document.getElementById('message');
@@ -23,34 +38,14 @@ messageTextarea.addEventListener('input', function () {
     }
 });
 
-fetchChannelsOption();
-
 //Functions =============================================================
-
-function logout() {
-    fetch('/logout')
-        .then((response) => {
-            window.location.href = '/login';
-        })
-        .catch((error) => {
-            console.error('Error during logout:', error);
-            window.location.href = '/login';
-        });
-}
-
-async function fetchFileCount() {
-    try {
-        const response = await fetch('/filecount');
-        const data = await response.json();
-    } catch (error) {
-        console.error('Error fetching file count:', error);
-    }
-}
 
 async function submitMessageForm(event) {
     event.preventDefault();
 
-    const channelId = document.getElementById('channelSelect').value;
+    const channelIdInput = document.getElementById('channelSelect');
+    const manualChannelInput = document.getElementById('manualChannelInput');
+    const channelId = channelIdInput.value || manualChannelInput.value;
     const message = document.getElementById('message').value;
 
     try {
@@ -61,8 +56,6 @@ async function submitMessageForm(event) {
             },
             body: JSON.stringify({ channelId, message })
         });
-
-        const data = await response.json();
 
         if (response.ok) {
             alert('Message sent successfully!');
@@ -80,13 +73,29 @@ async function fetchChannelsOption() {
         const response = await fetch('/getchannels');
         const channels = await response.json();
         const channelSelect = document.getElementById('channelSelect');
+        const channelSelectEditor = document.getElementById('channelSelectEditor');
+
+        // Clear existing options
         channelSelect.innerHTML = '';
+        channelSelectEditor.innerHTML = '';
+
+        // Create an option for typing manually
+        const manualOption = document.createElement('option');
+        manualOption.value = '';
+        manualOption.text = 'Type Channel ID';
+        channelSelect.appendChild(manualOption);
+        channelSelectEditor.appendChild(manualOption.cloneNode(true));
 
         channels.forEach(channel => {
             const option = document.createElement('option');
             option.value = channel.id;
             option.text = channel.name;
             channelSelect.appendChild(option);
+
+            const optionEditor = document.createElement('option');
+            optionEditor.value = channel.id;
+            optionEditor.text = channel.name;
+            channelSelectEditor.appendChild(optionEditor);
         });
     } catch (error) {
         console.error('Error fetching channels:', error);
@@ -98,7 +107,7 @@ async function fetchChannels() {
         const response = await fetch('/getchannels');
         const channels = await response.json();
 
-        availableChannels.length = 0; // Clear existing array
+        availableChannels.length = 0;
         channels.forEach(channel => {
             availableChannels.push({ id: channel.id, name: channel.name });
         });
@@ -107,13 +116,6 @@ async function fetchChannels() {
     }
 }
 
-async function fetchInitialData() {
-    try {
-        await fetchChannels();
-    } catch (error) {
-        console.error('Error fetching initial data:', error);
-    }
-}
 
 function showSuggestions(availableItems, typedText) {
     const matchedItems = availableItems.filter(item =>
@@ -170,39 +172,126 @@ async function fetchProfileInfo() {
     }
 }
 
-function setupMessageEditor() {
-    const messageIdInput = document.getElementById('messageId');
+async function submitMessageEditorForm(event) {
+    event.preventDefault();
+
+    const channelIdInput = document.getElementById('channelSelectEditor');
+    const manualChannelInput = document.getElementById('manualChannelEditorInput');
+    const channelId = channelIdInput.value || manualChannelInput.value;
+    const messageId = document.getElementById('messageId').value;
+    const editedMessage = document.getElementById('editedMessage').value;
+
     const editedMessageTextarea = document.getElementById('editedMessage');
 
-    messageIdInput.addEventListener('input', async () => {
-        editedMessageTextarea.value = '';
-        const messageId = messageIdInput.value;
-        if (!messageId) {
-            return;
-        }
-        await delay(2000);
-        const messageContent = await getMessageContent(messageId);
-        if (messageContent) {
-            editedMessageTextarea.value = messageContent;
-        }
-    });
+    if (!channelId || !messageId) {
+        editedMessageTextarea.value = 'Please provide both channel and message ID.';
+        return;
+    }
 
-    const messageEditorForm = document.getElementById('messageEditorForm');
-    messageEditorForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const messageId = messageIdInput.value;
-        const editedMessage = editedMessageTextarea.value;
-        if (!messageId || !editedMessage) {
-            alert('Please enter a message ID and an edited message.');
-            return;
-        }
-        const success = await editAndSendMessage(messageId, editedMessage);
-        if (success) {
-            alert('Message edited and sent successfully!');
+    try {
+        const response = await fetch('/editmessage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ channelId, messageId, editedMessage })
+        });
+
+        if (response.ok) {
+            alert('Message edited successfully!');
         } else {
-            alert('Failed to edit and send message. Please check the message ID and content.');
+            alert('Failed to edit message. Please try again.');
         }
-    });
+    } catch (error) {
+        console.error('Error editing message:', error);
+        alert('An error occurred while editing the message. Please try again later.');
+    }
+}
+
+let previousMessageId = '';
+
+function updateEditedMessage() {
+
+    const channelIdInput = document.getElementById('channelSelectEditor');
+    const manualChannelInput = document.getElementById('manualChannelEditorInput');
+    const channelId = channelIdInput.value || manualChannelInput.value;
+    const messageId = document.getElementById('messageId').value;
+
+    const editedMessageTextarea = document.getElementById('editedMessage');
+
+    if (!messageId || !channelId) {
+        editedMessageTextarea.value = 'Please provide channel and message ID.';
+        return;
+    }
+
+    if (messageId === previousMessageId) {
+        return;
+    }
+
+    fetch(`/getmessage/${messageId}?channelId=${channelId}`)
+        .then(response => response.json())
+        .then(data => {
+            editedMessageTextarea.value = data.messageContent;
+            previousMessageId = messageId;
+        })
+        .catch(error => {
+            console.error('Error fetching message content:', error);
+            editedMessageTextarea.value = 'An error occurred while fetching the message content.';
+        });
+}
+
+async function fetchDiscordData(event) {
+    event.preventDefault();
+    const userId = document.getElementById('userId').value;
+    const roleId = document.getElementById('roleSelect').value;
+    const action = document.getElementById('actionSelect').value;
+
+    try {
+        const response = await fetch('/getdiscorddata', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId, roleId, action })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+                alert(`Success: ${result.message}`);
+            } else {
+                alert(`Failed: ${result.message}`);
+            }
+        } else {
+            alert(`Failed: ${result.message}`);
+        }
+    } catch (error) {
+        console.error('Error fetching Discord data:', error);
+        alert('An error occurred while fetching Discord data. Please try again later.');
+    }
+}
+
+async function populateRoleDropdown() {
+    try {
+        const response = await fetch('/getroles');
+        const data = await response.json();
+
+        if (response.ok) {
+            const roleSelect = document.getElementById('roleSelect');
+            roleSelect.innerHTML = ''; 
+
+            data.roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role.id;
+                option.textContent = role.name;
+                roleSelect.appendChild(option);
+            });
+        } else {
+            console.error('Failed to fetch role data:', data.error);
+        }
+    } catch (error) {
+        console.error('Error fetching role data:', error);
+    }
 }
 
 //Helper Functions =============================================================
@@ -212,38 +301,36 @@ function getChannelIdFromName(channelName) {
     return channel ? channel.id : null;
 }
 
-async function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function getMessageContent(messageId) {
-    try {
-        const response = await fetch(`/getmessage/${messageId}`);
-        const data = await response.json();
-        return response.ok ? data.messageContent : null;
-    } catch (error) {
-        console.error('Error retrieving message:', error);
-        return null;
-    }
-}
-
-async function editAndSendMessage(messageId, editedMessage) {
-    try {
-        const response = await fetch(`/editmessage/${messageId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ editedMessage })
-        });
-
-        return response.ok;
-    } catch (error) {
-        console.error('Error editing and sending message:', error);
-        return false;
-    }
-}
-
 function viewTicketLog() {
-    window.location.href = '/ticket'; 
+    window.location.href = '/ticket';
+}
+
+async function fetchInitialData() {
+    try {
+        await fetchChannels();
+        await populateRoleDropdown();
+        await fetchChannelsOption();
+    } catch (error) {
+        console.error('Error fetching initial data:', error);
+    }
+}
+
+function logout() {
+    fetch('/logout')
+        .then((response) => {
+            window.location.href = '/login';
+        })
+        .catch((error) => {
+            console.error('Error during logout:', error);
+            window.location.href = '/login';
+        });
+}
+
+async function fetchFileCount() {
+    try {
+        const response = await fetch('/filecount');
+        const data = await response.json();
+    } catch (error) {
+        console.error('Error fetching file count:', error);
+    }
 }

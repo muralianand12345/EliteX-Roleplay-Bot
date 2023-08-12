@@ -82,7 +82,7 @@ module.exports = {
                 NAME: client.jobs.MEDIA.NAME
             }
         };
-        
+
         const selectedRole = Object.values(roleMap).find(role => interaction.member.roles.cache.has(role.HO));
 
         if (!selectedRole) return interaction.editReply({ content: 'You do not have the necessary role to use this command!', ephemeral: true });
@@ -104,15 +104,15 @@ module.exports = {
         } else if (grOption === 'gr-job') {
             if (userMember.roles.cache.has(client.jobs.GOVTCOOL)) return interaction.editReply({ content: "The user has a Govt Job cooldown", ephemeral: true });
             if (userMember.roles.cache.has(targetRole.ROLEID)) return interaction.editReply({ content: "The user already has the Job Role!", ephemeral: true });
-            if (userMember.roles.cache.has(targetRole.INTERVIEW)) {
-                await RoleLog(targetRole.NAME, "Job Role", userMember.id, interaction.user.id);
-                await userMember.roles.add(targetRole.ROLEID);
-                await userMember.roles.remove(targetRole.INTERVIEW);
-                return interaction.editReply({ content: `Added Job Role to <@${userMember.id}>!`, ephemeral: true });
-            } else {
+            //if (userMember.roles.cache.has(targetRole.INTERVIEW)) {
+            await RoleLog(targetRole.NAME, "Job Role", userMember.id, interaction.user.id);
+            await userMember.roles.add(targetRole.ROLEID);
+            await userMember.roles.remove(targetRole.INTERVIEW);
+            return interaction.editReply({ content: `Added Job Role to <@${userMember.id}>!`, ephemeral: true });
+            /*} else {
                 return interaction.editReply({ content: "The user no Interview role!", ephemeral: true });
-            }
-            
+            }*/
+
         } else if (grOption === 'gr-remove') {
 
             if (userMember.roles.cache.has(targetRole.ROLEID)) {
