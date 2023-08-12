@@ -1,0 +1,14 @@
+{
+    "ROLES": {
+        "roles": [
+            {
+                "id": "",
+                "name": "Owner"
+            },
+            {
+                "id": "",
+                "name": "Moderator"
+            }
+        ]
+    }
+}

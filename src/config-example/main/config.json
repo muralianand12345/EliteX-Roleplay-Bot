@@ -1,10 +1,12 @@
 {
     "INFO": {
-        "OWNER_ID": "678402714765361182",
+        "OWNER_ID": "",
         "PREFIX": "-"
     },
 
-    "DEPLOY_COMMAND": true,
+    "GUILD_ID": "",
+
+    "DEPLOY_COMMAND": false,
 
     "MESSAGE": {
 		"COOLDOWN_MESSAGE": "You are on `<duration>` cooldown!" 
@@ -42,7 +44,8 @@
     },
 
     "YT": {
-        "CHANID": ""
+        "CHANID": "",
+        "LOG": ""
     },
 
     "MSG": {
