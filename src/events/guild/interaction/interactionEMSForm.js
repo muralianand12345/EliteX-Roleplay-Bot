@@ -35,7 +35,31 @@ module.exports = {
 
         var emsFeedbackEmbed = new EmbedBuilder();
         var emsResignationEmbed = new EmbedBuilder();
-        var emsResignationButton = new ActionRowBuilder();
+
+        var emsResignationButton = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('ems-resignation-accept')
+                    .setLabel('Accept')
+                    .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId('ems-resignation-reject')
+                    .setLabel('Reject')
+                    .setStyle(ButtonStyle.Danger)
+            );
+        var editemsResignationButton = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('ems-resignation-accept')
+                    .setLabel('Accept')
+                    .setStyle(ButtonStyle.Success)
+                    .setDisabled(true),
+                new ButtonBuilder()
+                    .setCustomId('ems-resignation-reject')
+                    .setLabel('Reject')
+                    .setStyle(ButtonStyle.Danger)
+                    .setDisabled(true)
+            );
 
         //Suggestions
 
@@ -198,16 +222,6 @@ module.exports = {
                     { name: 'Reason', value: `${emsResContent}` },
                 )
                 .setFooter({ text: `${interaction.user.id}` });
-            emsResignationButton.addComponents(
-                new ButtonBuilder()
-                    .setCustomId('ems-resignation-accept')
-                    .setLabel('Accept')
-                    .setStyle(ButtonStyle.Success),
-                new ButtonBuilder()
-                    .setCustomId('ems-resignation-reject')
-                    .setLabel('Reject')
-                    .setStyle(ButtonStyle.Danger)
-            );
 
             await reschan.send({
                 embeds: [emsResignationEmbed],
@@ -229,12 +243,12 @@ module.exports = {
             }
             await userMember.send({
                 content: `We have received and accepted your EMS resignation! Please arrange a meeting at your earliest convenience to discuss the next steps.`
-            }).catch(async (err)=>{
+            }).catch(async (err) => {
                 if (err.code == 50007) return;
                 console.error(`EMS FORM: ${err}`);
             });
-            reschan.send({ content: `<@${userMember.id}>\'s resignation has been **accepted** by <@${interaction.user.id}>` });
-            await interaction.message.delete();
+            interaction.reply({ content: `<@${userMember.id}>\'s resignation has been **accepted** by <@${interaction.user.id}>` });
+            await interaction.message.edit({ components: [editemsResignationButton] });
         }
 
         if (interaction.customId == "ems-resignation-reject") {
@@ -246,12 +260,12 @@ module.exports = {
             }
             await userMember.send({
                 content: `Your EMS resignation has been reviewed and has been rejected. If you would like to discuss this further, please schedule a meeting.`
-            }).catch(async (err)=>{
+            }).catch(async (err) => {
                 if (err.code == 50007) return;
                 console.error(`EMS FORM: ${err}`);
             });
-            reschan.send({ content: `<@${userMember.id}>\'s resignation has been **rejected** by <@${interaction.user.id}>` });
-            await interaction.message.delete();
+            interaction.reply({ content: `<@${userMember.id}>\'s resignation has been **rejected** by <@${interaction.user.id}>` });
+            await interaction.message.edit({ components: [editemsResignationButton] });
         }
     }
 };
