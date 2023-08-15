@@ -16,6 +16,7 @@ const path = require('path');
 
 const ticketModel = require('../../../events/mongodb/modals/ticket.js');
 const ticketData = require("../../../events/mongodb/modals/channel.js");
+const ticketLogModel = require('../../../events/mongodb/modals/ticketlog.js');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -39,6 +40,21 @@ module.exports = {
 
                 if (!ticketDoc) {
                     return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
+                }
+
+                var ticketLog = await ticketLogModel.findOne({
+                    guildID: interaction.guild.id,
+                    userID: ticketDoc.userID
+                }).catch(err => console.log(err));
+
+                if (!ticketLog) {
+                    ticketLog = new ticketLogModel({
+                        guildID: interaction.guild.id,
+                        userID: ticketDoc.userID,
+                        count: 0,
+                        ticketlog: []
+                    });
+                    await ticketLog.save();
                 }
 
                 var IdData = await ticketData.findOne({
@@ -70,6 +86,17 @@ module.exports = {
                         console.log(err);
                     }
                 });
+
+                var ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
+                const ticketlog = {
+                    ticketNumber: ticketNumber,
+                    ticketId: interaction.channel.id,
+                    transcriptLink: `${serverAdd}/transcript-${interaction.channel.id}.html`
+                };
+
+                ticketLog.ticketlog.push(ticketlog);
+                ticketLog.count += 1;
+                await ticketLog.save();
 
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: 'Logs Ticket', iconURL: client.config.EMBED.IMAGE })
@@ -148,6 +175,21 @@ module.exports = {
                     return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
                 }
 
+                var ticketLog = await ticketLogModel.findOne({
+                    guildID: interaction.guild.id,
+                    userID: ticketDoc.userID
+                }).catch(err => console.log(err));
+
+                if (!ticketLog) {
+                    ticketLog = new ticketLogModel({
+                        guildID: interaction.guild.id,
+                        userID: ticketDoc.userID,
+                        count: 0,
+                        ticketlog: []
+                    });
+                    await ticketLog.save();
+                }
+
                 var IdData = await ticketData.findOne({
                     ticketGuildID: interaction.guild.id
                 }).catch(err => console.log(err));
@@ -176,6 +218,17 @@ module.exports = {
                         console.log(err);
                     }
                 });
+
+                var ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
+                const ticketlog = {
+                    ticketNumber: ticketNumber,
+                    ticketId: interaction.channel.id,
+                    transcriptLink: `${serverAdd}/transcript-${interaction.channel.id}.html`
+                };
+
+                ticketLog.ticketlog.push(ticketlog);
+                ticketLog.count += 1;
+                await ticketLog.save();
 
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: 'Logs Ticket', iconURL: client.config.EMBED.IMAGE })

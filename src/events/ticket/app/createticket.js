@@ -88,7 +88,7 @@ module.exports = {
             var ticketChannel = await interaction.guild.channels.create({
                 name: `ticket-${guildDoc.ticketCount}-${interaction.user.username}`,
                 parent: mainTicket,
-                topic: interaction.user.username,
+                topic: guildDoc.ticketCount,
                 permissionOverwrites: [
                     {
                         id: interaction.user.id,
