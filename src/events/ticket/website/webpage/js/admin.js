@@ -254,9 +254,9 @@ async function fetchDiscordData(event) {
             },
             body: JSON.stringify({ userId, roleId, action })
         });
-
+        
+        const result = await response.json();
         if (response.ok) {
-            const result = await response.json();
             if (result.success) {
                 alert(`Success: ${result.message}`);
             } else {

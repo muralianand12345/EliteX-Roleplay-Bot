@@ -11,6 +11,7 @@ const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 
 const AdminModal = require('../../../events/mongodb/modals/adminLogin.js');
+const TicketModel = require('../../../events/mongodb/modals/ticketlog.js');
 
 module.exports = {
     name: Events.ClientReady,
@@ -249,18 +250,30 @@ module.exports = {
             }
         });
 
-        app.get('/getfilelist', checkLoggedIn, (req, res) => {
-            const ticketLogDir = path.join(__dirname, 'ticket-logs');
-            fs.readdir(ticketLogDir, (err, files) => {
-                if (err) {
-                    console.error('Error reading directory:', err);
-                    //res.status(500).json({ error: 'Failed to read directory.' });
-                    res.redirect('/error');
-                } else {
-                    const htmlFiles = files.filter(file => file.endsWith('.html'));
-                    res.json(htmlFiles);
-                }
-            });
+        app.get('/getfilelist', checkLoggedIn, async (req, res) => {
+            const searchText = req.query.search || '';
+            try {
+                const tickets = await TicketModel.find({
+                    $or: [
+                        { ticketNumber: { $regex: searchText, $options: 'i' } },
+                        { ticketId: { $regex: searchText, $options: 'i' } },
+                        { userID: { $regex: searchText, $options: 'i' } }
+                    ]
+                });
+        
+                const ticketList = tickets.map(ticket => ({
+                    ticketNumber: ticket.ticketNumber,
+                    ticketId: ticket.ticketId,
+                    transcriptLink: ticket.transcriptLink,
+                    userID: ticket.userID,
+                    ticketlog: ticket.ticketlog // Include the ticketlog array
+                }));
+        
+                res.json(ticketList);
+            } catch (error) {
+                console.error('Error fetching ticket data:', error);
+                res.status(500).json({ error: 'An error occurred while fetching ticket data.' });
+            }
         });
 
         app.post('/editmessage', checkLoggedIn, async (req, res) => {
@@ -310,7 +323,7 @@ module.exports = {
         app.get('/getmessage/:messageId', checkLoggedIn, async (req, res) => {
             const { messageId } = req.params;
             const channelId = req.query.channelId;
-            
+
             try {
                 const channel = client.channels.cache.get(channelId);
                 if (!channel) {
@@ -358,10 +371,10 @@ module.exports = {
                         if (!member.roles.cache.has(role.id)) {
                             await member.roles.add(role);
                             embed.addFields(
-                                { name: 'To', value: `<@${userId}>`},
-                                { name: 'Role Added', value: `${role.name}`}
+                                { name: 'To', value: `<@${userId}>` },
+                                { name: 'Role Added', value: `${role.name}` }
                             )
-                            .setColor('Green');
+                                .setColor('Green');
                             responseMessage = `Added role ${role.name} to ${member.user.tag}`;
                         } else {
                             responseMessage = `${member.user.tag} already has the role ${role.name}`;
@@ -374,10 +387,10 @@ module.exports = {
                         if (member.roles.cache.has(role.id)) {
                             await member.roles.remove(role);
                             embed.addFields(
-                                { name: 'To', value: `<@${userId}>`},
-                                { name: 'Role Removed', value: `${role.name}`}
+                                { name: 'To', value: `<@${userId}>` },
+                                { name: 'Role Removed', value: `${role.name}` }
                             )
-                            .setColor('Red');
+                                .setColor('Red');
                             responseMessage = `Removed role ${role.name} from ${member.user.tag}`;
                         } else {
                             responseMessage = `${member.user.tag} doesn't have the role ${role.name}`;
@@ -429,7 +442,7 @@ module.exports = {
             res.sendFile(path.join(__dirname, 'webpage', 'ticket.html'));
         });
 
-        app.get('/error', (req, res) => {
+        app.get('/error', checkLoggedIn, (req, res) => {
             res.sendFile(path.join(__dirname, 'webpage', 'error.html'));
         });
 
