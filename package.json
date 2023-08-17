@@ -1,6 +1,6 @@
 {
   "name": "iconic-roleplay",
-  "version": "7.3.1",
+  "version": "7.4.0",
   "description": "Iconic Roleplay discord bot",
   "main": "./src/index.js",
   "scripts": {

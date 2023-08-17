@@ -112,6 +112,8 @@ client.login(Token).catch(err => {
     return process.exit();
 });
 
+module.exports = client;
+
 //Error Handling
 process.on('unhandledRejection', async (err, promise) => {
     handle.createrr(client, undefined, undefined, err);
