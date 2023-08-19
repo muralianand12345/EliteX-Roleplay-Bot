@@ -47,7 +47,9 @@ module.exports = {
             secret: secretKey,
             resave: false,
             saveUninitialized: true,
-            cookie: { secure: false },
+            cookie: { 
+                secure: false 
+            },
         }));
 
         //=================================================================================

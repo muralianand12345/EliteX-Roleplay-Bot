@@ -6,7 +6,7 @@ const {
     GatewayIntentBits,
     Partials
 } = require('discord.js');
-const Errorhandler = require("discord-error-handler");
+const Errorhandler = require("./modules/error-handler/discord-error-handler.js");
 
 const client = new Client({
     intents: [
