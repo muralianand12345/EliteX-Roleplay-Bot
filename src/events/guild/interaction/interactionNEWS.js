@@ -23,6 +23,7 @@ const cooldown = new Collection();
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
+        var MsgContent;
 
         var TaxiEmbed = new EmbedBuilder();
         var button = new ActionRowBuilder()
@@ -172,7 +173,7 @@ module.exports = {
                 await newRoleData.save();
                 await userMember.roles.add(role);
                 await RoleLog(JobName, 'Accepted', userMember.id, interaction.user.id);
-                var MsgContent = `<@${userId}>, **Congratulations on being selected for an Iconic Media interview! We are excited to learn more about you and discuss your potential role in our Iconic Media team. Please contact us to schedule the interview at your earliest convenience.**`;
+                MsgContent = `<@${userId}>, **Congratulations on being selected for an Iconic Media interview! We are excited to learn more about you and discuss your potential role in our Iconic Media team. Please contact us to schedule the interview at your earliest convenience.**`;
                 await chan.send(`${MsgContent}`);
                 interaction.editReply({ content: `Interview Role Added and Accepted! <@${userMember.id}>`, ephemeral: true });
             }
@@ -205,7 +206,7 @@ module.exports = {
             } else {
                 await userMember.roles.remove(role);
                 await RoleLog(JobName, 'Rejected', userMember.id, interaction.user.id);
-                var MsgContent = `<@${userId}>, **Thank you for your interest in the Iconic Media. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**`;
+                MsgContent = `<@${userId}>, **Thank you for your interest in the Iconic Media. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**`;
                 await chan.send(`${MsgContent}`);
                 interaction.editReply({ content: `Interview Role Removed and Rejected! <@${userMember.id}>`, ephemeral: true });
             }
