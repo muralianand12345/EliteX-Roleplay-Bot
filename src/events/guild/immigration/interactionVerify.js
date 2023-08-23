@@ -1,6 +1,5 @@
 const {
     Events,
-    ComponentType
 } = require('discord.js');
 
 module.exports = {

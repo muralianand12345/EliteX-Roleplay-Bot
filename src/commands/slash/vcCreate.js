@@ -39,6 +39,8 @@ module.exports = {
 
     async execute(interaction, client) {
 
+        var newData;
+
         //log
         const commandName = "VCCREATE_SETUP";
         client.std_log.error(client, commandName, interaction.user.id, interaction.channel.id);
@@ -99,7 +101,7 @@ module.exports = {
         const vcName = await interaction.options.getString("vc-name");
 
         if (!vcName) {
-            var newData = dateSetupData({
+            newData = dateSetupData({
                 guildID: interaction.guild.id,
                 vcID: vcChan.id,
                 parentID: vcParent.id,
@@ -108,7 +110,7 @@ module.exports = {
             });
             await newData.save();
         } else {
-            var newData = dateSetupData({
+            newData = dateSetupData({
                 guildID: interaction.guild.id,
                 vcID: vcChan.id,
                 parentID: vcParent.id,

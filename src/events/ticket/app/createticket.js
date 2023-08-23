@@ -85,7 +85,7 @@ module.exports = {
                 mainTicket = ticketParents.mainPar;
             }
 
-            var ticketChannel = await interaction.guild.channels.create({
+            await interaction.guild.channels.create({
                 name: `ticket-${guildDoc.ticketCount}-${interaction.user.username}`,
                 parent: mainTicket,
                 topic: guildDoc.ticketCount,

@@ -1,17 +1,6 @@
 const {
-    Events,
-    Collection
+    Events
 } = require('discord.js');
-
-//Embed and Buttons
-const {
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-} = require("discord.js");
-
-const cooldown = new Collection();
 
 const modMailModel = require("../../../events/mongodb/modals/modmail.js");
 

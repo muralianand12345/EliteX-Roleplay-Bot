@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const blockUserModel = require("../../events/mongodb/modals/blockusers.js");
 
 module.exports = {
@@ -44,6 +44,8 @@ module.exports = {
         ),
 
     async execute(interaction, client) {
+
+        var blockUserData;
         // Log
         const commandName = "BLOCKUSER";
         client.std_log.error(client, commandName, interaction.user.id, interaction.channel.id);
@@ -56,7 +58,7 @@ module.exports = {
         const removeblock = await interaction.options.getBoolean("block-boolean") || false;
 
         if (removeblock == true) {
-            var blockUserData = await blockUserModel.findOne({
+            blockUserData = await blockUserModel.findOne({
                 guildId: interaction.guild.id,
                 userId: user.id,
                 event: events
@@ -73,7 +75,7 @@ module.exports = {
             }
         } else {
 
-            var blockUserData = await blockUserModel.findOne({
+            blockUserData = await blockUserModel.findOne({
                 guildId: interaction.guild.id,
                 userId: user.id,
                 event: events

@@ -4,9 +4,10 @@ const blockUserModel = require("../../../events/mongodb/modals/blockusers.js");
 module.exports = {
     name: Events.MessageCreate,
     async execute(message, client) {
+        var blockUserData;
 
         if (message.channel.id == client.blockchat.CHAN.PICSCAFE) {
-            var blockUserData = await blockUserModel.findOne({
+            blockUserData = await blockUserModel.findOne({
                 guildId: message.guild.id,
                 userId: message.author.id,
                 event: 'piccafe',
@@ -42,7 +43,7 @@ module.exports = {
         }
 
         if (message.channel.id == client.blockchat.CHAN.MEME) {
-            var blockUserData = await blockUserModel.findOne({
+            blockUserData = await blockUserModel.findOne({
                 guildId: message.guild.id,
                 userId: message.author.id,
                 event: 'meme',
@@ -78,7 +79,7 @@ module.exports = {
         }
 
         if (message.channel.id == client.blockchat.CHAN.OOCCHAT) {
-            var blockUserData = await blockUserModel.findOne({
+            blockUserData = await blockUserModel.findOne({
                 guildId: message.guild.id,
                 userId: message.author.id,
                 event: 'oocchat',
@@ -114,7 +115,7 @@ module.exports = {
         }
 
         if (message.channel.id == client.blockchat.CHAN.ICCHAT) {
-            var blockUserData = await blockUserModel.findOne({
+            blockUserData = await blockUserModel.findOne({
                 guildId: message.guild.id,
                 userId: message.author.id,
                 event: 'icchat',
@@ -150,7 +151,7 @@ module.exports = {
         }
 
         if (message.channel.id == client.blockchat.CHAN.OPENCHAT) {
-            var blockUserData = await blockUserModel.findOne({
+            blockUserData = await blockUserModel.findOne({
                 guildId: message.guild.id,
                 userId: message.author.id,
                 event: 'openchat',

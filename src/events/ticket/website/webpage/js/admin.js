@@ -328,8 +328,7 @@ function logout() {
 
 async function fetchFileCount() {
     try {
-        const response = await fetch('/filecount');
-        const data = await response.json();
+        await fetch('/filecount');
     } catch (error) {
         console.error('Error fetching file count:', error);
     }

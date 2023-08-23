@@ -16,8 +16,8 @@ module.exports = {
         const commandName = `MESS_CUSTOM_EMBED`;
         client.std_log.error(client, commandName, message.author.id, message.channel.id);
 
-        var User = args[0];
-        var Message = args.slice(1).join(" ");
+        /*var User = args[0];
+        var Message = args.slice(1).join(" ");*/
 
         message.delete()
 

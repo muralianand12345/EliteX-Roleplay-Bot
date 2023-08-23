@@ -21,6 +21,7 @@ const ticketLogModel = require('../../../events/mongodb/modals/ticketlog.js');
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
+        var ticketNumber, IdData, ticketLog;
 
         if (interaction.customId == "delete-ticket") {
 
@@ -42,7 +43,7 @@ module.exports = {
                     return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
                 }
 
-                var ticketLog = await ticketLogModel.findOne({
+                ticketLog = await ticketLogModel.findOne({
                     guildID: interaction.guild.id,
                     userID: ticketDoc.userID
                 }).catch(err => console.log(err));
@@ -57,7 +58,7 @@ module.exports = {
                     await ticketLog.save();
                 }
 
-                var IdData = await ticketData.findOne({
+                IdData = await ticketData.findOne({
                     ticketGuildID: interaction.guild.id
                 }).catch(err => console.log(err));
 
@@ -87,7 +88,7 @@ module.exports = {
                     }
                 });
 
-                var ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
+                ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
                 const ticketlog = {
                     ticketNumber: ticketNumber,
                     ticketId: interaction.channel.id,
@@ -175,7 +176,7 @@ module.exports = {
                     return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
                 }
 
-                var ticketLog = await ticketLogModel.findOne({
+                ticketLog = await ticketLogModel.findOne({
                     guildID: interaction.guild.id,
                     userID: ticketDoc.userID
                 }).catch(err => console.log(err));
@@ -190,7 +191,7 @@ module.exports = {
                     await ticketLog.save();
                 }
 
-                var IdData = await ticketData.findOne({
+                IdData = await ticketData.findOne({
                     ticketGuildID: interaction.guild.id
                 }).catch(err => console.log(err));
 
@@ -219,7 +220,7 @@ module.exports = {
                     }
                 });
 
-                var ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
+                ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
                 const ticketlog = {
                     ticketNumber: ticketNumber,
                     ticketId: interaction.channel.id,
@@ -235,7 +236,7 @@ module.exports = {
                     .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketDoc.userID}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${serverAdd}/transcript-${interaction.channel.id}.html)`)
                     .setColor('#206694')
                     .addFields(
-                        { name: 'Reason', value: `\`\`\`${TicketReason}\`\`\`` || 'No Reason' }
+                        { name: 'Reason', value: `\`\`\`${TicketReason}\`\`\`` }
                     )
                     .setTimestamp();
 

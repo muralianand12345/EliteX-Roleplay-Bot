@@ -7,4 +7,4 @@ const channelSchema = new Schema({
     ticketLogChannelID: String
 });
 
-const channelModel = module.exports = new model('Ticket-Channels', channelSchema)
+module.exports = new model('Ticket-Channels', channelSchema)

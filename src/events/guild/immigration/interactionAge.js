@@ -1,12 +1,10 @@
 const {
     Events,
-    ComponentType
 } = require('discord.js');
 
 const {
     EmbedBuilder,
     ActionRowBuilder,
-    StringSelectMenuBuilder,
     ButtonBuilder,
     ButtonStyle,
 } = require("discord.js");

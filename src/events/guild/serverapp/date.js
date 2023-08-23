@@ -1,5 +1,4 @@
 const moment = require('moment');
-const tz = require('moment-timezone');
 const {
     Events
 } = require('discord.js');
