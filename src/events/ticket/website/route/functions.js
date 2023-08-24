@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 function checkLoggedIn(req, res, next) {
     if (req.session.isLoggedIn) {
         next();
@@ -28,4 +30,13 @@ async function fetchMessage(channel, messageId) {
     }
 }
 
-module.exports = { checkLoggedIn, fetchMessage }
+function authenticateAPIKey(req, res, next) {
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey === process.env.WEBKEY) {
+        next();
+    } else {
+        res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+}
+
+module.exports = { checkLoggedIn, fetchMessage, authenticateAPIKey }

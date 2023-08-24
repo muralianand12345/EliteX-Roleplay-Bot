@@ -8,14 +8,15 @@ const path = require('path');
 const { checkLoggedIn, fetchMessage } = require('../functions.js');
 const AdminModal = require('../../../../mongodb/modals/adminLogin.js');
 const TicketModel = require('../../../../mongodb/modals/ticketlog.js');
-const client = require('../../../../../bot.js')
+const roleModel = require('../../../../mongodb/modals/roleremove.js');
+const client = require('../../../../../bot.js');
 
 //---------------------------------------------------------
 
 const guildId = client.config.GUILD_ID;
 const roleEdit = client.website.ROLES.roles;
 
-const Web = process.env.WEBSITEMESSWEB;;
+const Web = process.env.WEBSITEMESSWEB;
 const WebRole = process.env.WEBSITEROLE;
 
 const webhookClient = new WebhookClient({ url: Web });
@@ -247,6 +248,18 @@ router.post('/getdiscorddata', checkLoggedIn, async (req, res) => {
                 } else {
                     responseMessage = `${member.user.tag} doesn't have the role ${role.name}`;
                 }
+
+                if (role.id === client.ooc.LIVE) {
+                    const expirationDate = new Date(Date.now() + 10 * 60 * 1000);
+                    const newRoleData = new roleModel({
+                        userId: member.id,
+                        roleId: role.id,
+                        expirationDate: expirationDate,
+                        guildId: guild.id
+                    });
+                    await newRoleData.save();
+                }
+
             } else {
                 responseMessage = `Role with ID ${roleId} not found`;
             }

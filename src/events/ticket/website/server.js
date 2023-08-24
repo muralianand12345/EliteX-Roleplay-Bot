@@ -56,9 +56,11 @@ module.exports = {
 
         const authRoutes = require('./route/app/auth.js');
         const apiRoutes = require('./route/app/api.js');
+        const fivemApiRoutes = require('./route/app/fivemapi.js');
 
         app.use('/', authRoutes);
         app.use('/', apiRoutes);
+        app.use('/fivem', fivemApiRoutes);
 
         // ================================================================================
 
