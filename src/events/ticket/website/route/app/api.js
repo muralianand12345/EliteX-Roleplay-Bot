@@ -301,4 +301,57 @@ router.get('/filecount', (req, res) => {
     });
 });
 
+router.post('/sendembed', checkLoggedIn, (req, res) => {
+    const embedData = req.body;
+
+    if (!embedData.webhook) return res.status(400).json({ error: 'Invalid Webhook URL' });
+
+    const webhookClientEmbed = new WebhookClient({ url: embedData.webhook });
+
+    const embed = new EmbedBuilder()
+        .setColor(embedData.color);
+
+    if (embedData.title) {
+        embed.setTitle(embedData.title);
+    }
+    if (embedData.url) {
+        embed.setURL(embedData.url);
+    }
+    if (embedData.author) {
+        embed.setAuthor({ name: embedData.author });
+    }
+    if (embedData.description) {
+        embed.setDescription(embedData.description);
+    }
+    if (embedData.thumbnail) {
+        embed.setThumbnail(embedData.thumbnail);
+    }
+    if (embedData.image) {
+        embed.setImage(embedData.image);
+    }
+    if (embedData.timestamp) {
+        embed.setTimestamp();
+    }
+    if (embedData.footer) {
+        embed.setFooter({ text: embedData.footer });
+    }
+    embedData.fields.forEach(field => {
+        embed.addFields({ name: field.name, value: field.value });
+    });
+
+    webhookClientEmbed.send({
+        username: 'Iconic Roleplay',
+        avatarURL: "https://cdn.discordapp.com/avatars/942080467241410630/7f5814e2184723cac12d87ec7fe433f3.png",
+        embeds: [embed]
+    })
+        .then(() => {
+            res.status(200).json({ message: 'Embed sent successfully' });
+        })
+        .catch(error => {
+            console.error('Error sending embed:', error);
+            res.status(500).json({ error: 'An error occurred while sending the embed' });
+        });
+});
+
+
 module.exports = router;

@@ -81,6 +81,10 @@ module.exports = {
             res.sendFile(path.join(__dirname, 'webpage', 'ticket.html'));
         });
 
+        app.get('/embed', checkLoggedIn, (req, res) => {
+            res.sendFile(path.join(__dirname, 'webpage', 'embed.html'));
+        });
+
         app.get('/error', checkLoggedIn, (req, res) => {
             res.sendFile(path.join(__dirname, 'webpage', 'error.html'));
         });

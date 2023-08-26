@@ -46,8 +46,6 @@ module.exports = {
                 }
 
                 const userButton = interaction.user.id;
-                const guild = client.guilds.cache.get(interaction.guildId);
-                const chan = guild.channels.cache.get(interaction.channelId);
 
                 const row = new ActionRowBuilder()
                     .addComponents(
@@ -103,6 +101,61 @@ module.exports = {
                                 content: `Ticket closed by <@!${i.user.id}>`,
                                 components: []
                             });
+
+                            interaction.channel.edit({
+                                name: `ticket-closed`,
+                                parent: closeTicket,
+                                permissionOverwrites: [
+                                    {
+                                        id: ticketDoc.userID,
+                                        deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                                    },
+                                    {
+                                        id: IdData.ticketSupportID,
+                                        allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                                    },
+                                    {
+                                        id: interaction.guild.roles.everyone,
+                                        deny: [PermissionFlagsBits.ViewChannel],
+                                    },
+                                ],
+                            }).then(async () => {
+                                const embed = new EmbedBuilder()
+                                    .setColor('#206694')
+                                    .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
+                                    .setDescription('```Ticket Supporters, Delete After Verifying```')
+                                    .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
+                                    .setTimestamp();
+
+                                const row = new ActionRowBuilder()
+                                    .addComponents(
+                                        new ButtonBuilder()
+                                            .setCustomId('delete-ticket')
+                                            .setLabel('Delete Ticket')
+                                            .setEmoji('🗑️')
+                                            .setStyle(ButtonStyle.Danger),
+                                        new ButtonBuilder()
+                                            .setCustomId('delete-ticket-reason')
+                                            .setLabel('Delete with Reason')
+                                            .setEmoji('📄')
+                                            .setStyle(ButtonStyle.Danger),
+                                        new ButtonBuilder()
+                                            .setCustomId('reopen-ticket')
+                                            .setLabel('Reopen Ticket')
+                                            .setEmoji('🔓')
+                                            .setStyle(ButtonStyle.Success),
+                                    );
+
+                                await interaction.channel.send({
+                                    embeds: [embed],
+                                    components: [row]
+                                });
+
+                                ticketDoc.ticketStatus = false;
+                                await ticketDoc.save();
+                                collector.stop();
+                            });
+
                         } catch (error) {
                             if (error.code == 10062) {
                                 const followUpContent = 'An error occurred while closing the ticket. Please try again.';
@@ -112,58 +165,6 @@ module.exports = {
                                 console.error(`An error occurred while editing the reply: ${error}`);
                             }
                         }
-
-                        chan.edit({
-                            name: `ticket-closed`,
-                            parent: closeTicket,
-                            permissionOverwrites: [
-                                {
-                                    id: ticketDoc.userID,
-                                    deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-                                },
-                                {
-                                    id: IdData.ticketSupportID,
-                                    allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-                                },
-                                {
-                                    id: interaction.guild.roles.everyone,
-                                    deny: [PermissionFlagsBits.ViewChannel],
-                                },
-                            ],
-                        }).then(async () => {
-                            const embed = new EmbedBuilder()
-                                .setColor('#206694')
-                                .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
-                                .setDescription('```Ticket Supporters, Delete After Verifying```')
-                                .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
-                                .setTimestamp();
-
-                            const row = new ActionRowBuilder()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setCustomId('delete-ticket')
-                                        .setLabel('Delete ticket')
-                                        .setEmoji('🗑️')
-                                        .setStyle(ButtonStyle.Danger),
-                                    new ButtonBuilder()
-                                        .setCustomId('delete-ticket-reason')
-                                        .setLabel('Delete with Reason')
-                                        .setEmoji('📄')
-                                        .setStyle(ButtonStyle.Danger),
-                                );
-
-                            chan.send({
-                                embeds: [embed],
-                                components: [row]
-                            });
-
-                            ticketDoc.msgPannelID = null;
-                            ticketDoc.ticketStatus = false;
-                            await ticketDoc.save();
-                        });
-
-                        collector.stop();
-
                     }
 
                     if (i.customId == 'no') {
