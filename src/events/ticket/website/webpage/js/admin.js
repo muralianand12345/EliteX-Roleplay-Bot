@@ -14,10 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageForm = document.getElementById('messageForm');
     const messageEditorForm = document.getElementById('messageEditorForm');
     const roleForm = document.getElementById('roleForm');
+
     messageForm.addEventListener('submit', submitMessageForm);
     messageEditorForm.addEventListener('submit', submitMessageEditorForm);
     messageEditorForm.addEventListener('input', updateEditedMessage);
     roleForm.addEventListener('submit', fetchDiscordData);
+
     fetchInitialData();
     fetchProfileInfo();
 });
@@ -294,15 +296,19 @@ async function populateRoleDropdown() {
     }
 }
 
+function viewTicketLog() {
+    window.location.href = '/ticket';
+}
+
+function embedRedirect() {
+    window.location.href = '/embed';
+}
+
 //Helper Functions =============================================================
 
 function getChannelIdFromName(channelName) {
     const channel = availableChannels.find(channel => channel.name.toLowerCase() === channelName.toLowerCase());
     return channel ? channel.id : null;
-}
-
-function viewTicketLog() {
-    window.location.href = '/ticket';
 }
 
 async function fetchInitialData() {

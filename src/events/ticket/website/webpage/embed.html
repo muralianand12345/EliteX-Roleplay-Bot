@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Embed</title>
+        <link rel="stylesheet" href="/css/embed.css">
+    </head>
+
+    <body>
+        <div class="header">
+            <h1>Embed Here</h1>
+        </div>
+
+        <form id="embedForm">
+
+            <button type="button" class="back-button"
+                onclick="window.location.href = '/admin'">Back
+            </button>
+
+            <label for="webhook">Webhook URL</label>
+            <input type="url" id="webhook" name="webhook">
+
+            <label for="color">Color:</label>
+            <input type="color" id="color" name="color">
+
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title">
+
+            <label for="url">URL:</label>
+            <input type="url" id="url" name="url">
+
+            <label for="author">Author:</label>
+            <input type="text" id="author" name="author">
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4"></textarea>
+
+            <label for="thumbnail">Thumbnail URL:</label>
+            <input type="url" id="thumbnail" name="thumbnail">
+
+            <h3>Fields:</h3>
+            <div id="fields-container">
+                <div class="dynamic-field">
+                    <input type="text" placeholder="Field Name">
+                    <input type="text" placeholder="Field Value">
+                    <button type="button" class="remove-field-button">Remove</button>
+                </div>
+            </div>
+            <button type="button" id="add-field-button">Add Field</button>
+
+            <label for="image">Image URL:</label>
+            <input type="url" id="image" name="image">
+
+            <label for="timestamp">Timestamp:</label>
+            <input type="checkbox" id="timestamp" name="timestamp">
+
+            <label for="footer">Footer:</label>
+            <input type="text" id="footer" name="footer">
+
+            <button type="button" onclick="sendEmbed()">Send Embed</button>
+        </form>
+        <script src="/js/embed.js"></script>
+    </body>
+</html>
