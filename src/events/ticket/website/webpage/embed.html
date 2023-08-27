@@ -18,25 +18,31 @@
                 onclick="window.location.href = '/admin'">Back
             </button>
 
-            <label for="webhook">Webhook URL</label>
+            <label for="webhook"><h3>Webhook URL:</h3></label>
             <input type="url" id="webhook" name="webhook">
 
-            <label for="color">Color:</label>
+            <label for="color"><h3>Color:</h3></label>
             <input type="color" id="color" name="color">
 
-            <label for="title">Title:</label>
+            <label for="title"><h3>Title:</h3></label>
             <input type="text" id="title" name="title">
 
-            <label for="url">URL:</label>
+            <label for="url"><h3>URL:</h3></label>
             <input type="url" id="url" name="url">
 
-            <label for="author">Author:</label>
-            <input type="text" id="author" name="author">
+            <h3>Author:</h3>
+            <div id="author-container">
+                <div class="dynamic-field">
+                    <input type="text" placeholder="Author Name">
+                    <input type="url" placeholder="Author IconURL">
+                    <input type="url" placeholder="Author URL">
+                </div>
+            </div>
 
-            <label for="description">Description:</label>
+            <label for="description"><h3>Description:</h3></label>
             <textarea id="description" name="description" rows="4"></textarea>
 
-            <label for="thumbnail">Thumbnail URL:</label>
+            <label for="thumbnail"><h3>Thumbnail URL:</h3></label>
             <input type="url" id="thumbnail" name="thumbnail">
 
             <h3>Fields:</h3>
@@ -49,14 +55,19 @@
             </div>
             <button type="button" id="add-field-button">Add Field</button>
 
-            <label for="image">Image URL:</label>
+            <label for="image"><h3>Image URL:</h3></label>
             <input type="url" id="image" name="image">
 
-            <label for="timestamp">Timestamp:</label>
+            <label for="timestamp"><h3>Timestamp:</h3></label>
             <input type="checkbox" id="timestamp" name="timestamp">
 
-            <label for="footer">Footer:</label>
-            <input type="text" id="footer" name="footer">
+            <h3>Footer:</h3>
+            <div id="footer-container">
+                <div class="dynamic-field">
+                    <input type="text" placeholder="Footer Text">
+                    <input type="url" placeholder="Footer IconURL">
+                </div>
+            </div>
 
             <button type="button" onclick="sendEmbed()">Send Embed</button>
         </form>

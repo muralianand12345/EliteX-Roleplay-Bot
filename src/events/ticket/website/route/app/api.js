@@ -317,8 +317,8 @@ router.post('/sendembed', checkLoggedIn, (req, res) => {
     if (embedData.url) {
         embed.setURL(embedData.url);
     }
-    if (embedData.author) {
-        embed.setAuthor({ name: embedData.author });
+    if (embedData.author && embedData.author.length > 0) {
+        embed.setAuthor({ name: embedData.author[0].name, iconURL: embedData.author[0].icon_url || null, url: embedData.author[0].url || null });
     }
     if (embedData.description) {
         embed.setDescription(embedData.description);
@@ -332,8 +332,8 @@ router.post('/sendembed', checkLoggedIn, (req, res) => {
     if (embedData.timestamp) {
         embed.setTimestamp();
     }
-    if (embedData.footer) {
-        embed.setFooter({ text: embedData.footer });
+    if (embedData.footer && embedData.footer.length > 0) {
+        embed.setFooter({ text: embedData.footer[0].text, iconURL: embedData.footer[0].icon_url || null});
     }
     embedData.fields.forEach(field => {
         embed.addFields({ name: field.name, value: field.value });
@@ -342,7 +342,7 @@ router.post('/sendembed', checkLoggedIn, (req, res) => {
     webhookClientEmbed.send({
         username: 'Iconic Roleplay',
         avatarURL: "https://cdn.discordapp.com/avatars/942080467241410630/7f5814e2184723cac12d87ec7fe433f3.png",
-        embeds: [embed]
+        embeds: [embed.toJSON()]
     })
         .then(() => {
             res.status(200).json({ message: 'Embed sent successfully' });

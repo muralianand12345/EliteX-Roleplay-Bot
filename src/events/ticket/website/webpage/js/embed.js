@@ -20,13 +20,13 @@ function sendEmbed() {
         color: document.getElementById('color').value,
         title: document.getElementById('title').value,
         url: document.getElementById('url').value,
-        author: document.getElementById('author').value,
+        author: getAuthorData(),
         description: document.getElementById('description').value,
         thumbnail: document.getElementById('thumbnail').value,
         fields: getFieldsData(),
         image: document.getElementById('image').value,
         timestamp: document.getElementById('timestamp').checked,
-        footer: document.getElementById('footer').value
+        footer: getFooterData()
     };
 
 
@@ -90,4 +90,54 @@ function getFieldsData() {
     });
 
     return fieldsData;
+}
+
+function getAuthorData() {
+    const authorContainer = document.getElementById('author-container');
+    const authorElements = authorContainer.querySelectorAll('.dynamic-field');
+
+    const authorData = [];
+
+    authorElements.forEach(authorElement => {
+        const authorName = authorElement.querySelector('input[type="text"]').value;
+        const authorIconUrl = authorElement.querySelector('input[type="url"]:nth-child(2)').value;
+        const authorUrl = authorElement.querySelector('input[type="url"]:nth-child(3)').value;
+
+        if (authorName) {
+            const author = { name: authorName };
+            if (authorIconUrl) {
+                author.icon_url = authorIconUrl;
+            }
+            if (authorUrl) {
+                author.url = authorUrl;
+            }
+            authorData.push(author);
+        }
+    });
+
+    return authorData;
+}
+
+function getFooterData() {
+    const footerContainer = document.getElementById('footer-container');
+    const footerElements = footerContainer.querySelectorAll('.dynamic-field');
+
+    const footerData = [];
+
+    footerElements.forEach(footerElement => {
+        const footerTextInput = footerElement.querySelector('input[type="text"]');
+        const footerIconUrlInput = footerElement.querySelector('input[type="url"]:nth-child(2)');
+
+        const footerText = footerTextInput.value;
+        const footerIconUrl = footerIconUrlInput.value;
+
+        if (footerText) {
+            const footer = { text: footerText };
+            if (footerIconUrl) {
+                footer.icon_url = footerIconUrl;
+            }
+            footerData.push(footer);
+        }
+    });
+    return footerData;
 }
