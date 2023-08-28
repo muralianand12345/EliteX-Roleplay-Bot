@@ -40,7 +40,12 @@ module.exports = {
                 });
             }
 
-            if (msg.toLowerCase() === 'hi' || msg.toLowerCase() === 'hello' || msg.toLowerCase() === '.') {
+            if (msg.length === 3 ) return await message.delete();
+
+            if (msg.toLowerCase() === 'hi' || 
+            msg.toLowerCase() === 'hello' || 
+            msg.toLowerCase() === '.',
+            msg.toLowerCase().includes('test')) {
                 await message.delete();
                 return;
             }

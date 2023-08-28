@@ -4,6 +4,7 @@ module.exports = {
     name: Events.MessageCreate,
     async execute(message, client) {
 
+        if (client.config.ENABLE.TOXICCHAT == false) return;
         if (message.author.bot) return;
 
         var sentence = message.content;
