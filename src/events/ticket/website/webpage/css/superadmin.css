@@ -1,0 +1,149 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Open Sans', Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #000000;
+}
+
+header {
+    background-color: #201444;
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    z-index: 2;
+}
+
+.back-admin-button {
+    font-size: 16px;
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin-top: 10px;
+}
+
+.back-admin-button:hover {
+    background-color: #2980b9;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.logout-button {
+    font-size: 16px;
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Roboto', Arial, sans-serif;
+    margin-top: 10px;
+}
+
+.logout-button:hover {
+    background-color: #2980b9;
+}
+
+.super-admin-content {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.super-admin-section {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.super-admin-section h2 {
+    margin-top: 0;
+    font-size: 24px;
+}
+
+.super-admin-section label,
+.super-admin-section input[type="text"],
+.super-admin-section button[type="submit"] {
+    display: block;
+    width: 100%;
+}
+
+.super-admin-section input[type="text"],
+.super-admin-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+#actionSelect,
+#roleSelect {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    outline: none;
+}
+
+.super-admin-section button[type="submit"] {
+    font-size: 16px;
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Roboto', Arial, sans-serif;
+}
+.super-admin-section button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+
+.combined-input {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.combined-input select {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.combined-input input[type="text"] {
+    flex: 2;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#actionSelect,
+#roleSelect {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    outline: none;
+}

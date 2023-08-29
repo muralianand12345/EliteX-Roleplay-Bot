@@ -304,6 +304,10 @@ function embedRedirect() {
     window.location.href = '/embed';
 }
 
+function superAdminRedirect() {
+    window.location.href = '/superadmin';
+}
+
 //Helper Functions =============================================================
 
 function getChannelIdFromName(channelName) {

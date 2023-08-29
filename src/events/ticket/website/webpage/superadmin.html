@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Super Admin</title>
+        <link rel="stylesheet" href="/css/superadmin.css">
+    </head>
+
+    <body>
+        <header>
+            <div class="header-content">
+                <div>
+                    <div id="profile-info"></div>
+                    <h1>Super Admin Dashboard</h1>
+                    <button class="logout-button" onclick="logout()">Logout</button>
+                    <button class="back-admin-button" onclick="goToAdminPage()">Back</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="super-admin-content">
+
+            <div class="super-admin-section" id="message-sender">
+                <h2>Role Bulk Manager</h2>
+                <form id="roleBulkManager">
+                    <label for="roleSelect">Select the Role:</label>
+                    <div id="roleSelectContainer" class="combined-input">
+                        <select id="roleSelect" name="roleId"></select>
+                    </div>
+                    <label for="usersID">Users ID:</label>
+                    <textarea id="message" name="message" placeholder="',' after every userId Eg: 123456, 789012" rows="5" required></textarea>
+                    <label for="actionSelect">Select Action:</label>
+                    <select id="actionSelect" name="action">
+                        <option value="add">Add Role</option>
+                        <option value="remove">Remove Role</option>
+                    </select>
+                    <button type="submit">Execute</button>
+                </form>
+            </div>
+
+        </div>
+
+        <script src="/js/superadmin.js"></script>
+    </body>
+</html>

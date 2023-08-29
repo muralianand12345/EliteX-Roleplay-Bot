@@ -9,7 +9,7 @@ const session = require('express-session');
 const { v4: uuidv4 } = require('uuid');
 const cors = require('cors');
 
-const { checkLoggedIn } = require('./route/functions.js');
+const { checkLoggedIn, checkSuperAdmin } = require('./route/functions.js');
 
 module.exports = {
     name: Events.ClientReady,
@@ -56,10 +56,12 @@ module.exports = {
 
         const authRoutes = require('./route/app/auth.js');
         const apiRoutes = require('./route/app/api.js');
+        const superAdminRoutes = require('./route/app/superadmin.js');
         const fivemApiRoutes = require('./route/app/fivemapi.js');
 
         app.use('/', authRoutes);
         app.use('/', apiRoutes);
+        app.use('/superadmin', superAdminRoutes);
         app.use('/fivem', fivemApiRoutes);
 
         // ================================================================================
@@ -83,6 +85,10 @@ module.exports = {
 
         app.get('/embed', checkLoggedIn, (req, res) => {
             res.sendFile(path.join(__dirname, 'webpage', 'embed.html'));
+        });
+
+        app.get('/superadmin', checkLoggedIn, checkSuperAdmin, (req, res) => {
+            res.sendFile(path.join(__dirname, 'webpage', 'superadmin.html'));
         });
 
         app.get('/error', checkLoggedIn, (req, res) => {
