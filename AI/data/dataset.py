@@ -517,10 +517,13 @@ data = [
     ("Carbine rifle frame - just 25k come to 9013", "informative"),
     ("Cheap guns here, come to the location", "informative"),
     ("Come to this location for guns and dealing", "informative"),
+    ("Sales going to start", "informative"),
+    ("Sales going to start....(Bulk sales)...Per team 2 people only allowed", "informative"),
 
 
 # RP in Tamil-English Text ---------------------------------------------------------------
 
+    ("for the NPC and Biling system evlo nu solanume", "informative"),
     ("Vanakam guys", "non-informative"),
     ("Vanakamungoo nanbargalee!!!", "non-informative"),
     ("Enna da idhu!", "non-informative"),
