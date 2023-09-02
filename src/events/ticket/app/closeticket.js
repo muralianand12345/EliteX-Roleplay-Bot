@@ -18,6 +18,8 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
 
+        if (!interaction.isButton()) return;
+
         try {
             if (interaction.customId == "close-ticket") {
 

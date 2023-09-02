@@ -598,5 +598,4 @@ data = [
     ("Ayyo, enna solra da nee?", "non-informative"),
     ("Ivan full time bore adikaraan.", "non-informative"),
     ("Ada paavi, enna panra?", "non-informative"),
-
 ]

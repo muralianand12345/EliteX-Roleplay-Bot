@@ -32,6 +32,8 @@ module.exports = {
             return interaction.reply({ content: '**Error:** Password must contain at least one number', ephemeral: true });
         } else if (password == username) {
             return interaction.reply({ content: '**Error:** Password and Username cannot be same!', ephemeral: true });
+        } else if (password.toLowerCase().includes('password')) {
+            return interaction.reply({ content: '<:keku:1096878712777085008> not today...', ephemeral: true });
         } else {
             try {
                 await interaction.deferReply({ ephemeral: true });
