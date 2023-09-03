@@ -9,6 +9,7 @@
                 "id": "",
                 "name": "Moderator"
             }
-        ]
+        ],
+        "allowed_getrole": [ "" ]
     }
 }

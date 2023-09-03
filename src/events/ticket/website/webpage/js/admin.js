@@ -14,11 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageForm = document.getElementById('messageForm');
     const messageEditorForm = document.getElementById('messageEditorForm');
     const roleForm = document.getElementById('roleForm');
+    const roleSelect = document.getElementById('roleSelect');
+
 
     messageForm.addEventListener('submit', submitMessageForm);
     messageEditorForm.addEventListener('submit', submitMessageEditorForm);
     messageEditorForm.addEventListener('input', updateEditedMessage);
     roleForm.addEventListener('submit', fetchDiscordData);
+    roleSelect.addEventListener('change', populateUserDropdown);
 
     fetchInitialData();
     fetchProfileInfo();
@@ -40,7 +43,53 @@ messageTextarea.addEventListener('input', function () {
     }
 });
 
+const userRoleSelect = document.getElementById('userRoleSelect');
+const userIdInput = document.getElementById('userId');
+userRoleSelect.addEventListener('change', (event) => {
+    userIdInput.value = event.target.value;
+});
+
 //Functions =============================================================
+
+async function populateUserDropdown(event) {
+    const roleId = event.target.value;
+    if (!roleId) return;
+
+    try {
+        const response = await fetch('/getmembersbyrole', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ roleId })
+        });
+
+        if (response.status === 403) {
+            const userRoleSelect = document.getElementById('userRoleSelect');
+            userRoleSelect.innerHTML = '';
+
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Restricted!';
+            userRoleSelect.appendChild(option);
+        } else if (response.ok) {
+            const members = await response.json();
+            const userRoleSelect = document.getElementById('userRoleSelect');
+            userRoleSelect.innerHTML = '';
+
+            members.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = member.username;
+                userRoleSelect.appendChild(option);
+            });
+        } else {
+            console.error('Failed to fetch members by role:', response.status);
+        }
+    } catch (error) {
+        console.error('Error fetching members by role:', error);
+    }
+}
 
 async function submitMessageForm(event) {
     event.preventDefault();
@@ -256,7 +305,7 @@ async function fetchDiscordData(event) {
             },
             body: JSON.stringify({ userId, roleId, action })
         });
-        
+
         const result = await response.json();
         if (response.ok) {
             if (result.success) {
@@ -280,7 +329,7 @@ async function populateRoleDropdown() {
 
         if (response.ok) {
             const roleSelect = document.getElementById('roleSelect');
-            roleSelect.innerHTML = ''; 
+            roleSelect.innerHTML = '';
 
             data.roles.forEach(role => {
                 const option = document.createElement('option');

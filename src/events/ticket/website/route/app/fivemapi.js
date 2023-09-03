@@ -105,7 +105,7 @@ router.post('/roleedit', async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Error processing role edit:', error);
+        //console.error('Error processing role edit:', error);
         return res.status(500).json({ success: false, message: 'An error occurred while processing role edit' });
     }
 });

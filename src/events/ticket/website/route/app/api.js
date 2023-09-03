@@ -15,6 +15,7 @@ const client = require('../../../../../bot.js');
 
 const guildId = client.config.GUILD_ID;
 const roleEdit = client.website.ROLES.roles;
+const allowedRoleIds = client.website.ROLES.allowed_getrole;
 
 const Web = process.env.WEBSITEMESSWEB;
 const WebRole = process.env.WEBSITEROLE;
@@ -333,7 +334,7 @@ router.post('/sendembed', checkLoggedIn, (req, res) => {
         embed.setTimestamp();
     }
     if (embedData.footer && embedData.footer.length > 0) {
-        embed.setFooter({ text: embedData.footer[0].text, iconURL: embedData.footer[0].icon_url || null});
+        embed.setFooter({ text: embedData.footer[0].text, iconURL: embedData.footer[0].icon_url || null });
     }
     embedData.fields.forEach(field => {
         embed.addFields({ name: field.name, value: field.value });
@@ -351,6 +352,33 @@ router.post('/sendembed', checkLoggedIn, (req, res) => {
             console.error('Error sending embed:', error);
             res.status(500).json({ error: 'An error occurred while sending the embed' });
         });
+});
+
+router.post('/getmembersbyrole', checkLoggedIn, async (req, res) => {
+    const { roleId } = req.body;
+
+    if (!allowedRoleIds.includes(roleId)) {
+        return res.status(403).json([{ id: '', username: 'Restricted!' }]);
+    }
+
+    try {
+        const guild = await client.guilds.fetch(guildId);
+        const role = guild.roles.cache.get(roleId);
+
+        if (!role) {
+            return res.status(404).json({ message: 'Role not found' });
+        }
+        const membersWithRole = role.members.map(member => ({
+            id: member.user.id,
+            username: member.user.username,
+            discriminator: member.user.discriminator,
+        }));
+
+        return res.status(200).json(membersWithRole);
+    } catch (error) {
+        console.error('Error fetching members by role:', error);
+        return res.status(500).json({ message: 'An error occurred while fetching members by role' });
+    }
 });
 
 module.exports = router;

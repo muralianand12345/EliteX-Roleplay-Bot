@@ -17,7 +17,7 @@ const ticketPar = require('../../../events/mongodb/modals/ticketParent.js');
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
-
+        
         if (!interaction.isButton()) return;
 
         try {
@@ -104,7 +104,7 @@ module.exports = {
                                 components: []
                             });
 
-                            interaction.channel.edit({
+                            await interaction.channel.edit({
                                 name: `ticket-closed`,
                                 parent: closeTicket,
                                 permissionOverwrites: [
@@ -140,12 +140,7 @@ module.exports = {
                                             .setCustomId('delete-ticket-reason')
                                             .setLabel('Delete with Reason')
                                             .setEmoji('📄')
-                                            .setStyle(ButtonStyle.Danger),
-                                        new ButtonBuilder()
-                                            .setCustomId('reopen-ticket')
-                                            .setLabel('Reopen Ticket')
-                                            .setEmoji('🔓')
-                                            .setStyle(ButtonStyle.Success),
+                                            .setStyle(ButtonStyle.Danger)
                                     );
 
                                 await interaction.channel.send({

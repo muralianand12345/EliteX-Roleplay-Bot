@@ -23,8 +23,7 @@
                     <div id="profile-info"></div>
                     <h1>Admin Dashboard</h1>
                     <button class="logout-button" onclick="logout()">Logout</button>
-                    <button class="view-log-button" onclick="viewTicketLog()">View
-                        Ticket Log</button>
+                    <button class="view-log-button" onclick="viewTicketLog()">View Ticket Log</button>
                 </div>
             </div>
         </header>
@@ -35,15 +34,16 @@
                     <label for="channelSelect">Select a Channel:</label>
                     <div id="channelSelectContainer" class="combined-input">
                         <select id="channelSelect" name="channelId"></select>
-                        <input type="text" id="manualChannelInput"
-                            placeholder="Type Channel ID">
+                        <input type="text" id="manualChannelInput" placeholder="Type Channel ID">
                     </div>
+
                     <label for="message">Message:</label>
                     <textarea id="message" name="message" rows="5" required></textarea>
+
                     <button type="submit">Send Message</button>
                     <div id="autocomplete-suggestions"></div>
                 </form>
-            </div>
+            </div> 
             <div class="admin-section" id="message-editor">
                 <h2>Message Editor</h2>
                 <form id="messageEditorForm">
@@ -51,14 +51,15 @@
                     <div id="channelSelectEditorContainer"
                         class="combined-input">
                         <select id="channelSelectEditor" name="channelId"></select>
-                        <input type="text" id="manualChannelEditorInput"
-                            placeholder="Type Channel ID">
+                        <input type="text" id="manualChannelEditorInput" placeholder="Type Channel ID">
                     </div>
+
                     <label for="messageId">Message ID:</label>
                     <input type="text" id="messageId" name="messageId" required>
+
                     <label for="editedMessage">Edited Message:</label>
-                    <textarea id="editedMessage" name="editedMessage" rows="5"
-                        required></textarea>
+                    <textarea id="editedMessage" name="editedMessage" rows="5" required></textarea>
+    
                     <button type="submit">Send Edited Message</button>
                     <div id="autocomplete-suggestions"></div>
                 </form>
@@ -66,12 +67,17 @@
             <div class="admin-section" id="role-edit">
                 <h2>Role Manager</h2>
                 <form id="roleForm">
-                    <label for="userId">User ID:</label>
-                    <input type="text" id="userId" name="userId" required>
                     <label for="roleSelect">Select the Role:</label>
                     <div id="roleSelectContainer" class="combined-input">
                         <select id="roleSelect" name="roleId"></select>
                     </div>
+
+                    <label for="userRoleSelect">User ID:</label>
+                    <div id="userRoleSelectContainer" class="combined-input">
+                        <input type="text" id="userId" placeholder="Enter User ID">
+                        <select id="userRoleSelect" name="userId"></select>
+                    </div>
+
                     <label for="actionSelect">Select Action:</label>
                     <select id="actionSelect" name="action">
                         <option value="add">Add Role</option>
