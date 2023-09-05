@@ -6,6 +6,8 @@
 
     "GUILD_ID": "",
 
+    "TICKET_LIMIT": 2,
+
     "DEPLOY_COMMAND": false,
 
     "MESSAGE": {

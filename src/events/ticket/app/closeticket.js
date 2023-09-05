@@ -34,9 +34,21 @@ module.exports = {
                     return;
                 }
 
-                const ticketDoc = await ticketModel.findOne({
-                    ticketID: interaction.channel.id
+                var ticketDoc = await ticketModel.findOne({
+                    ticketData: {
+                        $elemMatch: {
+                            ticketID: interaction.channel.id
+                        }
+                    }
                 }).catch(err => console.log(err));
+
+
+                //For OLD Ticket
+                if (!ticketDoc) {
+                    ticketDoc = await ticketModel.findOne({
+                        ticketID: interaction.channel.id
+                    }).catch(err => console.log(err));
+                }
 
                 var ticketParents = await ticketPar.findOne({
                     guildID: interaction.guild.id
@@ -87,9 +99,6 @@ module.exports = {
                                 .then(async () => {
 
                                     closeTicketEmbed(client, interaction);
-
-                                    ticketDoc.ticketStatus = false;
-                                    await ticketDoc.save();
                                     collector.stop();
                                 });
 

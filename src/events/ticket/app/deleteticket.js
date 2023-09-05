@@ -27,12 +27,21 @@ module.exports = {
             } else {
                 buttonCooldown.add(interaction.user.id);
 
-                const ticketDoc = await ticketModel.findOne({
-                    ticketID: interaction.channel.id
+                var ticketDoc = await ticketModel.findOne({
+                    ticketData: {
+                        $elemMatch: {
+                            ticketID: interaction.channel.id
+                        }
+                    }
                 }).catch(err => console.log(err));
 
                 if (!ticketDoc) {
-                    return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
+                    ticketDoc = await ticketModel.findOne({
+                        ticketID: interaction.channel.id
+                    }).catch(err => console.log(err));
+                    if (!ticketDoc) {
+                        return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
+                    }
                 }
 
                 ticketLog = await ticketLogModel.findOne({
@@ -88,12 +97,17 @@ module.exports = {
                                 return; //channel not found error
                             }
                         });
-                    await ticketDoc.deleteOne();
+                    if (ticketDoc.ticketCount) {
+                        ticketDoc.ticketCount -= 1;
+                    }
+                    ticketDoc.ticketLimit = client.config.TICKET_LIMIT;
+                    ticketDoc.ticketData = ticketDoc.ticketData.filter(ticket => ticket.ticketID !== interaction.channel.id);
+                    await ticketDoc.save();
                 }, 2000);
 
-                setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000)
+                setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000);
             }
-        };
+        }
 
         if (interaction.customId == "delete-ticket-reason") {
             await deleteTicketReasonModal(client, interaction);
@@ -111,12 +125,21 @@ module.exports = {
 
                 const TicketReason = interaction.fields.getTextInputValue('ticket-reason-text');
 
-                const ticketDoc = await ticketModel.findOne({
-                    ticketID: interaction.channel.id
+                var ticketDoc = await ticketModel.findOne({
+                    ticketData: {
+                        $elemMatch: {
+                            ticketID: interaction.channel.id
+                        }
+                    }
                 }).catch(err => console.log(err));
 
                 if (!ticketDoc) {
-                    return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
+                    ticketDoc = await ticketModel.findOne({
+                        ticketID: interaction.channel.id
+                    }).catch(err => console.log(err));
+                    if (!ticketDoc) {
+                        return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
+                    }
                 }
 
                 ticketLog = await ticketLogModel.findOne({
@@ -170,9 +193,14 @@ module.exports = {
                                 return; //channel not found error
                             }
                         });
-                    await ticketDoc.deleteOne();
+                    if (ticketDoc.ticketCount) {
+                        ticketDoc.ticketCount -= 1;
+                    }
+                    ticketDoc.ticketLimit = client.config.TICKET_LIMIT;
+                    ticketDoc.ticketData = ticketDoc.ticketData.filter(ticket => ticket.ticketID !== interaction.channel.id);
+                    await ticketDoc.save();
                 }, 2000);
-                setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000)
+                setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000);
             }
         }
     }

@@ -36,26 +36,45 @@ async function createTicketChan(client, interaction, parentCat, ticketCount, tic
 
 //Close --------------------------------
 async function closeTicketChan(client, interaction, parentCat, ticketSupport, userID) {
-    channel = await interaction.channel.edit({
-        name: `ticket-closed`,
-        parent: parentCat,
-        permissionOverwrites: [
-            {
-                id: userID,
-                deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-            },
-            {
-                id: ticketSupport,
-                allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-            },
-            {
-                id: interaction.guild.roles.everyone,
-                deny: [PermissionFlagsBits.ViewChannel],
-            },
-        ],
-    });
+    const user = await interaction.guild.members.fetch(userID).catch(() => null);
 
-    return channel;
+    if (user) {
+        channel = await interaction.channel.edit({
+            name: `ticket-closed`,
+            parent: parentCat,
+            permissionOverwrites: [
+                {
+                    id: ticketUserID,
+                    deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                },
+                {
+                    id: ticketSupport,
+                    allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                },
+                {
+                    id: interaction.guild.roles.everyone,
+                    deny: [PermissionFlagsBits.ViewChannel],
+                },
+            ],
+        });
+        return channel;
+    } else {
+        channel = await interaction.channel.edit({
+            name: `ticket-closed`,
+            parent: parentCat,
+            permissionOverwrites: [
+                {
+                    id: ticketSupport,
+                    allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                },
+                {
+                    id: interaction.guild.roles.everyone,
+                    deny: [PermissionFlagsBits.ViewChannel],
+                },
+            ],
+        });
+        return channel;
+    }
 }
 
 //Delete --------------------------------
