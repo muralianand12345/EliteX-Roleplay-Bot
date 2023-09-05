@@ -22,16 +22,17 @@ module.exports = {
         message.delete()
 
         const embed = new EmbedBuilder()
-            .setColor('#FFC0CB')
-            .setAuthor({ name: 'Resignation Form' })
-            .setTitle('ICare Emergency Services (ICE)')
-            .setDescription('`Click the button to enter your resignation.`');
+            .setColor('Blue')
+            .setAuthor({ name: 'Ticket' })
+            .setTitle('Iconic City Police Department')
+            .setDescription('`Click the button to open a ticket.`');
 
         const button = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('ice-resignation-button')
-                    .setLabel('Submit')
+                    .setCustomId('police-open-ticket')
+                    .setLabel('TICKET')
+                    .setEmoji('🎫')
                     .setStyle(ButtonStyle.Success)
             )
 

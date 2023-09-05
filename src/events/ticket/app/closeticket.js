@@ -1,10 +1,8 @@
 const {
-    PermissionFlagsBits,
     ComponentType,
     Events,
 } = require('discord.js');
 const {
-    EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
@@ -14,10 +12,13 @@ const ticketModel = require('../../../events/mongodb/modals/ticket.js');
 const ticketData = require("../../../events/mongodb/modals/channel.js");
 const ticketPar = require('../../../events/mongodb/modals/ticketParent.js');
 
+const { closeTicketChan } = require('./functions/ticketFunction.js');
+const { closeTicketEmbed, closeTicketEditInt } = require('./functions/ticketEmbed.js');
+
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
-        
+
         if (!interaction.isButton()) return;
 
         try {
@@ -62,28 +63,6 @@ module.exports = {
                             .setStyle(ButtonStyle.Secondary),
                     );
 
-                const editoriginalButton = new ActionRowBuilder()
-                    .addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('close-ticket')
-                            .setLabel('Close Ticket')
-                            .setEmoji('899745362137477181')
-                            .setStyle(ButtonStyle.Danger)
-                            .setDisabled(true),
-                        new ButtonBuilder()
-                            .setCustomId('transcript-ticket')
-                            .setLabel('Transcript')
-                            .setEmoji('📜')
-                            .setStyle(ButtonStyle.Primary)
-                            .setDisabled(true),
-                        new ButtonBuilder()
-                            .setCustomId('claim-ticket')
-                            .setLabel('Claim')
-                            .setEmoji('🔒')
-                            .setStyle(ButtonStyle.Secondary)
-                            .setDisabled(true),
-                    );
-
                 const verif = await interaction.editReply({
                     content: 'Are you sure you want to close the ticket?',
                     components: [row]
@@ -98,60 +77,21 @@ module.exports = {
                     await i.deferUpdate();
                     if (i.customId == 'confirm-close') {
                         try {
-                            await interaction.message.edit({ components: [editoriginalButton] })
+                            await closeTicketEditInt(client, interaction);
                             await i.editReply({
                                 content: `Ticket closed by <@!${i.user.id}>`,
                                 components: []
                             });
 
-                            await interaction.channel.edit({
-                                name: `ticket-closed`,
-                                parent: closeTicket,
-                                permissionOverwrites: [
-                                    {
-                                        id: ticketDoc.userID,
-                                        deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-                                    },
-                                    {
-                                        id: IdData.ticketSupportID,
-                                        allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-                                    },
-                                    {
-                                        id: interaction.guild.roles.everyone,
-                                        deny: [PermissionFlagsBits.ViewChannel],
-                                    },
-                                ],
-                            }).then(async () => {
-                                const embed = new EmbedBuilder()
-                                    .setColor('#206694')
-                                    .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
-                                    .setDescription('```Ticket Supporters, Delete After Verifying```')
-                                    .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
-                                    .setTimestamp();
+                            await closeTicketChan(client, interaction, closeTicket, IdData.ticketSupportID, ticketDoc.userID)
+                                .then(async () => {
 
-                                const row = new ActionRowBuilder()
-                                    .addComponents(
-                                        new ButtonBuilder()
-                                            .setCustomId('delete-ticket')
-                                            .setLabel('Delete Ticket')
-                                            .setEmoji('🗑️')
-                                            .setStyle(ButtonStyle.Danger),
-                                        new ButtonBuilder()
-                                            .setCustomId('delete-ticket-reason')
-                                            .setLabel('Delete with Reason')
-                                            .setEmoji('📄')
-                                            .setStyle(ButtonStyle.Danger)
-                                    );
+                                    closeTicketEmbed(client, interaction);
 
-                                await interaction.channel.send({
-                                    embeds: [embed],
-                                    components: [row]
+                                    ticketDoc.ticketStatus = false;
+                                    await ticketDoc.save();
+                                    collector.stop();
                                 });
-
-                                ticketDoc.ticketStatus = false;
-                                await ticketDoc.save();
-                                collector.stop();
-                            });
 
                         } catch (error) {
                             if (error.code == 10062) {

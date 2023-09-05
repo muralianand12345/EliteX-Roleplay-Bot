@@ -52,16 +52,11 @@ module.exports = {
                 .setName('category-setup')
                 .setDescription('Set the categorys for the ticket!')
                 .addChannelOption(option => option
-                    .setName('main')
-                    .setDescription('Main Category')
-                    .setRequired(true)
-                )
-                .addChannelOption(option => option
                     .setName('ooc')
                     .setDescription('OOC Category')
                     .setRequired(true)
                 )
-                .addChannelOption(option => option
+                /*.addChannelOption(option => option
                     .setName('supporters')
                     .setDescription('Supporters Pack Category')
                     .setRequired(true)
@@ -75,7 +70,7 @@ module.exports = {
                     .setName('character')
                     .setDescription('Character Issue Category')
                     .setRequired(true)
-                )
+                )*/
                 .addChannelOption(option => option
                     .setName('other')
                     .setDescription('Other Issues Category')
@@ -151,11 +146,10 @@ module.exports = {
                 return interaction.reply({ content: `Ticket system isn't enabled for your server!`, ephemeral: true });
             }
         } else if (interaction.options.getSubcommand() === "category-setup") {
-            const mainPar = await interaction.options.getChannel("main");
             const oocPar = await interaction.options.getChannel("ooc");
-            const supPar = await interaction.options.getChannel("supporters");
+            /*const supPar = await interaction.options.getChannel("supporters");
             const bugPar = await interaction.options.getChannel("bug");
-            const charPar = await interaction.options.getChannel("character");
+            const charPar = await interaction.options.getChannel("character");*/
             const otherPar = await interaction.options.getChannel("other");
             const closedPar = await interaction.options.getChannel("closed");
 
@@ -167,11 +161,10 @@ module.exports = {
                     return;
                 }
             }
-            checkParent(mainPar);
             checkParent(oocPar);
-            checkParent(supPar);
+            /*checkParent(supPar);
             checkParent(bugPar);
-            checkParent(charPar);
+            checkParent(charPar);*/
             checkParent(otherPar);
             checkParent(closedPar);
 
@@ -185,11 +178,10 @@ module.exports = {
                 } else if (!data) {
                     let newData = new parentData({
                         guildID: interaction.guild.id,
-                        mainPar: mainPar.id,
                         oocPar: oocPar.id,
-                        suppPar: supPar.id,
+                        /*suppPar: supPar.id,
                         bugPar: bugPar.id,
-                        charPar: charPar.id,
+                        charPar: charPar.id,*/
                         otherPar: otherPar.id,
                         closedPar: closedPar.id
                     });

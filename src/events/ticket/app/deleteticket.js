@@ -1,37 +1,29 @@
 const {
     Events,
 } = require('discord.js');
-const {
-    EmbedBuilder,
-    ActionRowBuilder,
-    ModalBuilder,
-    TextInputBuilder,
-    TextInputStyle
-} = require("discord.js");
 const buttonCooldown = new Set();
-const discordTranscripts = require('discord-html-transcripts');
 require("dotenv").config();
-const fs = require('fs');
 const path = require('path');
 
 const ticketModel = require('../../../events/mongodb/modals/ticket.js');
 const ticketData = require("../../../events/mongodb/modals/channel.js");
 const ticketLogModel = require('../../../events/mongodb/modals/ticketlog.js');
 
+const { deleteTicketLog } = require('./functions/ticketFunction.js');
+const { deleteTicketEmbedandClient, deleteTicketReasonModal, deleteTicketSpam } = require('./functions/ticketEmbed.js');
+
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
         var ticketNumber, IdData, ticketLog;
+        const serverAdd = `${process.env.SERVERADD}`;
 
         if (interaction.customId == "delete-ticket") {
 
             await interaction.deferReply({ ephemeral: true });
 
             if (buttonCooldown.has(interaction.user.id)) {
-                const replyEmbed = new EmbedBuilder()
-                    .setColor('#ED4245')
-                    .setDescription("Interaction not registered! (Button Spam Dedected!)")
-                await interaction.editReply({ embeds: [replyEmbed], ephemeral: true });
+                await deleteTicketSpam(client, interaction);
             } else {
                 buttonCooldown.add(interaction.user.id);
 
@@ -72,21 +64,9 @@ module.exports = {
                 });
 
                 //Ticket Logs
-                const htmlCode = await discordTranscripts.createTranscript(chan, {
-                    limit: -1,
-                    returnType: 'string',
-                    filename: `transcript-${interaction.channel.id}.html`,
-                    saveImages: false,
-                    poweredBy: false
-                });
 
-                const serverAdd = `${process.env.SERVERADD}`;
                 const ticketLogDir = path.join(__dirname, '../website/ticket-logs');
-                fs.writeFile(`${ticketLogDir}/transcript-${interaction.channel.id}.html`, htmlCode, function (err) {
-                    if (err) {
-                        console.log(err);
-                    }
-                });
+                await deleteTicketLog(client, interaction, ticketLogDir, chan);
 
                 ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
                 const ticketlog = {
@@ -99,29 +79,8 @@ module.exports = {
                 ticketLog.count += 1;
                 await ticketLog.save();
 
-                const embed = new EmbedBuilder()
-                    .setAuthor({ name: 'Logs Ticket', iconURL: client.config.EMBED.IMAGE })
-                    .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketDoc.userID}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${serverAdd}/transcript-${interaction.channel.id}.html)`)
-                    .setColor('#206694')
-                    .setTimestamp();
+                await deleteTicketEmbedandClient(client, interaction, IdData, ticketDoc, serverAdd, chan, null);
 
-                client.channels.cache.get(IdData.ticketLogChannelID).send({
-                    embeds: [embed]
-                });
-
-                client.users.cache.get(ticketDoc.userID).send({
-                    embeds: [embed]
-                }).catch(error => {
-                    if (error.code == 50007) {
-                        const logembed = new EmbedBuilder()
-                            .setColor('#000000')
-                            .setDescription(`Unable to DM User: <@${ticketDoc.userID}>\n\`Ticket No: ${chan.id}\``)
-
-                        return client.channels.cache.get(IdData.ticketLogChannelID).send({
-                            embeds: [logembed]
-                        });
-                    }
-                });
                 setTimeout(async () => {
                     chan.delete()
                         .catch(error => {
@@ -137,20 +96,7 @@ module.exports = {
         };
 
         if (interaction.customId == "delete-ticket-reason") {
-            const reasonModal = new ModalBuilder()
-                .setCustomId('ticket-reason-modal')
-                .setTitle('Ticket Reason');
-
-            const Reason = new TextInputBuilder()
-                .setCustomId('ticket-reason-text')
-                .setLabel('Ticket Close Text')
-                .setMaxLength(1000)
-                .setStyle(TextInputStyle.Paragraph)
-                .setRequired(true);
-
-            const firstActionRow = new ActionRowBuilder().addComponents(Reason);
-            reasonModal.addComponents(firstActionRow);
-            await interaction.showModal(reasonModal);
+            await deleteTicketReasonModal(client, interaction);
         }
 
         if (interaction.customId == "ticket-reason-modal") {
@@ -158,10 +104,7 @@ module.exports = {
             await interaction.deferReply({ ephemeral: true });
 
             if (buttonCooldown.has(interaction.user.id)) {
-                const replyEmbed = new EmbedBuilder()
-                    .setColor('#ED4245')
-                    .setDescription("Interaction not registered! (Button Spam Dedected!)")
-                await interaction.editReply({ embeds: [replyEmbed], ephemeral: true });
+                await deleteTicketSpam(client, interaction);
             } else {
 
                 buttonCooldown.add(interaction.user.id);
@@ -204,21 +147,8 @@ module.exports = {
                     ephemeral: true
                 });
 
-                const htmlCode = await discordTranscripts.createTranscript(chan, {
-                    limit: -1,
-                    returnType: 'string',
-                    filename: `transcript-${interaction.channel.id}.html`,
-                    saveImages: false,
-                    poweredBy: false
-                });
-
-                const serverAdd = `${process.env.SERVERADD}`;
                 const ticketLogDir = path.join(__dirname, '../website/ticket-logs');
-                fs.writeFile(`${ticketLogDir}/transcript-${interaction.channel.id}.html`, htmlCode, function (err) {
-                    if (err) {
-                        console.log(err);
-                    }
-                });
+                await deleteTicketLog(client, interaction, ticketLogDir, chan);
 
                 ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
                 const ticketlog = {
@@ -231,32 +161,8 @@ module.exports = {
                 ticketLog.count += 1;
                 await ticketLog.save();
 
-                const embed = new EmbedBuilder()
-                    .setAuthor({ name: 'Logs Ticket', iconURL: client.config.EMBED.IMAGE })
-                    .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketDoc.userID}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${serverAdd}/transcript-${interaction.channel.id}.html)`)
-                    .setColor('#206694')
-                    .addFields(
-                        { name: 'Reason', value: `\`\`\`${TicketReason}\`\`\`` }
-                    )
-                    .setTimestamp();
+                await deleteTicketEmbedandClient(client, interaction, IdData, ticketDoc, serverAdd, chan, TicketReason);
 
-                client.channels.cache.get(IdData.ticketLogChannelID).send({
-                    embeds: [embed]
-                });
-
-                client.users.cache.get(ticketDoc.userID).send({
-                    embeds: [embed]
-                }).catch(error => {
-                    if (error.code == 50007) {
-                        const logembed = new EmbedBuilder()
-                            .setColor('#000000')
-                            .setDescription(`Unable to DM User: <@${ticketDoc.userID}>\n\`Ticket No: ${chan.id}\``)
-
-                        return client.channels.cache.get(IdData.ticketLogChannelID).send({
-                            embeds: [logembed]
-                        });
-                    }
-                });
                 setTimeout(async () => {
                     chan.delete()
                         .catch(error => {
