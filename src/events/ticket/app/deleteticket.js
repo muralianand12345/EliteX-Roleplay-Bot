@@ -15,7 +15,7 @@ const { deleteTicketEmbedandClient, deleteTicketReasonModal, deleteTicketSpam } 
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
-        var ticketNumber, IdData, ticketLog;
+        var ticketNumber, IdData, ticketLog, ticketDoc;
         const serverAdd = `${process.env.SERVERADD}`;
 
         if (interaction.customId == "delete-ticket") {
@@ -27,7 +27,7 @@ module.exports = {
             } else {
                 buttonCooldown.add(interaction.user.id);
 
-                var ticketDoc = await ticketModel.findOne({
+                ticketDoc = await ticketModel.findOne({
                     ticketData: {
                         $elemMatch: {
                             ticketID: interaction.channel.id
@@ -125,7 +125,7 @@ module.exports = {
 
                 const TicketReason = interaction.fields.getTextInputValue('ticket-reason-text');
 
-                var ticketDoc = await ticketModel.findOne({
+                ticketDoc = await ticketModel.findOne({
                     ticketData: {
                         $elemMatch: {
                             ticketID: interaction.channel.id
@@ -204,4 +204,4 @@ module.exports = {
             }
         }
     }
-}
+};

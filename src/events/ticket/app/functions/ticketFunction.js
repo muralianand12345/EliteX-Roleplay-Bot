@@ -12,7 +12,7 @@ async function createTicketChan(client, interaction, parentCat, ticketCount, tic
     channel = await interaction.guild.channels.create({
         name: `ticket-${ticketCount}-${interaction.user.username}`,
         parent: parentCat,
-        topic: ticketCount,
+        topic: `${ticketCount}`,
         permissionOverwrites: [
             {
                 id: interaction.user.id,
@@ -96,4 +96,4 @@ async function deleteTicketLog(client, interaction, ticketLogDir, chan) {
 }
 
 //Export --------------------------------
-module.exports = { createTicketChan, closeTicketChan, deleteTicketLog }
+module.exports = { createTicketChan, closeTicketChan, deleteTicketLog };

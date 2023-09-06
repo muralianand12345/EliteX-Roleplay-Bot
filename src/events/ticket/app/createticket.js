@@ -19,7 +19,7 @@ const { createTicketEmbed, showTicketModalOOC, showTicketModalOthers, ticketModa
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
-
+        var ticketUserData;
         const errChan = client.config.ERR_LOG.CHAN_ID;
         const errorSend = client.channels.cache.get(errChan);
 
@@ -33,7 +33,7 @@ module.exports = {
 
             //Database
 
-            var ticketUserData = await ticketModel.findOne({
+            ticketUserData = await ticketModel.findOne({
                 guildID: interaction.guild.id,
                 userID: interaction.user.id
             }).catch(err => console.log(err));
@@ -79,11 +79,12 @@ module.exports = {
                     return errorSend.send({ embeds: [ticEmbed] });
                 }
             } else {
-                var ticketUserData = await new ticketModel({
+                ticketUserData = await new ticketModel({
                     guildID: interaction.guild.id,
                     userID: interaction.user.id,
                     ticketCount: 0,
                     ticketLimit: ticketLimitGlobal,
+                    ticketRecentID: "123",
                     ticketData: []
                 });
                 await ticketUserData.save();
@@ -221,7 +222,7 @@ module.exports = {
 
             await interaction.deferReply({ ephemeral: true });
 
-            var ticketUserData = await ticketModel.findOne({
+            ticketUserData = await ticketModel.findOne({
                 guildID: interaction.guild.id,
                 userID: interaction.user.id
             }).catch(err => console.log(err));
@@ -237,7 +238,7 @@ module.exports = {
 
             await interaction.deferReply({ ephemeral: true });
 
-            var ticketUserData = await ticketModel.findOne({
+            ticketUserData = await ticketModel.findOne({
                 guildID: interaction.guild.id,
                 userID: interaction.user.id
             }).catch(err => console.log(err));
