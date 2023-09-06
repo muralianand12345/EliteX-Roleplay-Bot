@@ -40,9 +40,21 @@ module.exports = {
         const chan = interaction.channel;
         if (chan.name.includes('ticket')) {
 
-            const ticketDoc = await ticketModel.findOne({
-                ticketID: interaction.channel.id
+            var ticketDoc = await ticketModel.findOne({
+                ticketData: {
+                    $elemMatch: {
+                        ticketID: interaction.channel.id
+                    }
+                }
             }).catch(err => console.log(err));
+
+            //Old Ticket
+            if (!ticketDoc) {
+                ticketDoc = await ticketModel.findOne({
+                    ticketID: interaction.channel.id
+                }).catch(err => console.log(err));
+                if (!ticketDoc) return interaction.reply('Ticket is not in database!');
+            }
 
             const htmlCode = await discordTranscripts.createTranscript(chan, {
                 limit: -1,
@@ -79,7 +91,7 @@ module.exports = {
                 if (error.code == 50007) {
                     const logembed = new EmbedBuilder()
                         .setColor('#000000')
-                        .setDescription(`Unable to DM User: <@${commUser}>\n\`Ticket No: ${chan.id}\``)
+                        .setDescription(`Unable to DM User: <@${commUser}>\n\`Ticket No: ${chan.id}\``);
 
                     return errorSend.send({
                         embeds: [logembed]
@@ -94,7 +106,7 @@ module.exports = {
                     if (error.code == 50007) {
                         const logembed = new EmbedBuilder()
                             .setColor('#000000')
-                            .setDescription(`Unable to DM User: <@${ticketDoc.userID}>\n\`Ticket No: ${chan.id}\``)
+                            .setDescription(`Unable to DM User: <@${ticketDoc.userID}>\n\`Ticket No: ${chan.id}\``);
 
                         return errorSend.send({
                             embeds: [logembed]
@@ -105,7 +117,7 @@ module.exports = {
 
             const ReplyEmbed = new EmbedBuilder()
                 .setColor("#57F287")
-                .setDescription('Ticket has been logged successfully')
+                .setDescription('Ticket has been logged successfully');
 
             await interaction.reply({
                 embeds: [ReplyEmbed],
@@ -115,7 +127,7 @@ module.exports = {
         } else {
             const ReplyEmbed = new EmbedBuilder()
                 .setColor("#ED4245")
-                .setDescription('You are not in a Ticket!')
+                .setDescription('You are not in a Ticket!');
 
             await interaction.reply({
                 embeds: [ReplyEmbed],

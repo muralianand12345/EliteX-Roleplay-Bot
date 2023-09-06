@@ -25,9 +25,20 @@ module.exports = {
                 ticketGuildID: interaction.guild.id
             }).catch(err => console.log(err));
 
-            const ticketDoc = await ticketModel.findOne({
-                ticketID: interaction.channel.id
+            var ticketDoc = await ticketModel.findOne({
+                ticketData: {
+                    $elemMatch: {
+                        ticketID: interaction.channel.id
+                    }
+                }
             }).catch(err => console.log(err));
+    
+            //Old Ticket
+            if (!ticketDoc) {
+                ticketDoc = await ticketModel.findOne({
+                    ticketID: interaction.channel.id
+                }).catch(err => console.log(err));
+            }
 
             const htmlCode = await discordTranscripts.createTranscript(chan, {
                 limit: -1,

@@ -44,7 +44,7 @@ async function closeTicketChan(client, interaction, parentCat, ticketSupport, us
             parent: parentCat,
             permissionOverwrites: [
                 {
-                    id: ticketUserID,
+                    id: userID,
                     deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
                 },
                 {

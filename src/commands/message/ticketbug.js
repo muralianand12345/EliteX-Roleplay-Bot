@@ -13,10 +13,21 @@ module.exports = {
         const commandName = `MESS_TICKETBUG`;
         client.std_log.error(client, commandName, message.author.id, message.channel.id);
 
-        const ticketDoc = await ticketModel.findOne({
-            ticketID: message.channel.id
+        var ticketDoc = await ticketModel.findOne({
+            ticketData: {
+                $elemMatch: {
+                    ticketID: message.channel.id
+                }
+            }
         }).catch(err => console.log(err));
-    
+
+        //Old Ticket
+        if (!ticketDoc) {
+            ticketDoc = await ticketModel.findOne({
+                ticketID: message.channel.id
+            }).catch(err => console.log(err));
+        }
+
         await ticketBugEmbed(client, message, ticketDoc);
     }
 };
