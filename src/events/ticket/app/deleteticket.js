@@ -101,7 +101,7 @@ module.exports = {
                         ticketDoc.ticketCount -= 1;
                     }
                     ticketDoc.ticketLimit = client.config.TICKET_LIMIT;
-                    ticketDoc.ticketData = ticketDoc.ticketData.filter(ticket => ticket.ticketID !== interaction.channel.id);
+                    ticketDoc.ticketData = ticketDoc.ticketData.filter(ticketDataItem => ticketDataItem.ticketID !== interaction.channel.id);
                     await ticketDoc.save();
                 }, 2000);
 
@@ -120,7 +120,6 @@ module.exports = {
             if (buttonCooldown.has(interaction.user.id)) {
                 await deleteTicketSpam(client, interaction);
             } else {
-
                 buttonCooldown.add(interaction.user.id);
 
                 const TicketReason = interaction.fields.getTextInputValue('ticket-reason-text');
@@ -197,7 +196,8 @@ module.exports = {
                         ticketDoc.ticketCount -= 1;
                     }
                     ticketDoc.ticketLimit = client.config.TICKET_LIMIT;
-                    ticketDoc.ticketData = ticketDoc.ticketData.filter(ticket => ticket.ticketID !== interaction.channel.id);
+                    ticketDoc.ticketData = ticketDoc.ticketData.filter(ticketDataItem => ticketDataItem.ticketID !== interaction.channel.id);
+
                     await ticketDoc.save();
                 }, 2000);
                 setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000);

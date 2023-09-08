@@ -77,6 +77,16 @@ module.exports = {
                             { name: 'Reason', value: "has already opened a Ticket" }
                         );
                     return errorSend.send({ embeds: [ticEmbed] });
+                } else {
+                    ticketUserData = await ticketModel.findOneAndUpdate(
+                        {
+                            guildID: interaction.guild.id,
+                            userID: interaction.user.id
+                        },
+                        {
+                            ticketRecentID: "123",
+                        }
+                    );
                 }
             } else {
                 ticketUserData = await new ticketModel({
@@ -149,16 +159,15 @@ module.exports = {
                                     components: []
                                 });
 
-                                await createTicketEmbed(client, interaction, i, c).then(async (opened) => {
-                                    let ticketData = {
-                                        ticketID: c.id,
-                                        ticketPannelID: opened.id,
-                                    };
-                                    ticketUserData.ticketData.push(ticketData);
-                                    ticketUserData.ticketCount += 1;
-                                    ticketUserData.ticketRecentID = c.id;
-                                    await ticketUserData.save();
-                                });
+                                opened = await createTicketEmbed(client, interaction, i, c)
+                                let ticketData = {
+                                    ticketID: c.id,
+                                    ticketPannelID: opened.id,
+                                };
+                                ticketUserData.ticketData.push(ticketData);
+                                ticketUserData.ticketCount += 1;
+                                ticketUserData.ticketRecentID = c.id;
+                                await ticketUserData.save();
                             });
                     }
 
@@ -180,16 +189,15 @@ module.exports = {
                                     components: []
                                 });
 
-                                await createTicketEmbed(client, interaction, i, c).then(async (opened) => {
-                                    let ticketData = {
-                                        ticketID: c.id,
-                                        ticketPannelID: opened.id,
-                                    };
-                                    ticketUserData.ticketData.push(ticketData);
-                                    ticketUserData.ticketCount += 1;
-                                    ticketUserData.ticketRecentID = c.id;
-                                    await ticketUserData.save();
-                                });
+                                opened = await createTicketEmbed(client, interaction, i, c)
+                                let ticketData = {
+                                    ticketID: c.id,
+                                    ticketPannelID: opened.id,
+                                };
+                                ticketUserData.ticketData.push(ticketData);
+                                ticketUserData.ticketCount += 1;
+                                ticketUserData.ticketRecentID = c.id;
+                                await ticketUserData.save();
                             });
 
                     }
@@ -244,11 +252,13 @@ module.exports = {
             }).catch(err => console.log(err));
 
             if (!ticketUserData) {
-                await interaction.editReply({ content: "Internal Error | Contact Discord Developer", ephemeral: true });
+                return await interaction.editReply({ content: "Internal Error | Contact Discord Developer", ephemeral: true });
             }
 
             const ticketChanID = ticketUserData.ticketRecentID;
             const ticketChan = client.channels.cache.get(ticketChanID);
+
+            if (!ticketChan) return await interaction.editReply({ content: "Internal Error | Contact Discord Manager!", ephemeral: true });
 
             ticketModalOthersEmbed(client, interaction, ticketChan);
             await interaction.editReply({ content: "Detail Submitted!", ephemeral: true });

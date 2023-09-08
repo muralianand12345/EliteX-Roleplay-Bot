@@ -29,6 +29,26 @@ const row = new ActionRowBuilder()
             .setStyle(ButtonStyle.Secondary),
     );
 
+const rowDisClose = new ActionRowBuilder()
+    .addComponents(
+        new ButtonBuilder()
+            .setCustomId('close-ticket')
+            .setLabel('Close Ticket')
+            .setEmoji('899745362137477181')
+            .setStyle(ButtonStyle.Danger)
+            .setDisabled(true),
+        new ButtonBuilder()
+            .setCustomId('transcript-ticket')
+            .setLabel('Transcript')
+            .setEmoji('📜')
+            .setStyle(ButtonStyle.Primary),
+        new ButtonBuilder()
+            .setCustomId('claim-ticket')
+            .setLabel('Claim')
+            .setEmoji('🔒')
+            .setStyle(ButtonStyle.Secondary),
+    );
+
 const rowDisAll = new ActionRowBuilder()
     .addComponents(
         new ButtonBuilder()
@@ -244,7 +264,7 @@ async function claimTicketEmbed(client, interaction) {
     const embed = new EmbedBuilder()
         .setColor('Green')
         .setAuthor({ name: 'Claimed Ticket' })
-        .setDescription(`Your ticket will be handled by <@${interaction.user.id}>`)
+        .setDescription(`Your ticket will be handled by <@${interaction.user.id}>`);
     await interaction.reply({ embeds: [embed] }).then(async (msg) => {
 
         const content = `**Handled By** <@${interaction.user.id}>`;
@@ -269,7 +289,7 @@ async function closeTicketEmbed(client, interaction) {
 }
 
 async function closeTicketEditInt(client, interaction) {
-    await interaction.message.edit({ components: [rowDisAll] })
+    await interaction.message.edit({ components: [rowDisAll] });
 }
 
 //Delete Ticket ----------------------------------------------
@@ -284,7 +304,7 @@ async function deleteTicketEmbedandClient(client, interaction, IdData, ticketDoc
     if (TicketReason) {
         embed.addFields(
             { name: 'Reason', value: `\`\`\`${TicketReason}\`\`\`` }
-        )
+        );
     }
 
     client.channels.cache.get(IdData.ticketLogChannelID).send({
@@ -297,7 +317,7 @@ async function deleteTicketEmbedandClient(client, interaction, IdData, ticketDoc
         if (error.code == 50007) {
             const logembed = new EmbedBuilder()
                 .setColor('#000000')
-                .setDescription(`Unable to DM User: <@${ticketDoc.userID}>\n\`Ticket No: ${chan.id}\``)
+                .setDescription(`Unable to DM User: <@${ticketDoc.userID}>\n\`Ticket No: ${chan.id}\``);
 
             return client.channels.cache.get(IdData.ticketLogChannelID).send({
                 embeds: [logembed]
@@ -326,19 +346,14 @@ async function deleteTicketReasonModal(client, interaction) {
 async function deleteTicketSpam(client, interaction) {
     const replyEmbed = new EmbedBuilder()
         .setColor('#ED4245')
-        .setDescription("Interaction not registered! (Button Spam Dedected!)")
+        .setDescription("Interaction not registered! (Button Spam Dedected!)");
     await interaction.editReply({ embeds: [replyEmbed], ephemeral: true });
 }
 
 //Bug Ticket ----------------------------------------------
 
 async function ticketBugEmbed(client, message, ticketDoc) {
-    if (!ticketDoc) {
-        row.components[0].setDisabled(true);
-        message.channel.send({ content: 'No Ticket Found in Database! / Manual delete needed' });
-    }
-    await message.delete();
-
+    const chan = message.channel;
     const embed = new EmbedBuilder()
         .setColor('#206694')
         .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
@@ -346,8 +361,16 @@ async function ticketBugEmbed(client, message, ticketDoc) {
         .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
         .setTimestamp();
 
-    const chan = message.channel;
-    await chan.send({ embeds: [embed], components: [row] });
+    if (!ticketDoc) {
+        await chan.send({ 
+            content: 'No Ticket Found in Database! / Manual delete needed',
+            embeds: [embed], 
+            components: [rowDisClose] 
+        });
+    } else {
+        await chan.send({ embeds: [embed], components: [row] });
+    }
+    await message.delete();
 }
 
 //Export ------------------------------------------------------
@@ -356,4 +379,4 @@ module.exports = {
     createTicketEmbed, showTicketModalOOC, ticketModalOOCEmbed, showTicketModalOthers, ticketModalOthersEmbed,
     claimTicketEmbed, closeTicketEmbed, closeTicketEditInt, deleteTicketEmbedandClient, deleteTicketReasonModal,
     deleteTicketSpam, ticketBugEmbed
-}
+};
