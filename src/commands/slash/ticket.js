@@ -56,12 +56,12 @@ module.exports = {
                     .setDescription('OOC Category')
                     .setRequired(true)
                 )
-                /*.addChannelOption(option => option
+                .addChannelOption(option => option
                     .setName('supporters')
                     .setDescription('Supporters Pack Category')
                     .setRequired(true)
                 )
-                .addChannelOption(option => option
+                /*.addChannelOption(option => option
                     .setName('bug')
                     .setDescription('Bugs Category')
                     .setRequired(true)
@@ -147,8 +147,8 @@ module.exports = {
             }
         } else if (interaction.options.getSubcommand() === "category-setup") {
             const oocPar = await interaction.options.getChannel("ooc");
-            /*const supPar = await interaction.options.getChannel("supporters");
-            const bugPar = await interaction.options.getChannel("bug");
+            const supPar = await interaction.options.getChannel("supporters");
+            /*const bugPar = await interaction.options.getChannel("bug");
             const charPar = await interaction.options.getChannel("character");*/
             const otherPar = await interaction.options.getChannel("other");
             const closedPar = await interaction.options.getChannel("closed");
@@ -162,8 +162,8 @@ module.exports = {
                 }
             }
             checkParent(oocPar);
-            /*checkParent(supPar);
-            checkParent(bugPar);
+            checkParent(supPar);
+            /*checkParent(bugPar);
             checkParent(charPar);*/
             checkParent(otherPar);
             checkParent(closedPar);

@@ -42,7 +42,6 @@ module.exports = {
                     }
                 }).catch(err => console.log(err));
 
-
                 //For OLD Ticket
                 if (!ticketDoc) {
                     ticketDoc = await ticketModel.findOne({

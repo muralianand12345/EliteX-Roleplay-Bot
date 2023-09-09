@@ -77,17 +77,18 @@ module.exports = {
                             { name: 'Reason', value: "has already opened a Ticket" }
                         );
                     return errorSend.send({ embeds: [ticEmbed] });
-                } else {
-                    ticketUserData = await ticketModel.findOneAndUpdate(
-                        {
-                            guildID: interaction.guild.id,
-                            userID: interaction.user.id
-                        },
-                        {
-                            ticketRecentID: "123",
-                        }
-                    );
                 }
+
+                ticketUserData = await ticketModel.findOneAndUpdate(
+                    {
+                        guildID: interaction.guild.id,
+                        userID: interaction.user.id
+                    },
+                    {
+                        ticketRecentID: "123",
+                    }
+                );
+
             } else {
                 ticketUserData = await new ticketModel({
                     guildID: interaction.guild.id,
@@ -119,6 +120,11 @@ module.exports = {
                                 label: 'OOC',
                                 value: 'Ooc',
                                 emoji: '📝',
+                            },
+                            {
+                                label: 'SUPPORTERS PACK',
+                                value: 'Supporters',
+                                emoji: '🪙',
                             },
                             {
                                 label: 'OTHERS',
@@ -159,7 +165,7 @@ module.exports = {
                                     components: []
                                 });
 
-                                opened = await createTicketEmbed(client, interaction, i, c)
+                                opened = await createTicketEmbed(client, interaction, i, c);
                                 let ticketData = {
                                     ticketID: c.id,
                                     ticketPannelID: opened.id,
@@ -189,7 +195,34 @@ module.exports = {
                                     components: []
                                 });
 
-                                opened = await createTicketEmbed(client, interaction, i, c)
+                                opened = await createTicketEmbed(client, interaction, i, c);
+                                let ticketData = {
+                                    ticketID: c.id,
+                                    ticketPannelID: opened.id,
+                                };
+                                ticketUserData.ticketData.push(ticketData);
+                                ticketUserData.ticketCount += 1;
+                                ticketUserData.ticketRecentID = c.id;
+                                await ticketUserData.save();
+                            });
+
+                    }
+
+                    if (i.values[0] == 'Supporters') {
+
+                        guildDoc.ticketCount += 1;
+                        await guildDoc.save();
+
+                        await createTicketChan(client, interaction, ticketParents.suppPar, guildDoc.ticketCount, IdData.ticketSupportID)
+                            .then(async (c) => {
+
+                                await interaction.editReply({
+                                    content: `Ticket Created <#${c.id}>`,
+                                    embeds: [],
+                                    components: []
+                                });
+
+                                opened = await createTicketEmbed(client, interaction, i, c);
                                 let ticketData = {
                                     ticketID: c.id,
                                     ticketPannelID: opened.id,
