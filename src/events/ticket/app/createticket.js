@@ -13,7 +13,7 @@ const ticketData = require("../../../events/mongodb/modals/channel.js");
 const guildModel = require('../../../events/mongodb/modals/guild.js');
 const ticketPar = require('../../../events/mongodb/modals/ticketParent.js');
 
-const { createTicketChan } = require('./functions/ticketFunction.js');
+const { createTicketChan, checkTicketCategory } = require('./functions/ticketFunction.js');
 const { createTicketEmbed, showTicketModalOOC, showTicketModalOthers, ticketModalOOCEmbed, ticketModalOthersEmbed } = require('./functions/ticketEmbed.js');
 
 module.exports = {
@@ -149,6 +149,13 @@ module.exports = {
 
                     if (i.values[0] == 'Ooc') {
 
+                        if (await checkTicketCategory(client, interaction, ticketParents.oocPar)) {
+                            return await i.reply({
+                                content: 'Sorry, the ticket category is full! Contact Discord Manager or Try again later.',
+                                ephemeral: true,
+                            });
+                        }
+
                         await showTicketModalOOC(client, i);
 
                         guildDoc.ticketCount += 1;
@@ -178,6 +185,13 @@ module.exports = {
                     }
 
                     if (i.values[0] == 'Others') {
+
+                        if (await checkTicketCategory(client, interaction, ticketParents.oocPar)) {
+                            return await i.reply({
+                                content: 'Sorry, the ticket category is full! Contact Discord Manager or Try again later.',
+                                ephemeral: true,
+                            });
+                        }
 
                         await showTicketModalOthers(client, i);
 
@@ -210,6 +224,13 @@ module.exports = {
 
                     if (i.values[0] == 'Supporters') {
 
+                        if (await checkTicketCategory(client, interaction, ticketParents.oocPar)) {
+                            return await i.reply({
+                                content: 'Sorry, the ticket category is full! Contact Discord Manager or Try again later.',
+                                ephemeral: true,
+                            });
+                        }
+
                         guildDoc.ticketCount += 1;
                         await guildDoc.save();
 
@@ -232,7 +253,6 @@ module.exports = {
                                 ticketUserData.ticketRecentID = c.id;
                                 await ticketUserData.save();
                             });
-
                     }
                 }
             });

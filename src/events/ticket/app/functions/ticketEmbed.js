@@ -275,12 +275,20 @@ async function claimTicketEmbed(client, interaction) {
 //Close Ticket ----------------------------------------------
 
 async function closeTicketEmbed(client, interaction) {
-    const embed = new EmbedBuilder()
+
+    var embed = new EmbedBuilder()
         .setColor('#206694')
-        .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
-        .setDescription('```Ticket Supporters, Delete After Verifying```')
+        .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE }) 
         .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
         .setTimestamp();
+
+    const channel = interaction.channel;
+    if (channel.parent) {
+        const categoryName = channel.parent.name;
+        embed.setDescription(`\`\`\`Delete After Verifying | ${categoryName}\`\`\``)
+    } else {
+        embed.setDescription(`\`\`\`Delete After Verifying\`\`\``)
+    }
 
     await interaction.channel.send({
         embeds: [embed],
@@ -362,10 +370,10 @@ async function ticketBugEmbed(client, message, ticketDoc) {
         .setTimestamp();
 
     if (!ticketDoc) {
-        await chan.send({ 
+        await chan.send({
             content: 'No Ticket Found in Database! / Manual delete needed',
-            embeds: [embed], 
-            components: [rowDisClose] 
+            embeds: [embed],
+            components: [rowDisClose]
         });
     } else {
         await chan.send({ embeds: [embed], components: [row] });

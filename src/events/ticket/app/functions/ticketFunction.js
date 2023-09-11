@@ -1,6 +1,7 @@
 const {
     ChannelType,
     PermissionFlagsBits,
+    EmbedBuilder
 } = require('discord.js');
 
 const fs = require('fs');
@@ -32,6 +33,24 @@ async function createTicketChan(client, interaction, parentCat, ticketCount, tic
     });
 
     return channel;
+}
+
+const logChanID = "1109438179603402762";
+async function checkTicketCategory(client, interaction, category) {
+    const parentCategory = interaction.guild.channels.cache.get(category);
+    if (parentCategory.children.cache.size >= 50) {
+        let chan = client.channels.cache.get(logChanID);
+        let embed = new EmbedBuilder()
+            .setAuthor({ name: 'Ticket Category Limit' })
+            .addFields(
+                { name: 'Username', value: `${interaction.user.username}` },
+                { name: 'Category', value: `${parentCategory.name}` }
+            );
+        chan.send({ embeds: [embed] });
+        return true;
+    } else {
+        return false;
+    }
 }
 
 //Close --------------------------------
@@ -79,14 +98,30 @@ async function closeTicketChan(client, interaction, parentCat, ticketSupport, us
 
 //Delete --------------------------------
 
-async function deleteTicketLog(client, interaction, ticketLogDir, chan) {
-    const htmlCode = await discordTranscripts.createTranscript(chan, {
-        limit: -1,
-        returnType: 'string',
-        filename: `transcript-${interaction.channel.id}.html`,
-        saveImages: false,
-        poweredBy: false
-    });
+async function deleteTicketLog(client, interaction, ticketLogDir, chan, type) {
+
+    let htmlCode;
+
+    switch (type) {
+        case 'image-save':
+            htmlCode = await discordTranscripts.createTranscript(chan, {
+                limit: -1,
+                returnType: 'string',
+                filename: `transcript-${interaction.channel.id}.html`,
+                saveImages: true,
+                poweredBy: false
+            });
+            break;
+        default:
+            htmlCode = await discordTranscripts.createTranscript(chan, {
+                limit: -1,
+                returnType: 'string',
+                filename: `transcript-${interaction.channel.id}.html`,
+                saveImages: false,
+                poweredBy: false
+            });
+            break;
+    }
 
     fs.writeFile(`${ticketLogDir}/transcript-${interaction.channel.id}.html`, htmlCode, function (err) {
         if (err) {
@@ -96,4 +131,4 @@ async function deleteTicketLog(client, interaction, ticketLogDir, chan) {
 }
 
 //Export --------------------------------
-module.exports = { createTicketChan, closeTicketChan, deleteTicketLog };
+module.exports = { createTicketChan, checkTicketCategory, closeTicketChan, deleteTicketLog };

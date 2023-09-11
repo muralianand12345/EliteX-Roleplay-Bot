@@ -94,12 +94,10 @@ module.exports = {
                                 components: []
                             });
 
-                            await closeTicketChan(client, interaction, closeTicket, IdData.ticketSupportID, ticketDoc.userID)
-                                .then(async () => {
-
-                                    closeTicketEmbed(client, interaction);
-                                    collector.stop();
-                                });
+                            await closeTicketEmbed(client, interaction).then(async () => {
+                                await closeTicketChan(client, interaction, closeTicket, IdData.ticketSupportID, ticketDoc.userID);
+                                collector.stop();
+                            });
 
                         } catch (error) {
                             if (error.code == 10062) {

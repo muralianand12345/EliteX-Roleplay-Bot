@@ -74,8 +74,15 @@ module.exports = {
 
                 //Ticket Logs
 
+                var theTicketType;
+                const ticketEmbedDes = interaction.message.embeds[0].description;
+                if (ticketEmbedDes.toLowerCase().includes("🪙")) {
+                    theTicketType = "image-save"
+                } else {
+                    theTicketType = "none"
+                }
                 const ticketLogDir = path.join(__dirname, '../website/ticket-logs');
-                await deleteTicketLog(client, interaction, ticketLogDir, chan);
+                await deleteTicketLog(client, interaction, ticketLogDir, chan, theTicketType);
 
                 ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
                 const ticketlog = {
@@ -169,8 +176,15 @@ module.exports = {
                     ephemeral: true
                 });
 
+                var theTicketType;
+                const ticketEmbedDes = interaction.message.embeds[0].description;
+                if (ticketEmbedDes.toLowerCase().includes("🪙")) {
+                    theTicketType = "image-save"
+                } else {
+                    theTicketType = "none"
+                }
                 const ticketLogDir = path.join(__dirname, '../website/ticket-logs');
-                await deleteTicketLog(client, interaction, ticketLogDir, chan);
+                await deleteTicketLog(client, interaction, ticketLogDir, chan, theTicketType);
 
                 ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
                 const ticketlog = {

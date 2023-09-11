@@ -179,8 +179,8 @@ module.exports = {
                     let newData = new parentData({
                         guildID: interaction.guild.id,
                         oocPar: oocPar.id,
-                        /*suppPar: supPar.id,
-                        bugPar: bugPar.id,
+                        suppPar: supPar.id,
+                        /*bugPar: bugPar.id,
                         charPar: charPar.id,*/
                         otherPar: otherPar.id,
                         closedPar: closedPar.id

@@ -20,6 +20,7 @@ module.exports = {
         const PDTicket = "1123887297822216323";
         const PDHeadRole = "1123600704662151290";
         const PDRoleID = "1123600704662151290";
+        const TicketSupporters = "";
 
         // ----------------------------------
 
@@ -54,6 +55,10 @@ module.exports = {
                     },
                     {
                         id: PDHeadRole,
+                        allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                    },
+                    {
+                        id: TicketSupporters,
                         allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
                     },
                     {
@@ -146,6 +151,10 @@ module.exports = {
                             },
                             {
                                 id: PDHeadRole,
+                                allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                            },
+                            {
+                                id: TicketSupporters,
                                 allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
                             },
                             {
