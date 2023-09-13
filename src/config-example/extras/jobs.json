@@ -1,4 +1,5 @@
 {
+    "COOLDOWN": 10000,
     "GOVTCOOL": "",
     "LOG": {
         "CHANID": ""
@@ -19,22 +20,157 @@
         "ROLEID": "",
         "HO": "",
         "INTERVIEW": "",
-        "SUBMIT": ""
+        "SUBMIT": "",
+        "ACCMSG": "**Congratulations on being selected for an EMS interview! We are excited to learn more about you and discuss your potential role in our EMS team. Please contact us to schedule the interview at your earliest convenience.**",
+        "REJMSG": "**Thank you for your interest in the EMS. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**"
     },
     "TAXI": {
         "ACCCHAN": "",
-        "NAME": "IPTC",
+        "NAME": "TAXI",
         "ROLEID": "",
         "HO": "",
         "INTERVIEW": "",
-        "SUBMIT": ""
+        "SUBMIT": "",
+        "ACCMSG": "**Congratulations on being selected for an IPTC interview! We are excited to learn more about you and discuss your potential role in our IPTC team. Please contact us to schedule the interview at your earliest convenience.**",
+        "REJMSG": "**Thank you for your interest in the IPTC. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**"
     },
     "MEDIA": {
         "ACCCHAN": "",
-        "NAME": "ICONIC MEDIA",
+        "NAME": "MEDIA",
         "ROLEID": "",
         "HO": "",
         "INTERVIEW": "",
-        "SUBMIT": ""
+        "SUBMIT": "",
+        "ACCMSG": "**Congratulations on being selected for an Iconic Media interview! We are excited to learn more about you and discuss your potential role in our Iconic Media team. Please contact us to schedule the interview at your earliest convenience.**",
+        "REJMSG": "**Thank you for your interest in the Iconic Media. After careful consideration, we regret to inform you that we have chosen not to proceed with your application at this time. We appreciate your understanding and encourage you to apply for future opportunities.**"
+    },
+
+    "MODALS": {
+        "EMS": {
+            "Q1": {
+                "LABEL": "Character Name and IC phone number",
+                "STYLE": "short",
+                "PLACEHOLDER": "Name - Phone Number",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q2": {
+                "LABEL": "Real Age",
+                "STYLE": "short",
+                "PLACEHOLDER": "OOC Age",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q3": {
+                "LABEL": "Why you think you are best fit for doctor?",
+                "STYLE": "short",
+                "PLACEHOLDER": "Answer Here",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q4": {
+                "LABEL": "How many hours can you put in per day?",
+                "STYLE": "short",
+                "PLACEHOLDER": "Hrs per day",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q5": {
+                "LABEL": "Do you have any previous experience?",
+                "STYLE": "long",
+                "PLACEHOLDER": "Brief your answer",
+                "REQUIRED": true,
+                "MAXLEN": 1000,
+                "MINLEN": 20
+            }
+        },
+        "TAXI": {
+            "Q1": {
+                "LABEL": "Character Name and IC phone number",
+                "STYLE": "short",
+                "PLACEHOLDER": "Name - Phone Number",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q2": {
+                "LABEL": "Real Age",
+                "STYLE": "short",
+                "PLACEHOLDER": "OOC Age",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q3": {
+                "LABEL": "Why should we hire you?",
+                "STYLE": "long",
+                "PLACEHOLDER": "Brief your answer",
+                "REQUIRED": true,
+                "MAXLEN": 1000,
+                "MINLEN": 20
+            },
+            "Q4": {
+                "LABEL": "How many hours can you put in per day?",
+                "STYLE": "short",
+                "PLACEHOLDER": "Hrs per day",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q5": {
+                "LABEL": "What are your Strength and Weakness?",
+                "STYLE": "long",
+                "PLACEHOLDER": "Brief your answer",
+                "REQUIRED": true,
+                "MAXLEN": 1000,
+                "MINLEN": 20
+            }
+        },
+        "MEDIA": {
+            "Q1": {
+                "LABEL": "Character Name and IC phone number",
+                "STYLE": "short",
+                "PLACEHOLDER": "Name - Phone Number",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q2": {
+                "LABEL": "Real Age",
+                "STYLE": "short",
+                "PLACEHOLDER": "OOC Age",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q3": {
+                "LABEL": "How many hours you can spend in a day?",
+                "STYLE": "short",
+                "PLACEHOLDER": "Hrs per day",
+                "REQUIRED": true,
+                "MAXLEN": 100,
+                "MINLEN": 2
+            },
+            "Q4": {
+                "LABEL": "Do you have any previous experience?",
+                "STYLE": "short",
+                "PLACEHOLDER": "Brief your answer",
+                "REQUIRED": true,
+                "MAXLEN": 200,
+                "MINLEN": 10
+            },
+            "Q5": {
+                "LABEL": "Why do you wish to be a journalist?",
+                "STYLE": "long",
+                "PLACEHOLDER": "Brief your answer",
+                "REQUIRED": true,
+                "MAXLEN": 1000,
+                "MINLEN": 20
+            }
+        }
     }
 }

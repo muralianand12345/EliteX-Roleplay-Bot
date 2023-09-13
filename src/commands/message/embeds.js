@@ -23,17 +23,23 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setColor('Blue')
-            .setAuthor({ name: 'Ticket' })
-            .setTitle('Iconic City Police Department')
-            .setDescription('`Click the button to open a ticket.`');
+            .setTitle('EMS Application')
+            .setDescription('`Thank you for your interest in joining our EMS team! Click the button below to proceed with your application.`');
 
         const button = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('police-open-ticket')
-                    .setLabel('TICKET')
-                    .setEmoji('🎫')
-                    .setStyle(ButtonStyle.Success)
+                    .setCustomId('apply-ems')
+                    .setLabel('APPLY')
+                    .setStyle(ButtonStyle.Success),
+                /*new ButtonBuilder()
+                    .setCustomId('apply-media')
+                    .setLabel('APPLY')
+                    .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId('apply-taxi')
+                    .setLabel('APPLY')
+                    .setStyle(ButtonStyle.Success),*/
             )
 
         await message.channel.send({
