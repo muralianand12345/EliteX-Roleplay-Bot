@@ -1,0 +1,113 @@
+const {
+    SlashCommandBuilder,
+    EmbedBuilder,
+    PermissionFlagsBits
+} = require('discord.js');
+
+const birthdayData = require("../../events/mongodb/modals/birthday.js");
+
+module.exports = {
+    cooldown: 10000,
+    userPerms: [],
+    botPerms: ['Administrator'],
+
+    data: new SlashCommandBuilder()
+        .setName('birthday')
+        .setDescription('Birthday Command')
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('set')
+                .setDescription('Set your birthday')
+                .addStringOption(option => option
+                    .setName('date')
+                    .setDescription('Date of your birthday')
+                    .setRequired(true)
+                )
+                .addStringOption(option => option
+                    .setName('month')
+                    .setDescription('Month of your birthday')
+                    .setRequired(true)
+                    .addChoices(
+                        { name: 'January', value: '01' },
+                        { name: 'February', value: '02' },
+                        { name: 'March', value: '03' },
+                        { name: 'April', value: '04' },
+                        { name: 'May', value: '05' },
+                        { name: 'June', value: '06' },
+                        { name: 'July', value: '07' },
+                        { name: 'August', value: '08' },
+                        { name: 'September', value: '09' },
+                        { name: 'October', value: '10' },
+                        { name: 'November', value: '11' },
+                        { name: 'December', value: '12' }
+                    )
+                )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('remove')
+                .setDescription('Remove your birthday')
+        ),
+    async execute(interaction, client) {
+
+        //log
+        const commandName = "BIRTHDAY";
+        client.std_log.error(client, commandName, interaction.user.id, interaction.channel.id);
+
+        await interaction.deferReply();
+
+        //set
+        if (interaction.options.getSubcommand() === "set") {
+
+            const date = interaction.options.getString('date');
+            const month = interaction.options.getString('month');
+
+            const birthdayMsg = `${date}/${month}`;
+            const birthday = new Date(new Date().getFullYear(), parseInt(month) - 1, parseInt(date));
+
+            const birthdayDoc = await birthdayData.findOne({
+                userID: interaction.user.id
+            }).catch(err => console.log(err));
+
+            if (birthdayDoc) {
+                await birthdayData.findOneAndUpdate({
+                    userID: interaction.user.id
+                }, {
+                    $set: {
+                        birthday: birthday
+                    }
+                }).catch(err => console.log(err));
+            } else {
+                await birthdayData.create({
+                    userID: interaction.user.id,
+                    birthday: birthday
+                }).catch(err => console.log(err));
+            }
+
+            return await interaction.editReply({
+                content: `Your birthday has been set to ${birthdayMsg}`
+            });
+        }
+
+        if (interaction.options.getSubcommand() === "remove") {
+
+            const birthdayDoc = await birthdayData.findOne({
+                userID: interaction.user.id
+            }).catch(err => console.log(err));
+
+            if (!birthdayDoc) {
+                return await interaction.editReply({
+                    content: `You don't have a birthday set!`
+                });
+            } else {
+                await birthdayData.findOneAndDelete({
+                    userID: interaction.user.id
+                }).catch(err => console.log(err));
+            }
+
+            return await interaction.editReply({
+                content: `Your birthday has been removed!`
+            });
+        }
+    },
+};
