@@ -1,7 +1,6 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder,
-    PermissionFlagsBits
+    EmbedBuilder
 } = require('discord.js');
 
 const birthdayData = require("../../events/mongodb/modals/birthday.js");
@@ -18,7 +17,7 @@ module.exports = {
             subcommand
                 .setName('set')
                 .setDescription('Set your birthday')
-                .addStringOption(option => option
+                .addIntegerOption(option => option
                     .setName('date')
                     .setDescription('Date of your birthday')
                     .setRequired(true)
@@ -56,11 +55,36 @@ module.exports = {
 
         await interaction.deferReply();
 
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: 'Birthday', iconURL: client.user.displayAvatarURL() })
+            .setTimestamp();
+
         //set
         if (interaction.options.getSubcommand() === "set") {
 
-            const date = interaction.options.getString('date');
+            const date = interaction.options.getInteger('date');
             const month = interaction.options.getString('month');
+
+            if (date > 31 || date < 1) {
+                embed.setColor('Red').setDescription(`Invalid date!`);
+                return await interaction.editReply({
+                    embeds: [embed]
+                });
+            }
+
+            if (month === "02" && date > 29) {
+                embed.setColor('Red').setDescription(`Invalid date!`);
+                return await interaction.editReply({
+                    embeds: [embed]
+                });
+            }
+
+            if (month === "04" && date > 30 || month === "06" && date > 30 || month === "09" && date > 30 || month === "11" && date > 30) {
+                embed.setColor('Red').setDescription(`Invalid date!`);
+                return await interaction.editReply({
+                    embeds: [embed]
+                });
+            }
 
             const birthdayMsg = `${date}/${month}`;
             const birthday = new Date(new Date().getFullYear(), parseInt(month) - 1, parseInt(date));
@@ -84,8 +108,9 @@ module.exports = {
                 }).catch(err => console.log(err));
             }
 
+            embed.setColor('Green').setDescription(`Your birthday has been set to ${birthdayMsg}`);
             return await interaction.editReply({
-                content: `Your birthday has been set to ${birthdayMsg}`
+                embeds: [embed]
             });
         }
 
@@ -96,8 +121,9 @@ module.exports = {
             }).catch(err => console.log(err));
 
             if (!birthdayDoc) {
+                embed.setColor('Red').setDescription(`You don't have a birthday set!`);
                 return await interaction.editReply({
-                    content: `You don't have a birthday set!`
+                    embeds: [embed]
                 });
             } else {
                 await birthdayData.findOneAndDelete({
@@ -105,8 +131,9 @@ module.exports = {
                 }).catch(err => console.log(err));
             }
 
+            embed.setColor('Orange').setDescription(`Your birthday has been removed!`);
             return await interaction.editReply({
-                content: `Your birthday has been removed!`
+                embeds: [embed]
             });
         }
     },

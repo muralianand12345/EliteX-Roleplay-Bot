@@ -48,10 +48,16 @@ module.exports = {
                 .setDescription(`Submitted By <@${interaction.user.id}>`)
                 .setFooter({ text: `${interaction.user.id}` });
 
-            await answers.forEach(async (answer, index) => {
+            /*await answers.forEach(async (answer, index) => {
                 const questionConf = jobModalConf[`Q${index + 1}`];
                 embed.addFields({ name: `${questionConf.LABEL}`, value: `${answer}` });
-            });
+            });*/
+
+            for (const [index, answer] of answers.entries()) {
+                const questionConf = jobModalConf[`Q${index + 1}`];
+                embed.addFields({ name: `${questionConf.LABEL}`, value: `${answer}` });
+                //await someAsyncFunction(answer); // Replace with your actual async function if needed
+            }
 
             const button = new ActionRowBuilder()
                 .addComponents(
@@ -69,7 +75,7 @@ module.exports = {
                 embeds: [embed],
                 components: [button]
             }).then(async () => {
-                return interaction.reply({
+                return await interaction.editReply({
                     content: 'Your Application Submitted!',
                     ephemeral: true
                 });
@@ -111,12 +117,13 @@ module.exports = {
             case 'apply-taxi':
                 const cooldownDuration = client.jobs.COOLDOWN;
                 if (cooldown.has(`${interaction.customId}${interaction.user.id}`)) {
+                    await interaction.deferReply({ ephemeral: true });
                     var coolMsg = client.config.MESSAGE["COOLDOWN_MESSAGE"]
                         .replace('<duration>', ms(cooldown.get(`${interaction.customId}${interaction.user.id}`) - Date.now(), { long: true }));
                     const coolEmbed = new EmbedBuilder()
                         .setDescription(`${coolMsg}`)
                         .setColor('#ED4245');
-                    interaction.reply({ embeds: [coolEmbed], ephemeral: true });
+                    await interaction.editReply({ embeds: [coolEmbed], ephemeral: true });
                     break;
                 } else {
                     const jobType = interaction.customId.split('-')[1].toUpperCase();
@@ -131,6 +138,7 @@ module.exports = {
             case 'ems-modal':
             case 'taxi-modal':
             case 'media-modal':
+                await interaction.deferReply({ ephemeral: true });
                 const jobName = interaction.customId.split('-')[0];
                 const jobAnswers = [];
                 for (let i = 1; i <= 5; i++) {
@@ -142,6 +150,7 @@ module.exports = {
             case 'ems-accept':
             case 'taxi-accept':
             case 'media-accept':
+                await interaction.deferReply({ ephemeral: true });
                 const jobTypeAcc = interaction.customId.split('-')[0].toUpperCase();
 
                 const chanAcc = client.channels.cache.get(client.jobs[jobTypeAcc].ACCCHAN);
@@ -150,12 +159,12 @@ module.exports = {
                 const userId = originalEmbed.footer.text;
                 const userMember = interaction.guild.members.cache.get(userId);
                 if (!userMember) {
-                    interaction.reply({ content: 'No user!', ephemeral: true });
+                    await interaction.editReply({ content: 'No user!', ephemeral: true });
                     break;
                 }
                 const role = interaction.guild.roles.cache.get(client.jobs[jobTypeAcc].INTERVIEW);
                 if (!role) {
-                    interaction.reply({
+                    await interaction.editReply({
                         content: 'The specified role does not exist in this guild.',
                         ephemeral: true
                     });
@@ -163,16 +172,16 @@ module.exports = {
                 }
                 const roleJob = interaction.guild.roles.cache.get(client.jobs[jobTypeAcc].ROLEID);
                 if (!roleJob) {
-                    interaction.reply({
+                    await interaction.editReply({
                         content: 'The specified role does not exist in this guild.',
                         ephemeral: true
                     });
                     break;
                 }
                 if (userMember.roles.cache.has(role.id)) {
-                    interaction.reply({ content: 'The user already has the role', ephemeral: true });
+                    await interaction.editReply({ content: 'The user already has the role', ephemeral: true });
                 } else if (userMember.roles.cache.has(roleJob.id)) {
-                    interaction.reply({ content: 'The user already has the role', ephemeral: true });
+                    await interaction.editReply({ content: 'The user already has the role', ephemeral: true });
                 } else {
                     const expirationDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
                     const newRoleData = new roleModel({
@@ -186,7 +195,7 @@ module.exports = {
                     await RoleLog(jobTypeAcc, 'Accepted', userMember.id, interaction.user.id);
                     MsgContent = `<@${userId}>, ${client.jobs[jobTypeAcc].ACCMSG}`;
                     await chanAcc.send(`${MsgContent}`);
-                    interaction.reply({ content: `Interview Role Added and Accepted!`, ephemeral: true });
+                    await interaction.editReply({ content: `Interview Role Added and Accepted!`, ephemeral: true });
                 }
                 await interaction.message.edit({ components: [] });
                 break;
@@ -194,6 +203,7 @@ module.exports = {
             case 'ems-reject':
             case 'taxi-reject':
             case 'media-reject':
+                await interaction.deferReply({ ephemeral: true });
                 const jobTypeRej = interaction.customId.split('-')[0].toUpperCase();
                 const chanRej = client.channels.cache.get(client.jobs[jobTypeRej].ACCCHAN);
 
@@ -202,12 +212,12 @@ module.exports = {
                 const userMemberRej = interaction.guild.members.cache.get(userIdRej);
 
                 if (!userMemberRej) {
-                    interaction.reply({ content: 'No user!', ephemeral: true });
+                    await interaction.editReply({ content: 'No user!', ephemeral: true });
                     break;
                 }
                 const roleRej = interaction.guild.roles.cache.get(client.jobs[jobTypeRej].INTERVIEW);
                 if (!roleRej) {
-                    interaction.reply({
+                    await interaction.editReply({
                         content: 'The specified role does not exist in this guild.',
                         ephemeral: true
                     });
@@ -215,21 +225,21 @@ module.exports = {
                 }
                 const roleJobRej = interaction.guild.roles.cache.get(client.jobs[jobTypeRej].ROLEID);
                 if (!roleJobRej) {
-                    interaction.reply({
+                    await interaction.editReply({
                         content: 'The specified role does not exist in this guild.',
                         ephemeral: true
                     });
                     break;
                 }
                 if (userMemberRej.roles.cache.has(roleRej.id)) {
-                    interaction.reply({ content: 'The user already has the role', ephemeral: true });
+                    await interaction.editReply({ content: 'The user already has the role', ephemeral: true });
                 } else if (userMemberRej.roles.cache.has(roleJobRej.id)) {
-                    interaction.reply({ content: 'The user already has the role', ephemeral: true });
+                    await interaction.editReply({ content: 'The user already has the role', ephemeral: true });
                 } else {
                     await RoleLog(jobTypeRej, 'Rejected', userMemberRej.id, interaction.user.id);
                     MsgContent = `<@${userIdRej}>, ${client.jobs[jobTypeRej].REJMSG}`;
                     await chanRej.send(`${MsgContent}`);
-                    interaction.reply({ content: `Interview Role Removed and Rejected!`, ephemeral: true });
+                    await interaction.editReply({ content: `Interview Role Removed and Rejected!`, ephemeral: true });
                 }
                 await interaction.message.edit({ components: [] });
                 break;

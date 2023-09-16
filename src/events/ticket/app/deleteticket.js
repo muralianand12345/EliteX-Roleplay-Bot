@@ -17,32 +17,33 @@ module.exports = {
     async execute(interaction, client) {
         var ticketNumber, IdData, ticketLog, ticketDoc;
         const serverAdd = `${process.env.SERVERADD}`;
+        var theTicketType;
 
         if (interaction.customId == "delete-ticket") {
 
             await interaction.deferReply({ ephemeral: true });
 
+            ticketDoc = await ticketModel.findOne({
+                ticketData: {
+                    $elemMatch: {
+                        ticketID: interaction.channel.id
+                    }
+                }
+            }).catch(err => console.log(err));
+
+            if (!ticketDoc) {
+                ticketDoc = await ticketModel.findOne({
+                    ticketID: interaction.channel.id
+                }).catch(err => console.log(err));
+                if (!ticketDoc) {
+                    return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
+                }
+            }
+
             if (buttonCooldown.has(interaction.user.id)) {
                 await deleteTicketSpam(client, interaction);
             } else {
                 buttonCooldown.add(interaction.user.id);
-
-                ticketDoc = await ticketModel.findOne({
-                    ticketData: {
-                        $elemMatch: {
-                            ticketID: interaction.channel.id
-                        }
-                    }
-                }).catch(err => console.log(err));
-
-                if (!ticketDoc) {
-                    ticketDoc = await ticketModel.findOne({
-                        ticketID: interaction.channel.id
-                    }).catch(err => console.log(err));
-                    if (!ticketDoc) {
-                        return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
-                    }
-                }
 
                 ticketLog = await ticketLogModel.findOne({
                     guildID: interaction.guild.id,
@@ -74,7 +75,7 @@ module.exports = {
 
                 //Ticket Logs
 
-                var theTicketType;
+
                 const ticketEmbedDes = interaction.message.embeds[0].description;
                 if (ticketEmbedDes.toLowerCase().includes("🪙")) {
                     theTicketType = "image-save"
@@ -176,7 +177,6 @@ module.exports = {
                     ephemeral: true
                 });
 
-                var theTicketType;
                 const ticketEmbedDes = interaction.message.embeds[0].description;
                 if (ticketEmbedDes.toLowerCase().includes("🪙")) {
                     theTicketType = "image-save"

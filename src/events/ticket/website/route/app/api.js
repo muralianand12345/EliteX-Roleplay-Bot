@@ -208,7 +208,21 @@ router.post('/getdiscorddata', checkLoggedIn, async (req, res) => {
         );
     try {
         const guild = await client.guilds.fetch(guildId);
-        const member = await guild.members.fetch(userId);
+
+        var memberId;
+
+        const userIdRegex = /^[0-9]+$/;
+        if (userId.match(userIdRegex)) {
+            memberId = userId;
+        } else {
+            const userByUsername = guild.members.cache.find((member) => member.user.username === userId);
+            if (!userByUsername) {
+                return res.status(404).json({ success: false, message: 'User not found' });
+            }
+            memberId = userByUsername.id;
+        }
+
+        const member = await guild.members.fetch(memberId);
         const role = guild.roles.cache.get(roleId);
 
         if (!member) {
@@ -225,7 +239,7 @@ router.post('/getdiscorddata', checkLoggedIn, async (req, res) => {
                 if (!member.roles.cache.has(role.id)) {
                     await member.roles.add(role);
                     embed.addFields(
-                        { name: 'To', value: `<@${userId}>` },
+                        { name: 'To', value: `<@${memberId}>` },
                         { name: 'Role Added', value: `${role.name}` }
                     )
                         .setColor('Green');
@@ -241,7 +255,7 @@ router.post('/getdiscorddata', checkLoggedIn, async (req, res) => {
                 if (member.roles.cache.has(role.id)) {
                     await member.roles.remove(role);
                     embed.addFields(
-                        { name: 'To', value: `<@${userId}>` },
+                        { name: 'To', value: `<@${memberId}>` },
                         { name: 'Role Removed', value: `${role.name}` }
                     )
                         .setColor('Red');
