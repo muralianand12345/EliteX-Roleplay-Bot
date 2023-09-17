@@ -4,7 +4,6 @@ const {
 } = require('discord.js');
 
 const birthdayData = require("../../events/mongodb/modals/birthday.js");
-const moment = require('moment-timezone');
 
 module.exports = {
     cooldown: 10000,
@@ -73,14 +72,14 @@ module.exports = {
                 });
             }
 
-            if (month === "02" && date > 29) {
+            if (month === 2 && date > 29) {
                 embed.setColor('Red').setDescription(`Invalid date!`);
                 return await interaction.editReply({
                     embeds: [embed]
                 });
             }
 
-            if (month === "04" && date > 30 || month === "06" && date > 30 || month === "09" && date > 30 || month === "11" && date > 30) {
+            if (month === 4 && date > 30 || month === 6 && date > 30 || month === 9 && date > 30 || month === 11 && date > 30) {
                 embed.setColor('Red').setDescription(`Invalid date!`);
                 return await interaction.editReply({
                     embeds: [embed]

@@ -66,6 +66,8 @@ module.exports = {
         const commandName = "ADMIN";
         client.std_log.error(client, commandName, interaction.user.id, interaction.channel.id);
 
+        var embed;
+        
         switch (interaction.options.getSubcommand()) {
             case "ban":
                 const banUser = await interaction.options.getMember("ban-user");
@@ -81,7 +83,7 @@ module.exports = {
 
                 const banChannel = client.channels.cache.get(client.mod.ADMIN.BAN.CHANID);
 
-                var embed = new EmbedBuilder()
+                embed = new EmbedBuilder()
                     .setColor('Red')
                     .setDescription(`User: <@${banUser.id}>\n**Reason:** ${banReason}`)
                     .setTimestamp();
@@ -114,7 +116,7 @@ module.exports = {
 
                 const warnChannel = client.channels.cache.get(client.mod.ADMIN.WARN.CHANID);
 
-                var embed = new EmbedBuilder()
+                embed = new EmbedBuilder()
                     .setColor('Orange')
                     .setDescription(`User: <@${warnUser.id}>\n**Reason:** ${warnReason}`)
                     .setTimestamp()
