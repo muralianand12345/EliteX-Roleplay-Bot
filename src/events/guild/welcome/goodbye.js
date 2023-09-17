@@ -6,6 +6,7 @@ module.exports = {
     name: Events.GuildMemberRemove,
     async execute(member, client) {
 
+        if (client.config.ENABLE.WELCOME === false) return;
         if (member.guild.id !== client.welcome.GUILDID) return;
         const chan = client.welcome.GOODBYECHAN;
         const msg = `\`${member.user.tag}\` **|** <@${member.user.id}> **Just Left The Server!!!**`;

@@ -10,6 +10,7 @@ module.exports = {
     name: Events.GuildMemberAdd,
     async execute(member, client) {
 
+        if (client.config.ENABLE.WELCOME === false) return;
         const guilId = client.visa.GUILDID;
         if (member.guild.id !== guilId) return;
 
@@ -70,4 +71,4 @@ module.exports = {
             return;
         }
     }
-}
+};

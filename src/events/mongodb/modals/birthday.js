@@ -2,7 +2,8 @@ const { Schema, model } = require('mongoose');
 
 const birthdaySchema = Schema({
     userID: String,
-    birthday: Date
+    day: Number,
+    month: Number,
 });
 
 module.exports = model('birthday', birthdaySchema);

@@ -15,6 +15,7 @@ module.exports = {
     name: Events.GuildMemberAdd,
     async execute(member, client) {
 
+        if (client.config.ENABLE.WELCOME === false) return;
         if (member.guild.id !== client.welcome.GUILDID) return;
 
         var memDoc = await countModel.findOne({
@@ -127,4 +128,5 @@ module.exports = {
             return await client.channels.cache.get(client.welcome.CHANID).send({ content: welcomeMsg, files: [attachment] });
         });
     }
+
 };

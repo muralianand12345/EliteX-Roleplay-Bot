@@ -4,6 +4,7 @@ const {
 } = require('discord.js');
 
 const birthdayData = require("../../events/mongodb/modals/birthday.js");
+const moment = require('moment-timezone');
 
 module.exports = {
     cooldown: 10000,
@@ -63,7 +64,7 @@ module.exports = {
         if (interaction.options.getSubcommand() === "set") {
 
             const date = interaction.options.getInteger('date');
-            const month = interaction.options.getString('month');
+            const month = parseInt(interaction.options.getString('month'));
 
             if (date > 31 || date < 1) {
                 embed.setColor('Red').setDescription(`Invalid date!`);
@@ -87,7 +88,6 @@ module.exports = {
             }
 
             const birthdayMsg = `${date}/${month}`;
-            const birthday = new Date(new Date().getFullYear(), parseInt(month) - 1, parseInt(date));
 
             const birthdayDoc = await birthdayData.findOne({
                 userID: interaction.user.id
@@ -98,13 +98,15 @@ module.exports = {
                     userID: interaction.user.id
                 }, {
                     $set: {
-                        birthday: birthday
+                        day: date,
+                        month: month
                     }
                 }).catch(err => console.log(err));
             } else {
                 await birthdayData.create({
                     userID: interaction.user.id,
-                    birthday: birthday
+                    day: date,
+                    month: month
                 }).catch(err => console.log(err));
             }
 

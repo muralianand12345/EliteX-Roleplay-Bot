@@ -74,7 +74,7 @@ module.exports = {
                 .then((data) => {
                     msg_prediction = data.predicted_label;
                 }).catch((error) => {
-                    console.log(`Error: ${error}`);
+                    console.log(`Error DarkChat API: ${error}`);
                 });
 
             if (msg_prediction === "informative") {
