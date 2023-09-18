@@ -71,6 +71,11 @@ module.exports = {
             res.redirect('/login');
         });
 
+        //Attendance Formatter
+        app.get('/attformat', (req, res) => {
+            res.sendFile(path.join(__dirname, 'webpage', 'formater.html'));
+        });
+
         app.get('/login', (req, res) => {
             res.sendFile(path.join(__dirname, 'webpage', 'login.html'));
         });
