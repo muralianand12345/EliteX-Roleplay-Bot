@@ -1,4 +1,4 @@
-const { Events, EmbedBuilder } = require('discord.js');
+const { Events, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const schedule = require('node-schedule');
 const moment = require('moment-timezone');
 
@@ -7,9 +7,22 @@ const birthdayModel = require("../../mongodb/modals/birthday.js");
 module.exports = {
     name: Events.ClientReady,
     async execute(client) {
-        schedule.scheduleJob('0 0 * * *', async function () {
-        //schedule.scheduleJob('*/10 * * * * *', async function () {
-            console.log("Checking for birthdays");
+        schedule.scheduleJob('5 0 * * *', async function () {
+            //schedule.scheduleJob('*/10 * * * * *', async function () {
+
+            const channel = client.channels.cache.get('1109438179603402762');
+
+            if (!channel) {
+                console.error(`Channel with ID 1109438179603402762 not found`);
+                return;
+            }
+
+            if (!channel.permissionsFor(client.user).has(PermissionFlagsBits.SendMessages)) {
+                console.error(`Bot does not have permission to send messages in channel ${channel.name}`);
+                return;
+            }
+
+            channel.send('Checking for birthdays...');
             const now = moment().tz("UTC");
 
             var usersWithBirthdayToday = await birthdayModel.find({
@@ -17,18 +30,25 @@ module.exports = {
                 month: now.tz("Asia/Kolkata").month() + 1,
             });
 
+            channel.send(`Found ${usersWithBirthdayToday.length} users with birthdays today`);
+
             var embed = new EmbedBuilder()
                 .setColor('Blurple');
 
             if (usersWithBirthdayToday.length > 0) {
-                const channel = client.channels.cache.get('1151811052674220042');
+
                 usersWithBirthdayToday.forEach(async (user) => {
-                    console.log(`Wishing ${user.userID} a happy birthday!`)
+                    channel.send(`Wishing ${user.userID} a happy birthday!`);
+
                     try {
                         const userBirthday = moment(user.birthday).tz("UTC");
 
+                        console.log(userBirthday.format("MM-DD"))
+                        console.log(now.clone().tz("Asia/Kolkata").format("MM-DD"))
+
                         if (userBirthday.format("MM-DD") === now.clone().tz("Asia/Kolkata").format("MM-DD")) {
                             embed.setDescription(`**Happy Birthday** <@${user.userID}>**!** 🎉🎂`);
+                            console.log(`Sending embed message to channel ${channel.name}`);
                             await channel.send({ embeds: [embed] });
                         }
                     } catch (error) {
