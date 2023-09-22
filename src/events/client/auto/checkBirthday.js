@@ -8,7 +8,6 @@ module.exports = {
     name: Events.ClientReady,
     async execute(client) {
         schedule.scheduleJob('5 0 * * *', async function () {
-            //schedule.scheduleJob('*/10 * * * * *', async function () {
 
             const channel = client.channels.cache.get('1109438179603402762');
 
@@ -22,7 +21,6 @@ module.exports = {
                 return;
             }
 
-            channel.send('Checking for birthdays...');
             const now = moment().tz("UTC");
 
             var usersWithBirthdayToday = await birthdayModel.find({
@@ -30,27 +28,14 @@ module.exports = {
                 month: now.tz("Asia/Kolkata").month() + 1,
             });
 
-            channel.send(`Found ${usersWithBirthdayToday.length} users with birthdays today`);
-
             var embed = new EmbedBuilder()
                 .setColor('Blurple');
 
             if (usersWithBirthdayToday.length > 0) {
-
                 usersWithBirthdayToday.forEach(async (user) => {
-                    channel.send(`Wishing ${user.userID} a happy birthday!`);
-
                     try {
-                        const userBirthday = moment(user.birthday).tz("UTC");
-
-                        console.log(userBirthday.format("MM-DD"))
-                        console.log(now.clone().tz("Asia/Kolkata").format("MM-DD"))
-
-                        if (userBirthday.format("MM-DD") === now.clone().tz("Asia/Kolkata").format("MM-DD")) {
-                            embed.setDescription(`**Happy Birthday** <@${user.userID}>**!** 🎉🎂`);
-                            console.log(`Sending embed message to channel ${channel.name}`);
-                            await channel.send({ embeds: [embed] });
-                        }
+                        embed.setDescription(`**Happy Birthday** <@${user.userID}>**!** 🎉🎂`);
+                        await channel.send({ embeds: [embed] });
                     } catch (error) {
                         console.error(`Error sending birthday wishes: ${error}`);
                     }

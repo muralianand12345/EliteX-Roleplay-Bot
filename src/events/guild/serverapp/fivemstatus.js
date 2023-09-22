@@ -16,7 +16,7 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: 'Iconic RP', iconURL: 'https://cdn.discordapp.com/attachments/1099720199588040824/1099784792821743686/ic_logo.png', url: 'https://discord.gg/iconicrp' })
                     .setThumbnail('https://cdn.discordapp.com/attachments/1113031312513708073/1122174543600042064/11abac85b780a6bfb422bb414511bacab31e72a7.png')
-                    .setFooter({ text: 'Updates Every 10 Seconds', iconURL: 'https://cdn.discordapp.com/attachments/1099720199588040824/1099784792821743686/ic_logo.png' });
+                    .setFooter({ text: 'Updates Every Minute', iconURL: 'https://cdn.discordapp.com/attachments/1099720199588040824/1099784792821743686/ic_logo.png' });
 
                 if (!status.everythingOk) {
                     embed.setTitle('CFX.re Status: Down');
@@ -58,7 +58,7 @@ module.exports = {
                         console.error('No Channel Find | CFX.re Status')
                     }
                 }
-                
+
             } catch (err) {
                 await webhookClient.send({
                     content: `\`\`\`${err}\`\`\``,
@@ -69,6 +69,6 @@ module.exports = {
         }
 
         updateEmbed();
-        setInterval(updateEmbed, 10000);
+        setInterval(updateEmbed, 60000);
     }
 }
