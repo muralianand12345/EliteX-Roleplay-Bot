@@ -7,12 +7,12 @@ const birthdayModel = require("../../mongodb/modals/birthday.js");
 module.exports = {
     name: Events.ClientReady,
     async execute(client) {
-        schedule.scheduleJob('5 0 * * *', async function () {
+        schedule.scheduleJob(client.auto.BIRTHDAY.WISHAT, async function () {
 
-            const channel = client.channels.cache.get('1109438179603402762');
+            const channel = client.channels.cache.get(client.auto.BIRTHDAY.WISHCHAN);
 
             if (!channel) {
-                console.error(`Channel with ID 1109438179603402762 not found`);
+                console.error(`Channel not found`);
                 return;
             }
 
@@ -24,8 +24,8 @@ module.exports = {
             const now = moment().tz("UTC");
 
             var usersWithBirthdayToday = await birthdayModel.find({
-                day: now.tz("Asia/Kolkata").date(),
-                month: now.tz("Asia/Kolkata").month() + 1,
+                day: now.tz(client.auto.BIRTHDAY.TIMEZONE).date(),
+                month: now.tz(client.auto.BIRTHDAY.TIMEZONE).month() + 1,
             });
 
             var embed = new EmbedBuilder()

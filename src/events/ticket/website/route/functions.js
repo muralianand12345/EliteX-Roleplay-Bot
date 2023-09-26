@@ -14,7 +14,7 @@ function checkLoggedIn(req, res, next) {
 
 async function checkSuperAdmin(req, res, next) {
     const client = require('../../../../bot.js');
-    const user = await AdminModal.findOne({ username: req.session.username });
+    const user = await AdminModal.findOne({ discordId: req.session.discordId });
     if (!user) {
         return res.status(401).json({ message: 'Internal Error: User not found!' });
     }

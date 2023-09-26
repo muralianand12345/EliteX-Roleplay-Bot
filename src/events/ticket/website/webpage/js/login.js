@@ -3,27 +3,14 @@ const loginForm = document.getElementById('loginForm');
 loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    const username = loginForm.username.value;
-    const password = loginForm.password.value;
-
-    try {
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            window.location.href = '/admin';
-        } else {
-            alert(data.message);
-        }
-    } catch (error) {
-        console.error('Error during login:', error);
-        alert('An error occurred during login. Please try again later.');
-    }
+    window.location.href = "https://discord.com/api/oauth2/authorize?client_id=905841414401851404&redirect_uri=http%3A%2F%2Flocalhost%3A5002%2Fdiscordauth&response_type=code&scope=identify";
 });
+
+function generateRandomString() {
+    let randomString = '';
+    const randomNumber = Math.floor(Math.random() * 10);
+    for (let i = 0; i < 20 + randomNumber; i++) {
+        randomString += String.fromCharCode(33 + Math.floor(Math.random() * 94));
+    }
+    return randomString;
+}

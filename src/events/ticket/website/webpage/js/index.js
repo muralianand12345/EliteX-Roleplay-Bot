@@ -24,27 +24,12 @@ function closeLoginBox() {
     loginBox.style.display = 'none';
 }
 
+
 async function submitLoginForm(event) {
     event.preventDefault();
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
 
     try {
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            window.location.href = '/admin';
-        } else {
-            alert(data.message);
-        }
+        window.location.href = "https://discord.com/api/oauth2/authorize?client_id=905841414401851404&redirect_uri=http%3A%2F%2Flocalhost%3A5002%2Fdiscordauth&response_type=code&scope=identify";
     } catch (error) {
         console.error('Error during login:', error);
         alert('An error occurred during login. Please try again later.');

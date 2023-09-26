@@ -27,7 +27,7 @@ const webhookClientRole = new WebhookClient({ url: WebRole });
 
 router.get('/getprofile', checkLoggedIn, async (req, res) => {
     try {
-        const user = await AdminModal.findOne({ username: req.session.username });
+        const user = await AdminModal.findOne({ discordId: req.session.discordId });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }

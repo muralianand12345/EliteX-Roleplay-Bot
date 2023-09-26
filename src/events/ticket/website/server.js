@@ -16,7 +16,7 @@ module.exports = {
     async execute(client) {
 
         const Port = process.env.PORT;
-
+        
         // CSS JS JSON CORS -----------------------------------------------
 
         app.use(express.json());
@@ -39,7 +39,7 @@ module.exports = {
 
         const ticketLogDir = path.join(__dirname, './ticket-logs');
         app.use(express.static(ticketLogDir));
-        
+
         //LOGIN LOGIC --------------------------------------------------------------
 
         const secretKey = uuidv4();
@@ -47,8 +47,8 @@ module.exports = {
             secret: secretKey,
             resave: false,
             saveUninitialized: true,
-            cookie: { 
-                secure: false 
+            cookie: {
+                secure: false
             },
         }));
 
@@ -74,6 +74,10 @@ module.exports = {
         //Attendance Formatter
         app.get('/attformat', (req, res) => {
             res.sendFile(path.join(__dirname, 'webpage', 'formater.html'));
+        });
+
+        app.get('/applyvisa', (req, res) => {
+            res.sendFile(path.join(__dirname, 'webpage', 'applyvisa.html'));
         });
 
         app.get('/login', (req, res) => {

@@ -9,5 +9,6 @@ testfolder
 *.pkl
 *.pyc
 .vscode/settings.json
+credentials.json
 
 zdevelopment
