@@ -10,5 +10,6 @@ testfolder
 *.pyc
 .vscode/settings.json
 credentials.json
+/AI/sql.json
 
 zdevelopment

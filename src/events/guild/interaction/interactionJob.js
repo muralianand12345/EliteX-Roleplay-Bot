@@ -27,8 +27,6 @@ module.exports = {
 
         var MsgContent;
 
-        //Functions
-
         async function RoleLog(Job, type, TouserId, FromuserId) {
             const logembed = new EmbedBuilder()
                 .setColor('#FFFFFF')
@@ -41,22 +39,15 @@ module.exports = {
         }
 
         async function sendJobEmbed(client, interaction, jobName, answers) {
-
             const jobModalConf = client.jobs.MODALS[jobName.toUpperCase()];
             const embed = new EmbedBuilder()
                 .setColor('Red')
                 .setDescription(`Submitted By <@${interaction.user.id}>`)
                 .setFooter({ text: `${interaction.user.id}` });
 
-            /*await answers.forEach(async (answer, index) => {
-                const questionConf = jobModalConf[`Q${index + 1}`];
-                embed.addFields({ name: `${questionConf.LABEL}`, value: `${answer}` });
-            });*/
-
             for (const [index, answer] of answers.entries()) {
                 const questionConf = jobModalConf[`Q${index + 1}`];
                 embed.addFields({ name: `${questionConf.LABEL}`, value: `${answer}` });
-                //await someAsyncFunction(answer); // Replace with your actual async function if needed
             }
 
             const button = new ActionRowBuilder()
@@ -70,6 +61,7 @@ module.exports = {
                         .setLabel('Reject')
                         .setStyle(ButtonStyle.Danger)
                 );
+
             const jobEmbedChan = client.jobs[jobName.toUpperCase()].SUBMIT;
             await client.channels.cache.get(jobEmbedChan).send({
                 embeds: [embed],
@@ -151,13 +143,13 @@ module.exports = {
             case 'taxi-accept':
             case 'media-accept':
                 await interaction.deferReply({ ephemeral: true });
+
                 const jobTypeAcc = interaction.customId.split('-')[0].toUpperCase();
-
                 const chanAcc = client.channels.cache.get(client.jobs[jobTypeAcc].ACCCHAN);
-
                 const originalEmbed = interaction.message.embeds[0];
                 const userId = originalEmbed.footer.text;
                 const userMember = interaction.guild.members.cache.get(userId);
+
                 if (!userMember) {
                     await interaction.editReply({ content: 'No user!', ephemeral: true });
                     break;
@@ -243,7 +235,6 @@ module.exports = {
                 }
                 await interaction.message.edit({ components: [] });
                 break;
-
 
             default:
                 break;

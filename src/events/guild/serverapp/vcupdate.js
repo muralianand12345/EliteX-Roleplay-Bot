@@ -4,7 +4,7 @@ const statsModel = require('../../../events/mongodb/modals/serverStats.js');
 module.exports = {
     name: Events.ClientReady,
     execute: async (client) => {
-        const intervalTime = 5000;
+        const intervalTime = client.auto.VCMEM.INTERVAL;
 
         setInterval(async () => {
             const datas = await statsModel.find({}, 'chanID guildID totalMemberCount');
@@ -13,19 +13,21 @@ module.exports = {
                 const guildId = data.guildID;
                 const channel = client.channels.cache.get(chanID);
                 const guild = client.guilds.cache.get(guildId);
-                const members = await guild.members.fetch();
-                const memberCount = members.filter(member => !member.user.bot).size;
 
-                if (data.totalMemberCount !== memberCount) {
-                    try {
-                        await channel.setName(`Total Members: ${memberCount}`);
-                    } catch (err) {
-                        console.error(`Error while updating member count for ${guild.name} (${guild.id}): ${err}`);
+                await guild.members.fetch().then(async (member) => {
+                    const memberCount = member.filter(member => !member.user.bot).size;
+                    if (data.totalMemberCount !== memberCount) {
+                        try {
+                            await channel.setName(`Total Members: ${memberCount}`);
+                        } catch (err) {
+                            console.error(`Error while updating member count for ${guild.name} (${guild.id}): ${err}`);
+                        }
+                        data.totalMemberCount = memberCount;
+                        await data.save();
                     }
-
-                    data.totalMemberCount = memberCount;
-                    await data.save();
-                }
+                }).catch((err) => {
+                    console.error(`Error while fetching members for ${guild.name} (${guild.id}): ${err}`);
+                });
             }
         }, intervalTime);
     }

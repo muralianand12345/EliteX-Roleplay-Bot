@@ -123,11 +123,11 @@ module.exports = {
                 collector.on('end', async (collected) => {
                     if (collected.size <= 0) {
                         await interaction.editReply({
-                            content: `**Closing of the canceled ticket!** (<@!${userButton}>)`,
+                            content: `**Ticket closure cancelled!** (<@!${userButton}>)`,
                             components: []
                         }).catch(async (err) => {
                             if (err.code == 10008) {
-                                await interaction.channel.send({ content: '**Ticket Cancellation Message Has Been Deleted!**' }).then((msg) => {
+                                await interaction.channel.send({ content: '**ERROR: Interaction Not Found!**' }).then((msg) => {
                                     setTimeout(function () {
                                         msg.delete();
                                     }, 4000);

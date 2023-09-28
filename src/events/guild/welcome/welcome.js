@@ -126,6 +126,8 @@ module.exports = {
             //const welcomeMsg = `<a:welcome:1097130355137454181> <@${member.user.id}> **Welcome to ICONIC Roleplay** <a:welcome:1097130355137454181>\n\n━━━━━━━━▣━━◤<a:dancebear:1097134582102491226>◢━━▣━━━━━━━━\n\n<a:arrow:1097132735086198864> Read our Server Rules at <#${client.welcome.RULEID}>\n\n<a:arrow:1097132735086198864> You can get our branding materials at <#${client.welcome.BRANDID}>\n\n<a:arrow:1097132735086198864> In case of any queries contact our staff at <#${client.welcome.CHATID}>\n\n<a:arrow:1097132735086198864> Thanks for joining here\n\n━━━━━━━━▣━━◤<a:dancebear:1097134582102491226>◢━━▣━━━━━━━━\n\n<a:party:1097134575764914296> You are the ${currCount.toString()} member of ICONIC Roleplay Community <a:party:1097134575764914296>`;
             const welcomeMsg = `<a:welcome:1097130355137454181> <@${member.user.id}> **Welcome to ICONIC Roleplay** <a:welcome:1097130355137454181>\n\n<a:party:1097134575764914296> You are the ${currCount.toString()} member of ICONIC Roleplay Community <a:party:1097134575764914296>`;
             return await client.channels.cache.get(client.welcome.CHANID).send({ content: welcomeMsg, files: [attachment] });
+        }).catch((err) => {
+            console.log(`Error while fetching members for ${member.guild.name} (${member.guild.id}): ${err}`);
         });
     }
 
