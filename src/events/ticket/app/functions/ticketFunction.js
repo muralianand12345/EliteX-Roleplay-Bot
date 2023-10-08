@@ -130,5 +130,35 @@ async function deleteTicketLog(client, interaction, ticketLogDir, chan, type) {
     });
 }
 
+//Reopen --------------------------------
+
+async function reopenTicketChan(client, interaction, ticketCheck, IdData) {
+    var ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
+    var userInfo = client.users.cache.get(ticketCheck.userID);
+    channel = await interaction.channel.edit({
+        name: `ticket-reopen-${ticketNumber}-${userInfo.username}`,
+        permissionOverwrites: [
+            {
+                id: ticketCheck.userID,
+                allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+                deny: [PermissionFlagsBits.MentionEveryone]
+            },
+            {
+                id: IdData.ticketSupportID,
+                allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+            },
+            {
+                id: interaction.guild.roles.everyone,
+                deny: [PermissionFlagsBits.ViewChannel],
+            },
+        ],
+    });
+    return channel;
+}
+
 //Export --------------------------------
-module.exports = { createTicketChan, checkTicketCategory, closeTicketChan, deleteTicketLog };
+
+module.exports = {
+    createTicketChan, checkTicketCategory, closeTicketChan,
+    deleteTicketLog, reopenTicketChan
+};

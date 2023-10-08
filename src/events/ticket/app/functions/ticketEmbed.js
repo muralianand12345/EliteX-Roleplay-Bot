@@ -103,11 +103,33 @@ const rowTicketClose = new ActionRowBuilder()
             .setLabel('Delete with Reason')
             .setEmoji('📄')
             .setStyle(ButtonStyle.Danger),
-        /*new ButtonBuilder()
+        new ButtonBuilder()
             .setCustomId('reopen-ticket')
             .setLabel('Reopen Ticket')
             .setEmoji('🔓')
-            .setStyle(ButtonStyle.Success)*/
+            .setStyle(ButtonStyle.Success)
+    );
+
+const rowTicketCloseDisAll = new ActionRowBuilder()
+    .addComponents(
+        new ButtonBuilder()
+            .setCustomId('delete-ticket')
+            .setLabel('Delete Ticket')
+            .setEmoji('🗑️')
+            .setStyle(ButtonStyle.Danger)
+            .setDisabled(true),
+        new ButtonBuilder()
+            .setCustomId('delete-ticket-reason')
+            .setLabel('Delete with Reason')
+            .setEmoji('📄')
+            .setStyle(ButtonStyle.Danger)
+            .setDisabled(true),
+        new ButtonBuilder()
+            .setCustomId('reopen-ticket')
+            .setLabel('Reopen Ticket')
+            .setEmoji('🔓')
+            .setStyle(ButtonStyle.Success)
+            .setDisabled(true),
     );
 
 //Ticket Function ------------------------------------------
@@ -278,7 +300,7 @@ async function closeTicketEmbed(client, interaction) {
 
     var embed = new EmbedBuilder()
         .setColor('#206694')
-        .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE }) 
+        .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
         .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
         .setTimestamp();
 
@@ -381,10 +403,17 @@ async function ticketBugEmbed(client, message, ticketDoc) {
     await message.delete();
 }
 
+//Reopen Ticket ----------------------------------------------
+
+async function reopenEmbedEdit(interaction, message) {
+    await message.edit({ components: [rowClaimDis] });
+    await interaction.message.edit({ components: [rowTicketCloseDisAll] });
+}
+
 //Export ------------------------------------------------------
 
 module.exports = {
     createTicketEmbed, showTicketModalOOC, ticketModalOOCEmbed, showTicketModalOthers, ticketModalOthersEmbed,
     claimTicketEmbed, closeTicketEmbed, closeTicketEditInt, deleteTicketEmbedandClient, deleteTicketReasonModal,
-    deleteTicketSpam, ticketBugEmbed
+    deleteTicketSpam, ticketBugEmbed, reopenEmbedEdit
 };

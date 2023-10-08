@@ -79,11 +79,12 @@ module.exports = {
         });
 
         const sheetsList = sheetsResponse.data.sheets;
-        let sheetId = null;
+        //let sheetId = null;
         const sheetExists = sheetsList.some(sheet => sheet.properties.title === sheetName);
 
         if (!sheetExists) {
-            const createSheetResponse = await sheets.spreadsheets.batchUpdate({
+            //const createSheetResponse = await sheets.spreadsheets.batchUpdate({
+            sheets.spreadsheets.batchUpdate({
                 auth: clientAuthorized,
                 spreadsheetId,
                 resource: {
@@ -96,11 +97,11 @@ module.exports = {
                     }],
                 },
             });
-            sheetId = createSheetResponse.data.replies[0].addSheet.properties.sheetId;
+            //sheetId = createSheetResponse.data.replies[0].addSheet.properties.sheetId;
 
             const defaultHeaders = client.auto.ATTENDANCE.HEADER;
             const defaultValues = [defaultHeaders];
-            await sheets.spreadsheets.values.update({
+            sheets.spreadsheets.values.update({
                 auth: clientAuthorized,
                 spreadsheetId,
                 range: `${sheetName}!A1:C1`,
@@ -109,15 +110,15 @@ module.exports = {
                     values: defaultValues,
                 },
             });
-        } else {
+        } /*else {
             const existingSheet = sheetsList.find(sheet => sheet.properties.title === sheetName);
             sheetId = existingSheet.properties.sheetId;
-        }
+        }*/
 
         const range = `${sheetName}`;
 
         //Add data to the sheet
-        const response = await sheets.spreadsheets.values.get({
+        const response = sheets.spreadsheets.values.get({
             auth: clientAuthorized,
             spreadsheetId: spreadsheetId,
             range,
@@ -135,7 +136,7 @@ module.exports = {
             existingRow[2] = updatedDuration.toString();
             existingRow[0] = name;
 
-            await sheets.spreadsheets.values.update({
+            sheets.spreadsheets.values.update({
                 auth: clientAuthorized,
                 spreadsheetId: spreadsheetId,
                 range: `${sheetName}!A${existingCitizenIndex + 1}:C${existingCitizenIndex + 1}`, // Use the range variable
@@ -147,10 +148,10 @@ module.exports = {
         } else {
             const newRow = [name, citizenid, duration];
 
-            await sheets.spreadsheets.values.append({
+            sheets.spreadsheets.values.append({
                 auth: clientAuthorized,
                 spreadsheetId: spreadsheetId,
-                range, 
+                range,
                 valueInputOption: "RAW",
                 resource: {
                     values: [newRow],
