@@ -26,9 +26,9 @@ module.exports = {
                         await data.save();
                     }
                 }).catch((err) => {
-                    console.error(`Error while fetching members for ${guild.name} (${guild.id}): ${err}`);
+                    console.error(`Error while fetching members for ${guild.name} (${guild.id}) [VC UPDATE]: ${err}`);
                 });
             }
-        }, intervalTime);
+        }, intervalTime * 1000 * 60);
     }
 };

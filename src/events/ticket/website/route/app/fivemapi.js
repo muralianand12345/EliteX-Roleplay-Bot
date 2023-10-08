@@ -5,7 +5,6 @@ require("dotenv").config();
 
 const { authenticateAPIKey } = require('../functions.js');
 const client = require('../../../../../bot.js');
-const roleModel = require('../../../../mongodb/modals/roleremove.js');
 
 //---------------------------------------------------------
 
@@ -14,27 +13,35 @@ const webhookClient = new WebhookClient({ url: Web });
 
 const guildId = client.config.GUILD_ID;
 
-const govtJobs = ["ambulance", "customs"];
-const gangJobs = ["police", "mechanics"];
+const govtJobs = ["ambulance", "police", "reporter", "taxi"];
+const businessJobs = ["ff", "uwu", "mechanic1", "gc", "dealer2", "primeoil", "hcs",
+    "dealer1", "govt", "gasngo", "ssc", "smc", "logistics",
+    "darkgas", "snh", "r69", "nexusoil", "nexusoil", "ht"];
 
 //---------------------------------------------------------
 
 router.use(authenticateAPIKey);
 
 router.post('/roleedit', async (req, res) => {
-    const { userId, targetId, action, job, playerCitiID, targetCitiID } = req.body;
+    var { userId, targetId, action, job, playerCitiID, targetCitiID } = req.body;
+    if (!playerCitiID || !targetCitiID) {
+        playerCitiID = "No Citizen ID";
+        targetCitiID = "No Citizen ID";
+    }
+
+    if (!action || !job) {
+        return res.status(404).json({ success: false, message: 'No Action or Job' });
+    }
 
     var embed = new EmbedBuilder()
         .setFields(
-            { name: `User`, value: `<@${userId}>` },
-            { name: `Target`, value: `<@${targetId}>` },
-            { name: `Player CitizenID`, value: `\`\`\`${playerCitiID}\`\`\`` },
-            { name: `Target CitizenID`, value: `\`\`\`${targetCitiID}\`\`\`` },
+            { name: `User`, value: `<@${userId}>\n\`\`\`${playerCitiID}\`\`\`` },
+            { name: `Target`, value: `<@${targetId}>\n\`\`\`${targetCitiID}\`\`\`` }
         )
         .setTimestamp();
 
     try {
-        
+
         const guild = await client.guilds.fetch(guildId);
 
         if (!userId || !targetId) {
@@ -43,107 +50,101 @@ router.post('/roleedit', async (req, res) => {
 
         const member = await guild.members.fetch(userId);
         const targetMember = await guild.members.fetch(targetId);
-        
+
         if (!member || !targetMember) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        if (gangJobs.includes(job)) {
+        //Business / Gangs
 
-            const gangLeaderRole = client.gangs.GANGLEADER;
-            const gangRoleList = client.gangs.GANGROLE;
+        if (businessJobs.includes(job)) {
 
-            if (member.roles.cache.has(gangLeaderRole)) {
-                for (const gangRole of gangRoleList) {
-                    if (member.roles.cache.has(gangLeaderRole) && member.roles.cache.has(gangRole)) {
+            const businessJobRoles = client.jobs.BUSINESS.JOBS;
+            for (const businessJobRole of businessJobRoles) {
+                if (businessJobRole.name === job) {
+                    if (member.roles.cache.has(businessJobRole.role)) {
                         if (action === 'add') {
                             embed.setColor('Green')
-                                .setDescription(`\`Role: ${job} Removed\``);
-                            await targetMember.roles.add(gangRole);
+                                .setTitle(`\`Role: ${job} Added\``);
+                            await targetMember.roles.add(businessJobRole.role);
                             res.status(200).json({ success: true, message: `Added role to ${targetMember.user.tag}` });
                             break;
                         } else if (action === 'remove') {
                             embed.setColor('Red')
-                                .setDescription(`\`Role: ${job} Removed\``);
-                            await targetMember.roles.remove(gangRole);
+                                .setTitle(`\`Role: ${job} Removed\``);
+                            await targetMember.roles.remove(businessJobRole.role);
                             res.status(200).json({ success: true, message: `Removed role from ${targetMember.user.tag}` });
                             break;
                         } else {
                             res.status(400).json({ success: false, message: 'Invalid action' });
                             break;
                         }
+                    } else {
+                        res.status(400).json({ success: false, message: 'Invalid action | The user has no role' });
+                        break;
                     }
                 }
-                await webhookClient.send({
-                    username: 'FiveM Gang Role',
-                    avatarURL: "https://cdn.discordapp.com/attachments/1115161695120277596/1144282022295113748/jobs_660_130920052343_291020052310.png",
-                    embeds: [embed],
-                });
             }
+            await webhookClient.send({
+                username: 'FiveM Business Role',
+                avatarURL: "https://cdn.discordapp.com/attachments/1115161695120277596/1144282022295113748/jobs_660_130920052343_291020052310.png",
+                embeds: [embed],
+            });
         }
 
+        //Govt
+
         if (govtJobs.includes(job)) {
-            const roleMap = {
-                PD: {
-                    HO: client.jobs.PD.HO,
-                    INTERVIEW: client.jobs.PD.INTERVIEW,
-                    ROLEID: client.jobs.PD.ROLEID,
-                    NAME: client.jobs.PD.NAME
+
+            const govtRoles = [
+                {
+                    "name": "ambulance",
+                    "role": client.jobs.EMS.ROLEID,
+                    "interview": client.jobs.EMS.INTERVIEW
                 },
-                EMS: {
-                    HO: client.jobs.EMS.HO,
-                    INTERVIEW: client.jobs.EMS.INTERVIEW,
-                    ROLEID: client.jobs.EMS.ROLEID,
-                    NAME: client.jobs.EMS.NAME
+                {
+                    "name": "police",
+                    "role": client.jobs.PD.ROLEID,
+                    "interview": client.jobs.PD.INTERVIEW
                 },
-                TAXI: {
-                    HO: client.jobs.TAXI.HO,
-                    INTERVIEW: client.jobs.TAXI.INTERVIEW,
-                    ROLEID: client.jobs.TAXI.ROLEID,
-                    NAME: client.jobs.TAXI.NAME
+                {
+                    "name": "reporter",
+                    "role": client.jobs.MEDIA.ROLEID,
+                    "interview": client.jobs.MEDIA.INTERVIEW
                 },
-                MEDIA: {
-                    HO: client.jobs.MEDIA.HO,
-                    INTERVIEW: client.jobs.MEDIA.INTERVIEW,
-                    ROLEID: client.jobs.MEDIA.ROLEID,
-                    NAME: client.jobs.MEDIA.NAME
+                {
+                    "name": "taxi",
+                    "role": client.jobs.TAXI.ROLEID,
+                    "interview": client.jobs.TAXI.INTERVIEW
                 }
-            };
+            ];
 
-            const selectedRole = Object.values(roleMap).find(job => member.roles.cache.has(job.HO));
-            if (!selectedRole) return res.status(403).json({ success: false, message: `You do not have the necessary role to use this command!` });
-            const rolecool = guild.roles.cache.get(client.jobs.GOVTCOOL);
-            if (!rolecool) return res.status(403).json({ success: false, message: `The "Govt Cool" role does not exist in this guild.` });
-            const targetRole = roleMap[selectedRole.NAME];
-
-            if (action === 'add') {
-                embed.setColor('Green')
-                    .setDescription(`\`Role: ${targetRole.NAME} Added\``);
-                //if (targetMember.roles.cache.has(client.jobs.GOVTCOOL)) return res.status(403).json({ success: false, message: `The user has Govt Cooldown role` });
-                await targetMember.roles.add(targetRole.ROLEID);
-                await targetMember.roles.remove(targetRole.INTERVIEW);
-                res.status(200).json({ success: true, message: `Added role to ${targetMember.user.tag}` });
-
-            } else if (action === 'remove') {
-                embed.setColor('Red')
-                    .setDescription(`\`Role: ${targetRole.NAME} Removed\``);
-                const expirationDate = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000);
-                const newRoleData = new roleModel({
-                    userId: member.id,
-                    roleId: rolecool.id,
-                    expirationDate: expirationDate,
-                    guildId: guild.id
-                });
-                await newRoleData.save();
-                await targetMember.roles.remove(targetRole.ROLEID);
-                await targetMember.roles.remove(targetRole.INTERVIEW);
-                await targetMember.roles.add(rolecool);
-                res.status(200).json({ success: true, message: `Removed role from ${targetMember.user.tag}` });
-
-            } else {
-                return res.status(400).json({ success: false, message: 'Invalid action' });
+            for (const govtRole of govtRoles) {
+                if (govtRole.name === job) {
+                    if (member.roles.cache.has(govtRole.role)) {
+                        if (action === 'add') {
+                            embed.setColor('Green')
+                                .setTitle(`\`Role: ${job} Added\``);
+                            await targetMember.roles.add(govtRole.role);
+                            await targetMember.roles.remove(govtRole.interview);
+                            res.status(200).json({ success: true, message: `Added role to ${targetMember.user.tag}` });
+                            break;
+                        } else if (action === 'remove') {
+                            embed.setColor('Red')
+                                .setTitle(`\`Role: ${job} Removed\``);
+                            await targetMember.roles.remove(govtRole.role);
+                            await targetMember.roles.remove(govtRole.interview);
+                            res.status(200).json({ success: true, message: `Removed role from ${targetMember.user.tag}` });
+                            break;
+                        } else {
+                            return res.status(400).json({ success: false, message: 'Invalid action' });
+                        }
+                    } else {
+                        res.status(400).json({ success: false, message: 'Invalid action | The user has no role' });
+                        break;
+                    }
+                }
             }
-
             await webhookClient.send({
                 username: 'FiveM Job Role',
                 avatarURL: "https://cdn.discordapp.com/attachments/1115161695120277596/1144282022295113748/jobs_660_130920052343_291020052310.png",
@@ -152,7 +153,7 @@ router.post('/roleedit', async (req, res) => {
         }
 
     } catch (error) {
-        //console.error('Error processing role edit:', error);
+        console.error('Error processing role edit:', error);
         return res.status(500).json({ success: false, message: 'An error occurred while processing role edit' });
     }
 });

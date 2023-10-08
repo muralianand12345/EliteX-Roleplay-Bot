@@ -9,8 +9,11 @@ module.exports = {
 
         if (client.config.ENABLE.STREAM == true) {
 
+            if (!newMember) return;
             const streamingRoleID = client.streaming.ROLEID;
             const member = newMember.member;
+            
+            if (!member) return;
             if (member.user.bot) return;
 
             if (member.roles.cache.has(client.streaming.YTROLEID)) {
@@ -28,7 +31,7 @@ module.exports = {
                         member.roles.add(nowStreamingRole)
                             .then(() => chan.send(`Assigned "Now Streaming" role to ${member.user.tag}`))
                             .catch(console.error);
-                            
+
                     } else {
                         if (!member.roles.cache.has(streamingRoleID)) return;
                         member.roles.remove(nowStreamingRole)

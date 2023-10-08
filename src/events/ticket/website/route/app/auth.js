@@ -60,6 +60,9 @@ router.get('/discordauth', limiter, async (req, res) => {
 
             const userData = await userResult.body.json();
 
+            if (!userData) return res.status(404).json({ message: 'User not found' });
+            if (!userData.id) return res.status(404).json({ message: 'User not found' });
+
             var userLogin = await AdminModal.findOne({ discordId: userData.id });
 
             if (!userLogin) {

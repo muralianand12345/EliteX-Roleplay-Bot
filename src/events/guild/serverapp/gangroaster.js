@@ -2,6 +2,7 @@ const {
     PermissionFlagsBits,
     Events
 } = require('discord.js');
+const schedule = require('node-schedule');
 
 module.exports = {
     name: Events.ClientReady,
@@ -18,12 +19,9 @@ module.exports = {
             const GuildID = client.config.GUILD_ID;
             const ChanID = client.auto.ROSTER.CHANID;
 
-            console.log(currDay)
-
             if (currDay.includes('Saturday')) {
                 const Guild = client.guilds.cache.get(GuildID)
                 const chan = client.channels.cache.get(ChanID);
-
                 await chan.edit({
                     name: `${channelName}`,
                     topic: `Will be open only on Saturdays (automatically by bots)`,
@@ -48,16 +46,13 @@ module.exports = {
                                 PermissionFlagsBits.CreatePublicThreads,
                                 PermissionFlagsBits.AddReactions,
                                 PermissionFlagsBits.MentionEveryone,
-                                PermissionFlagsBits.UseApplicationCommands
+                                PermissionFlagsBits.UseApplicationCommands,
+                                PermissionFlagsBits.ReadMessageHistory
                             ]
                         }
                     ]
                 });
-
             } else {
-
-                console.log('else')
-
                 const Guild = client.guilds.cache.get(GuildID)
                 const chan = client.channels.cache.get(ChanID);
                 await chan.edit({
@@ -84,20 +79,19 @@ module.exports = {
                                 PermissionFlagsBits.CreatePublicThreads,
                                 PermissionFlagsBits.AddReactions,
                                 PermissionFlagsBits.MentionEveryone,
-                                PermissionFlagsBits.UseApplicationCommands
+                                PermissionFlagsBits.UseApplicationCommands,
+                                PermissionFlagsBits.ReadMessageHistory
                             ]
                         }
                     ]
                 });
-
-                console.log('done')
             }
         }
 
         if (client.config.ENABLE.GANGROSTER === true) {
-            setInterval(async () => {
-                await GangRoaster()
-            }, 1000 * 60 * 60 * 2);
+            schedule.scheduleJob("5 0 * * *", async function () {
+                await GangRoaster();
+            });
         }
     }
 }
