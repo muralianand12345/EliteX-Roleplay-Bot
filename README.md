@@ -8,7 +8,8 @@ An official Discord Bot for the Iconic Roleplay Server.
   - [Software and Other 3rd Party Apps Used:](#software-and-other-3rd-party-apps-used)
   - [Before You Start:](#before-you-start)
   - [About Code:](#about-code)
-    - [Developers](#developers)
+    - [Developer](#developer)
+    - [Supporters](#supporters)
     - [Time Taken](#time-taken)
 
 ## Bot Features:
@@ -96,9 +97,11 @@ An official Discord Bot for the Iconic Roleplay Server.
 
 ## About Code:
 
-### Developers
+### Developer
 - Murali Anand (murlee#0) **Owner**
-- Raghava (shadowctrl#0)
+
+### Supporters
+- Raghava (shadowctrl#0) **Bug Hunter**
 
 ### Time Taken
 This code took more than a year to complete. You can also check out my previous projects on FiveM RP server bots.
