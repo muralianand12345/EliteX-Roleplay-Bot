@@ -72,6 +72,9 @@ An official Discord Bot for the Iconic Roleplay Server.
 - **Voting:**
   - Single vote.
   - Multiple votes.
+- **Captcha:**
+  - Captcha to identify and moderate spam bots and bot users. 
+  - Command as well as automatic for new joinies.
 - **FiveM RP Server Job Role in Discord:**
   - You need to add my Lua file in the RP server (Only for QBCore).
 - And more features yet to come...
