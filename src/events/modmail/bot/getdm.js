@@ -14,6 +14,7 @@ module.exports = {
 
         if (message.author.bot) return;
         if (message.guild) return;
+        if (!client.config.ENABLE.MODMAIL) return;
 
         const modMailData = await modMailModel.findOne({
             userID: message.author.id

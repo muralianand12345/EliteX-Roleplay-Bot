@@ -33,6 +33,7 @@ module.exports = {
             return totalHours;
         }
 
+        if (client.config.ENABLE.AUTOATTENDANCE === false) return;
         if (message.channel.id !== client.auto.ATTENDANCE.ATTCHAN) return;
         if (!message.author.bot) return;
 

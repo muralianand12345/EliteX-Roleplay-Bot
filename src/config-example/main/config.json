@@ -29,11 +29,15 @@
     },
 
     "ENABLE": {
+        "MODMAIL": false,
         "DATE": false, 
         "NICKNAME": false,
         "AUTOTICKET": true,
-        "DARKCHAT": false,
-        "WELCOME": false
+        "DARKCHAT": true,
+        "TOXICCHAT": false,
+        "WELCOME": false,
+        "GANGROSTER": true,
+        "AUTOATTENDANCE": true
     },
 
     "DMREPLY": {

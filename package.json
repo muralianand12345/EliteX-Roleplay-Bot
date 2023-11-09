@@ -1,6 +1,6 @@
 {
   "name": "iconic-roleplay",
-  "version": "8.0.0",
+  "version": "8.3.0",
   "description": "Iconic Roleplay discord bot",
   "main": "./src/index.js",
   "scripts": {
@@ -13,12 +13,14 @@
     "@google-cloud/local-auth": "^2.1.0",
     "@napi-rs/canvas": "^0.1.25",
     "axios": "^1.4.0",
+    "canvas": "^2.11.2",
     "cfx-api": "^1.1.0",
     "colors": "1.4.0",
     "cors": "^2.8.5",
     "discord-gamecord": "^4.4.0",
     "discord-html-transcripts": "^3.1.2",
     "discord.js": "^14.13.0",
+    "discord.js-captcha": "^3.0.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-rate-limit": "^6.9.0",

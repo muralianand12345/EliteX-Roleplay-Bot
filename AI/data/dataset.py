@@ -1,13 +1,13 @@
 data = [
 
-# Links ---------------------------------------------------------------
+    # Links ---------------------------------------------------------------
 
     ("https://cdn.discordapp.com/attachments/xxxxxxx/xxxxxxxx/image.png", "non-informative"),
     ("https://discord.gg/xxxxxxxx", "non-informative"),
     ("x12343xx@gmail.com", "non-informative"),
     ("2ccx343xx@yahoo.com", "non-informative"),
 
-# ---------------------------------------------------------------
+    # ---------------------------------------------------------------
 
     ("The capital of France is Paris.", "informative"),
     ("Hi there!", "non-informative"),
@@ -258,7 +258,7 @@ data = [
     ("The public art installations in the downtown area contribute to the city's vibrant culture.", "informative"),
     ("The city's cultural heritage is preserved through museums, monuments, and historic sites.", "informative"),
 
-# RolePlay =================================================================
+    # RolePlay =================================================================
 
     ("Can anyone give me a ride to the city?", "informative"),
     ("Hey, are there any open jobs available?", "informative"),
@@ -521,7 +521,7 @@ data = [
     ("Sales going to start....(Bulk sales)...Per team 2 people only allowed", "informative"),
 
 
-# RP in Tamil-English Text ---------------------------------------------------------------
+    # RP in Tamil-English Text ---------------------------------------------------------------
 
     ("for the NPC and Biling system evlo nu solanume", "informative"),
     ("Vanakam guys", "non-informative"),
@@ -598,4 +598,11 @@ data = [
     ("Ayyo, enna solra da nee?", "non-informative"),
     ("Ivan full time bore adikaraan.", "non-informative"),
     ("Ada paavi, enna panra?", "non-informative"),
+
+    ("Shop enga aiya irukku", "informative"),
+    ("Continental Shop enga aiya irukku", "informative"),
+    ("Need clue for the next mission", "informative"),
+    ("Need clue for AR shop", "informative"),
+    ("When Dealer Available", "informative"),
+    ("Random timing brother", "non-informative")
 ]
