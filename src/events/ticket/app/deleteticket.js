@@ -17,16 +17,17 @@ module.exports = {
 
         const ticketLogDir = path.join(__dirname, '../../website/ticket-logs');
         const serverAdd = `${process.env.SERVERADD}`;
+        var ticketGuild, ticketUser;
 
         if (interaction.customId == "delete-ticket") {
 
             await interaction.deferReply({ ephemeral: true });
 
-            var ticketUser = await ticketUserModel.findOne({
+            ticketUser = await ticketUserModel.findOne({
                 'ticketlog.ticketId': interaction.channel.id
             }).catch(err => client.logger.error(err));
 
-            var ticketGuild = await ticketGuildModel.findOne({
+            ticketGuild = await ticketGuildModel.findOne({
                 guildID: interaction.guild.id
             }).catch(err => client.logger.error(err));
 
@@ -79,11 +80,11 @@ module.exports = {
 
             await interaction.deferReply({ ephemeral: true });
 
-            var ticketUser = await ticketUserModel.findOne({
+            ticketUser = await ticketUserModel.findOne({
                 'ticketlog.ticketId': interaction.channel.id
             }).catch(err => client.logger.error(err));
 
-            var ticketGuild = await ticketGuildModel.findOne({
+            ticketGuild = await ticketGuildModel.findOne({
                 guildID: interaction.guild.id
             }).catch(err => client.logger.error(err));
 

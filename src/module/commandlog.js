@@ -7,6 +7,10 @@ const logFilePath = path.join(__dirname, '../../logs', 'bot-user-log.log');
 module.exports = {
     log: (client, commandName, guild, user, channel) => {
 
+        if (!user) {
+            client.logger.error(`[COMMAND LOG] User is undefined! ${commandName}`);
+        }
+
         const embed = new EmbedBuilder()
             .setColor('Green')
             .setAuthor({ name: 'Command Log' })

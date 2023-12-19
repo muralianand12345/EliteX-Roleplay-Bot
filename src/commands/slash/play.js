@@ -5,7 +5,7 @@ const {
 } = require('discord.js');
 
 const { getAutocompleteSearch } = require('../../events/client/commands/functions/autoComplete.js');
-const { musicrow, musicrowdis } = require('../../events/client/music/musicUtls/musicEmbed.js');
+const { musicrow } = require('../../events/client/music/musicUtls/musicEmbed.js');
 const { msToTime, textLengthOverCut, hyperlink } = require('../../events/client/commands/functions/format.js');
 
 module.exports = {

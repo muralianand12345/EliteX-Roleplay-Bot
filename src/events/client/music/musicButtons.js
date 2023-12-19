@@ -12,6 +12,8 @@ module.exports = {
 
         if (!interaction.isButton()) return;
 
+        var musicData;
+
         if (interaction.customId == "pause-music") {
 
             const player = client.manager.get(interaction.guild.id);
@@ -127,7 +129,7 @@ module.exports = {
             player.stop(count);
 
             if (player.queue.size === 0) {
-                var musicData = await musicModel.findOne({
+                musicData = await musicModel.findOne({
                     guildID: interaction.guild.id
                 });
 
@@ -176,7 +178,7 @@ module.exports = {
                 });
             }
 
-            var musicData = await musicModel.findOne({
+            musicData = await musicModel.findOne({
                 guildID: interaction.guild.id
             });
 

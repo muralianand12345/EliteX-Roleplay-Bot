@@ -20,6 +20,8 @@ module.exports = {
 
         if (!interaction.isButton() && !interaction.isModalSubmit()) return;
 
+        var ticketUser;
+
         if (interaction.customId === "open-ticket") {
 
             await interaction.deferReply({ ephemeral: true });
@@ -30,7 +32,7 @@ module.exports = {
                 guildID: interaction.guild.id
             }).catch(err => client.logger.error(err));
 
-            var ticketUser = await ticketUserModel.findOne({
+            ticketUser = await ticketUserModel.findOne({
                 userID: interaction.user.id
             }).catch(err => client.logger.error(err));
 
@@ -136,7 +138,7 @@ module.exports = {
 
         if (interaction.customId == "modal-ticket") {
 
-            var ticketUser = await ticketUserModel.findOne({
+            ticketUser = await ticketUserModel.findOne({
                 userID: interaction.user.id
             }).catch(err => client.logger.error(err));
 

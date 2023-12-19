@@ -23,7 +23,7 @@ module.exports = {
             });
 
             if (!visaFormData) {
-                var visaFormData = new visaFormUserModal({
+                visaFormData = new visaFormUserModal({
                     guildId: interaction.guild.id,
                     userId: interaction.user.id,
                     rockstarId: null,
@@ -76,7 +76,7 @@ module.exports = {
                 .setDescription(`User: <@${interaction.user.id}> | \`${interaction.user.id} has submitted a visa form!\``)
                 .setTimestamp();
 
-            const visaFormData = await visaFormUserModal.findOne({
+            var visaFormData = await visaFormUserModal.findOne({
                 userId: interaction.user.id,
                 guildId: interaction.guild.id
             });

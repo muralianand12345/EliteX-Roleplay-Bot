@@ -1,7 +1,5 @@
 require("dotenv").config();
 
-const { PermissionFlagsBits, GuildMember } = require('discord.js');
-
 function checkLoggedIn(req, res, next) {
     if (req.session.isLoggedIn) {
         next();

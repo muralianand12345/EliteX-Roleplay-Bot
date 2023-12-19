@@ -23,12 +23,12 @@ module.exports = {
             const channelCreatedTimestamp = interaction.channel.createdTimestamp;
             const thresholdTimestamp = Date.now() - 20 * 60 * 1000;
 
-            /*if (channelCreatedTimestamp >= thresholdTimestamp) {
+            if (channelCreatedTimestamp >= thresholdTimestamp) {
                 return await interaction.reply({
                     content: 'You cannot reopen a newly created ticket! (Wait 20 minutes)',
                     ephemeral: true,
                 });
-            }*/
+            }
 
             await interaction.deferReply();
 

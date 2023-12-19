@@ -14,7 +14,7 @@ module.exports = {
         });
 
         if (!botAnalysisData) {
-            var botAnalysisData = new botAnalysis({
+            botAnalysisData = new botAnalysis({
                 clientId: client.user.id,
                 restartCount: 0,
                 interactionCount: 0,

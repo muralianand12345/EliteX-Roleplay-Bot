@@ -9,7 +9,7 @@ const session = require('express-session');
 const { v4: uuidv4 } = require('uuid');
 const cors = require('cors');
 
-const { checkLoggedIn, checkSuperAdmin } = require('./functions/function.js');
+const { checkLoggedIn } = require('./functions/function.js');
 
 module.exports = {
     name: Events.ClientReady,

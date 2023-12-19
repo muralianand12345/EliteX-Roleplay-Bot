@@ -89,7 +89,7 @@ module.exports = {
                 });
             }
 
-            if (year && year > 2020 || year && year < 1950 || year && isNaN(year) || year && year.toString().length !== 4 ) {
+            if (year && year > 2020 || year && year < 1950 || year && year.toString().length !== 4 ) {
                 embed.setColor('Red').setDescription(`Invalid year!`);
                 return await interaction.editReply({
                     embeds: [embed]

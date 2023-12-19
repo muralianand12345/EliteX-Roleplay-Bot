@@ -1,7 +1,6 @@
 const {
     ChannelType,
-    PermissionFlagsBits,
-    EmbedBuilder
+    PermissionFlagsBits
 } = require('discord.js');
 
 const fs = require('fs').promises;

@@ -55,6 +55,8 @@ module.exports = {
 
     async execute(interaction, client) {
 
+        var ticketGuildData;
+
         if (interaction.options.getSubcommand() === "setup") {
 
             await interaction.deferReply({ ephemeral: true });
@@ -74,7 +76,7 @@ module.exports = {
                 return await interaction.editReply({ content: 'Invalid Ticket Channel!', ephemeral: true });
             }
 
-            var ticketGuildData = await ticketGuildModal.findOne({ guildID: interaction.guild.id });
+            ticketGuildData = await ticketGuildModal.findOne({ guildID: interaction.guild.id });
 
             if (!ticketGuildData) {
                 ticketGuildData = new ticketGuildModal({
@@ -159,7 +161,7 @@ module.exports = {
 
             await interaction.deferReply({ ephemeral: true });
 
-            var ticketGuildData = await ticketGuildModal.findOne({ guildID: interaction.guild.id });
+            ticketGuildData = await ticketGuildModal.findOne({ guildID: interaction.guild.id });
 
             if (!ticketGuildData) {
                 return await interaction.editReply({ content: 'Ticket system is not active!', ephemeral: true });
