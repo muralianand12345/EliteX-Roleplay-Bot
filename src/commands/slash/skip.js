@@ -66,7 +66,7 @@ module.exports = {
                 if (pannelId) {
                     const pannelChan = client.channels.cache.get(musicData.musicChannel);
                     const pannelMsg = await pannelChan.messages.fetch(pannelId);
-                    if (!pannelMsg) return pannelMsg.send(`Music Pannel not found, setup again! | ${pannelId} `);
+                    if (!pannelMsg) return client.logger.error(`Music Pannel not found, setup again! | ${pannelId} `);
                     const embed = musicEmbedOff(client);
                     pannelMsg.edit({ content: musicContent , embeds: [embed], components: [musicrowdis] });
                 }

@@ -13,11 +13,13 @@ module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
 
+        var visaFormData;
+
         if (interaction.customId == 'visa-form') {
             if (interaction.user.bot) return;
             if (client.config.visaform.enable == false) return interaction.reply({ content: 'Visa Form is currently disabled!', ephemeral: true });
 
-            var visaFormData = await visaFormUserModal.findOne({
+            visaFormData = await visaFormUserModal.findOne({
                 userId: interaction.user.id,
                 guildId: interaction.guild.id
             });
@@ -76,7 +78,7 @@ module.exports = {
                 .setDescription(`User: <@${interaction.user.id}> | \`${interaction.user.id} has submitted a visa form!\``)
                 .setTimestamp();
 
-            var visaFormData = await visaFormUserModal.findOne({
+            visaFormData = await visaFormUserModal.findOne({
                 userId: interaction.user.id,
                 guildId: interaction.guild.id
             });

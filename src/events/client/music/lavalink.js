@@ -63,7 +63,7 @@ module.exports = {
                         if (pannelId) {
                             const pannelChan = client.channels.cache.get(musicData.musicChannel);
                             const pannelMsg = await pannelChan.messages.fetch(pannelId);
-                            if (!pannelMsg) return pannelMsg.send(`Music Pannel not found, setup again! | ${pannelId} `);
+                            if (!pannelMsg) return client.logger.error(`Music Pannel not found, setup again! | ${pannelId} `);
                             const embed = musicEmbed(client, track);
                             const musicContent = `Song queue:\n\n${player.queue.map((track, i) => `**${i + 1}** - [${track.title}](${track.uri})`).slice(0, 5).join("\n")}\n\n${player.queue.length > 5 ? `And **${player.queue.length - 5}** more tracks...` : `In the playlist **${player.queue.length}** tracks...`}`;
                             pannelMsg.edit({ content: musicContent, embeds: [embed], components: [musicrow] });
@@ -92,7 +92,7 @@ module.exports = {
                         if (pannelId) {
                             const pannelChan = client.channels.cache.get(musicData.musicChannel);
                             const pannelMsg = await pannelChan.messages.fetch(pannelId);
-                            if (!pannelMsg) return pannelMsg.send(`Music Pannel not found, setup again! | ${pannelId} `);
+                            if (!pannelMsg) return client.logger.error(`Music Pannel not found, setup again! | ${pannelId} `);
                             const embed = musicEmbedOff(client);
                             pannelMsg.edit({ content: musicContent, embeds: [embed], components: [musicrowdis] });
                         }
