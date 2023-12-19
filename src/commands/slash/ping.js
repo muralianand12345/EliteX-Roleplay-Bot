@@ -5,22 +5,13 @@ const {
 
 module.exports = {
     cooldown: 10000,
-
+    owner: false,
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription("Ping Pong!")
         .setDMPermission(true),
     async execute(interaction, client) {
 
-        //log
-        const commandName = "PING";
-        var chanID;
-        if (interaction.channel == null) {
-            chanID = "DM";
-        } else {
-            chanID = interaction.channel.id;
-        }
-        client.std_log.error(client, commandName, interaction.user.id, chanID);
         await interaction.reply({ content: "**🏓 Pong!**" });
 
         let embed = new EmbedBuilder()

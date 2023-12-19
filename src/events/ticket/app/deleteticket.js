@@ -5,9 +5,8 @@ const buttonCooldown = new Set();
 require("dotenv").config();
 const path = require('path');
 
-const ticketModel = require('../../../events/mongodb/modals/ticket.js');
-const ticketData = require("../../../events/mongodb/modals/channel.js");
-const ticketLogModel = require('../../../events/mongodb/modals/ticketlog.js');
+const ticketGuildModel = require('../../database/modals/ticketGuild.js');
+const ticketUserModel = require('../../database/modals/ticketUser.js');
 
 const { deleteTicketLog } = require('./functions/ticketFunction.js');
 const { deleteTicketEmbedandClient, deleteTicketReasonModal, deleteTicketSpam } = require('./functions/ticketEmbed.js');
@@ -15,54 +14,26 @@ const { deleteTicketEmbedandClient, deleteTicketReasonModal, deleteTicketSpam } 
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
-        var ticketNumber, IdData, ticketLog, ticketDoc;
+
+        const ticketLogDir = path.join(__dirname, '../../website/ticket-logs');
         const serverAdd = `${process.env.SERVERADD}`;
-        var theTicketType;
 
         if (interaction.customId == "delete-ticket") {
 
             await interaction.deferReply({ ephemeral: true });
 
-            ticketDoc = await ticketModel.findOne({
-                ticketData: {
-                    $elemMatch: {
-                        ticketID: interaction.channel.id
-                    }
-                }
-            }).catch(err => console.log(err));
+            var ticketUser = await ticketUserModel.findOne({
+                'ticketlog.ticketId': interaction.channel.id
+            }).catch(err => client.logger.error(err));
 
-            if (!ticketDoc) {
-                ticketDoc = await ticketModel.findOne({
-                    ticketID: interaction.channel.id
-                }).catch(err => console.log(err));
-                if (!ticketDoc) {
-                    return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
-                }
-            }
+            var ticketGuild = await ticketGuildModel.findOne({
+                guildID: interaction.guild.id
+            }).catch(err => client.logger.error(err));
 
             if (buttonCooldown.has(interaction.user.id)) {
                 await deleteTicketSpam(client, interaction);
             } else {
                 buttonCooldown.add(interaction.user.id);
-
-                ticketLog = await ticketLogModel.findOne({
-                    guildID: interaction.guild.id,
-                    userID: ticketDoc.userID
-                }).catch(err => console.log(err));
-
-                if (!ticketLog) {
-                    ticketLog = new ticketLogModel({
-                        guildID: interaction.guild.id,
-                        userID: ticketDoc.userID,
-                        count: 0,
-                        ticketlog: []
-                    });
-                    await ticketLog.save();
-                }
-
-                IdData = await ticketData.findOne({
-                    ticketGuildID: interaction.guild.id
-                }).catch(err => console.log(err));
 
                 const guild = client.guilds.cache.get(interaction.guildId);
                 const chan = guild.channels.cache.get(interaction.channelId);
@@ -75,44 +46,27 @@ module.exports = {
 
                 //Ticket Logs
 
+                
+                await deleteTicketLog(client, interaction, ticketLogDir, chan, null);
 
-                const ticketEmbedDes = interaction.message.embeds[0].description;
-                if (ticketEmbedDes.toLowerCase().includes("🪙")) {
-                    theTicketType = "image-save"
-                } else {
-                    theTicketType = "none"
+                const matchingEntry = ticketUser.ticketlog.find(ticket => ticket.ticketId === interaction.channel.id);
+
+                if (matchingEntry) {
+                    matchingEntry.transcriptLink = `${serverAdd}/transcript-${interaction.channel.id}.html`;
+                    matchingEntry.activeStatus = false;
+                    await ticketUser.save();
+
+                    await deleteTicketEmbedandClient(client, interaction, ticketUser, ticketGuild, serverAdd, chan, null);
+
+                    setTimeout(async () => {
+                        chan.delete()
+                            .catch(error => {
+                                if (error.code == 10003) {
+                                    return; //channel not found error
+                                }
+                            });
+                    }, 2000);
                 }
-                const ticketLogDir = path.join(__dirname, '../website/ticket-logs');
-                await deleteTicketLog(client, interaction, ticketLogDir, chan, theTicketType);
-
-                ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
-                const ticketlog = {
-                    ticketNumber: ticketNumber,
-                    ticketId: interaction.channel.id,
-                    transcriptLink: `${serverAdd}/transcript-${interaction.channel.id}.html`
-                };
-
-                ticketLog.ticketlog.push(ticketlog);
-                ticketLog.count += 1;
-                await ticketLog.save();
-
-                await deleteTicketEmbedandClient(client, interaction, IdData, ticketDoc, serverAdd, chan, null);
-
-                setTimeout(async () => {
-                    chan.delete()
-                        .catch(error => {
-                            if (error.code == 10003) {
-                                return; //channel not found error
-                            }
-                        });
-                    if (ticketDoc.ticketCount) {
-                        ticketDoc.ticketCount -= 1;
-                    }
-                    ticketDoc.ticketLimit = client.config.TICKET_LIMIT;
-                    ticketDoc.ticketData = ticketDoc.ticketData.filter(ticketDataItem => ticketDataItem.ticketID !== interaction.channel.id);
-                    await ticketDoc.save();
-                }, 2000);
-
                 setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000);
             }
         }
@@ -125,48 +79,20 @@ module.exports = {
 
             await interaction.deferReply({ ephemeral: true });
 
+            var ticketUser = await ticketUserModel.findOne({
+                'ticketlog.ticketId': interaction.channel.id
+            }).catch(err => client.logger.error(err));
+
+            var ticketGuild = await ticketGuildModel.findOne({
+                guildID: interaction.guild.id
+            }).catch(err => client.logger.error(err));
+
             if (buttonCooldown.has(interaction.user.id)) {
                 await deleteTicketSpam(client, interaction);
             } else {
                 buttonCooldown.add(interaction.user.id);
 
-                const TicketReason = interaction.fields.getTextInputValue('ticket-reason-text');
-
-                ticketDoc = await ticketModel.findOne({
-                    ticketData: {
-                        $elemMatch: {
-                            ticketID: interaction.channel.id
-                        }
-                    }
-                }).catch(err => console.log(err));
-
-                if (!ticketDoc) {
-                    ticketDoc = await ticketModel.findOne({
-                        ticketID: interaction.channel.id
-                    }).catch(err => console.log(err));
-                    if (!ticketDoc) {
-                        return await interaction.editReply({ content: "Internal Error Occured. Delete Ticket Manually || Database missing", ephemeral: true });
-                    }
-                }
-
-                ticketLog = await ticketLogModel.findOne({
-                    guildID: interaction.guild.id,
-                    userID: ticketDoc.userID
-                }).catch(err => console.log(err));
-
-                if (!ticketLog) {
-                    ticketLog = new ticketLogModel({
-                        guildID: interaction.guild.id,
-                        userID: ticketDoc.userID,
-                        count: 0,
-                        ticketlog: []
-                    });
-                    await ticketLog.save();
-                }
-
-                IdData = await ticketData.findOne({
-                    ticketGuildID: interaction.guild.id
-                }).catch(err => console.log(err));
+                const TicketReason = interaction.fields.getTextInputValue('ticket-reason-modal-text');
 
                 const guild = client.guilds.cache.get(interaction.guildId);
                 const chan = guild.channels.cache.get(interaction.channelId);
@@ -177,43 +103,26 @@ module.exports = {
                     ephemeral: true
                 });
 
-                const ticketEmbedDes = interaction.message.embeds[0].description;
-                if (ticketEmbedDes.toLowerCase().includes("🪙")) {
-                    theTicketType = "image-save"
-                } else {
-                    theTicketType = "none"
+                await deleteTicketLog(client, interaction, ticketLogDir, chan, null);
+
+                const matchingEntry = ticketUser.ticketlog.find(ticket => ticket.ticketId === interaction.channel.id);
+
+                if (matchingEntry) {
+                    matchingEntry.transcriptLink = `${serverAdd}/transcript-${interaction.channel.id}.html`;
+                    matchingEntry.activeStatus = false;
+                    await ticketUser.save();
+
+                    await deleteTicketEmbedandClient(client, interaction, ticketUser, ticketGuild, serverAdd, chan, TicketReason);
+
+                    setTimeout(async () => {
+                        chan.delete()
+                            .catch(error => {
+                                if (error.code == 10003) {
+                                    return; //channel not found error
+                                }
+                            });
+                    }, 2000);
                 }
-                const ticketLogDir = path.join(__dirname, '../website/ticket-logs');
-                await deleteTicketLog(client, interaction, ticketLogDir, chan, theTicketType);
-
-                ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
-                const ticketlog = {
-                    ticketNumber: ticketNumber,
-                    ticketId: interaction.channel.id,
-                    transcriptLink: `${serverAdd}/transcript-${interaction.channel.id}.html`
-                };
-
-                ticketLog.ticketlog.push(ticketlog);
-                ticketLog.count += 1;
-                await ticketLog.save();
-
-                await deleteTicketEmbedandClient(client, interaction, IdData, ticketDoc, serverAdd, chan, TicketReason);
-
-                setTimeout(async () => {
-                    chan.delete()
-                        .catch(error => {
-                            if (error.code == 10003) {
-                                return; //channel not found error
-                            }
-                        });
-                    if (ticketDoc.ticketCount) {
-                        ticketDoc.ticketCount -= 1;
-                    }
-                    ticketDoc.ticketLimit = client.config.TICKET_LIMIT;
-                    ticketDoc.ticketData = ticketDoc.ticketData.filter(ticketDataItem => ticketDataItem.ticketID !== interaction.channel.id);
-
-                    await ticketDoc.save();
-                }, 2000);
                 setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000);
             }
         }

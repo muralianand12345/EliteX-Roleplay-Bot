@@ -1,38 +1,36 @@
-var colors = require('colors/safe');
 const {
     EmbedBuilder,
-    ActivityType,
     Events
 } = require('discord.js');
 
+const botAnalysis = require('../../database/modals/botDataAnalysis.js');
+
 module.exports = {
     name: Events.ClientReady,
-    execute(client) {
-        console.log(colors.rainbow(`${client.user.tag} Bot is ready to rock n roll!`));
+    async execute(client) {
 
-        //Err
-        const err_chanid = client.config.ERR_LOG.CHAN_ID;
-        const err_logchan = client.channels.cache.get(err_chanid);
+        var botAnalysisData = await botAnalysis.findOne({
+            clientId: client.user.id
+        });
 
-        const activities = [
-            { name: `Indian Community`, type: ActivityType.Competing },
-            { name: `Iconic RolePlay ❤️`, type: ActivityType.Playing },
-            { name: `your Feedback and Suggestions!`, type: ActivityType.Listening },
-            { name: `${client.users.cache.size} Users!`, type: ActivityType.Watching },
-            { name: `#tamilcommunityrp`, type: ActivityType.Competing },
-        ];
-        //client.user.setStatus('invisible');
-        let i = 0;
-        setInterval(() => {
-            if (i >= activities.length) i = 0;
-            //client.user.setPresence({ activities: [{ name: activities[i] }], status: 'invisible' });
-            client.user.setActivity(activities[i]);
-            i++;
-        }, 5000);
+        if (!botAnalysisData) {
+            var botAnalysisData = new botAnalysis({
+                clientId: client.user.id,
+                restartCount: 0,
+                interactionCount: 0,
+                commandCount: 0
+            });
+            await botAnalysisData.save();
+        }
 
-        //Restart Embed Message
+        botAnalysisData.restartCount += 1;
+        await botAnalysisData.save();
+
+        client.logger.success(`"${client.user.tag}" is Online!`);
+        const err_logchan = client.channels.cache.get(client.config.bot.stdchan);
+
         const embed = new EmbedBuilder()
-            .setColor('#E67E22')
+            .setColor('Orange')
             .setTitle(`Bot Restart Completed and Online ❤️`)
             .setTimestamp();
         err_logchan.send({ embeds: [embed] });

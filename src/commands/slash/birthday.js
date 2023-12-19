@@ -3,11 +3,12 @@ const {
     EmbedBuilder
 } = require('discord.js');
 
-const birthdayData = require("../../events/mongodb/modals/birthday.js");
+const birthdayData = require("../../events/database/modals/birthday.js");
 
 module.exports = {
     cooldown: 10000,
     userPerms: [],
+    owner: false,
     botPerms: ['Administrator'],
 
     data: new SlashCommandBuilder()
@@ -41,6 +42,11 @@ module.exports = {
                         { name: 'December', value: '12' }
                     )
                 )
+                .addIntegerOption(option => option
+                    .setName('year')
+                    .setDescription('Birthday Year')
+                    .setRequired(false)
+                )
         )
         .addSubcommand(subcommand =>
             subcommand
@@ -49,21 +55,18 @@ module.exports = {
         ),
     async execute(interaction, client) {
 
-        //log
-        const commandName = "BIRTHDAY";
-        client.std_log.error(client, commandName, interaction.user.id, interaction.channel.id);
-
         await interaction.deferReply();
 
         const embed = new EmbedBuilder()
             .setAuthor({ name: 'Birthday', iconURL: client.user.displayAvatarURL() })
             .setTimestamp();
 
-        //set
         if (interaction.options.getSubcommand() === "set") {
 
             const date = interaction.options.getInteger('date');
             const month = parseInt(interaction.options.getString('month'));
+            const year = parseInt(interaction.options.getInteger('year')) || null;
+            var userAge;
 
             if (date > 31 || date < 1) {
                 embed.setColor('Red').setDescription(`Invalid date!`);
@@ -86,11 +89,22 @@ module.exports = {
                 });
             }
 
+            if (year && year > 2020 || year && year < 1950 || year && isNaN(year) || year && year.toString().length !== 4 ) {
+                embed.setColor('Red').setDescription(`Invalid year!`);
+                return await interaction.editReply({
+                    embeds: [embed]
+                });
+            }
+
+            if (year) {
+                userAge = new Date().getFullYear() - year;
+            }
+
             const birthdayMsg = `${date}/${month}`;
 
             const birthdayDoc = await birthdayData.findOne({
                 userID: interaction.user.id
-            }).catch(err => console.log(err));
+            }).catch(err => client.logger.error(err));
 
             if (birthdayDoc) {
                 await birthdayData.findOneAndUpdate({
@@ -98,15 +112,19 @@ module.exports = {
                 }, {
                     $set: {
                         day: date,
-                        month: month
+                        month: month,
+                        year: year,
+                        age: userAge
                     }
-                }).catch(err => console.log(err));
+                }).catch(err => client.logger.error(err));
             } else {
                 await birthdayData.create({
                     userID: interaction.user.id,
                     day: date,
-                    month: month
-                }).catch(err => console.log(err));
+                    month: month,
+                    year: year,
+                    age: userAge
+                }).catch(err => client.logger.error(err));
             }
 
             embed.setColor('Green').setDescription(`Your birthday has been set to ${birthdayMsg}`);
@@ -119,7 +137,7 @@ module.exports = {
 
             const birthdayDoc = await birthdayData.findOne({
                 userID: interaction.user.id
-            }).catch(err => console.log(err));
+            }).catch(err => client.logger.error(err));
 
             if (!birthdayDoc) {
                 embed.setColor('Red').setDescription(`You don't have a birthday set!`);
@@ -129,7 +147,7 @@ module.exports = {
             } else {
                 await birthdayData.findOneAndDelete({
                     userID: interaction.user.id
-                }).catch(err => console.log(err));
+                }).catch(err => client.logger.error(err));
             }
 
             embed.setColor('Orange').setDescription(`Your birthday has been removed!`);

@@ -134,12 +134,12 @@ const rowTicketCloseDisAll = new ActionRowBuilder()
 
 //Ticket Function ------------------------------------------
 
-async function createTicketEmbed(client, interaction, interaction2, channel) {
+async function createTicketEmbed(client, interaction, channel) {
     const embed = new EmbedBuilder()
         .setColor('#206694')
-        .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
-        .setDescription(`<@!${interaction.user.id}> Created a ticket ${interaction2.values[0]}`)
-        .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
+        .setAuthor({ name: 'Ticket', iconURL: client.user.avatarURL() })
+        .setDescription(`<@!${interaction.user.id}> Created a ticket`)
+        .setFooter({ text: client.user.username, iconURL: client.user.avatarURL() })
         .setTimestamp();
 
     opened = await channel.send({
@@ -157,126 +157,59 @@ async function createTicketEmbed(client, interaction, interaction2, channel) {
 
 // OOC ---------------------------------------------------
 
-async function showTicketModalOOC(client, interaction) {
+async function showTicketModal(client, interaction) {
 
     const oocModal = new ModalBuilder()
-        .setCustomId('ticket-ooc-modal')
+        .setCustomId('modal-ticket')
         .setTitle('Ticket Details');
 
     const oocDate = new TextInputBuilder()
-        .setCustomId('ooc-date')
+        .setCustomId('date-modal-ticket')
         .setLabel('Date and Time of the Scenario:')
         .setPlaceholder('Approximate Time is also acceptable')
         .setStyle(TextInputStyle.Short)
         .setRequired(true);
     const oocAgainst = new TextInputBuilder()
-        .setCustomId('ooc-against')
-        .setLabel('Ticket Raised Against:')
+        .setCustomId('against-modal-ticket')
+        .setLabel('Ticket Raised Against/For:')
         .setStyle(TextInputStyle.Short)
         .setRequired(false);
     const oocDetails = new TextInputBuilder()
-        .setCustomId('ooc-details')
+        .setCustomId('details-modal-ticket')
         .setLabel('Ticket raised because of:')
         .setStyle(TextInputStyle.Paragraph)
         .setMaxLength(1000)
         .setRequired(true);
     const oocProof = new TextInputBuilder()
-        .setCustomId('ooc-proof')
+        .setCustomId('proof-modal-ticket')
         .setLabel('Proof')
         .setPlaceholder('Yes/No')
         .setStyle(TextInputStyle.Short)
         .setRequired(false);
-    const oocRules = new TextInputBuilder()
-        .setCustomId('ooc-rules')
-        .setLabel('RP Rules Breaked (Fail RP)')
-        .setPlaceholder('Power Gaming/Fear RP/Meta Gaming/Fear RP')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true);
 
     const firstActionRow = new ActionRowBuilder().addComponents(oocDate);
     const secondActionRow = new ActionRowBuilder().addComponents(oocAgainst);
     const thirdActionRow = new ActionRowBuilder().addComponents(oocDetails);
     const fourthActionRow = new ActionRowBuilder().addComponents(oocProof);
-    const fivethActionRow = new ActionRowBuilder().addComponents(oocRules);
 
-    oocModal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow, fivethActionRow);
+    oocModal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow);
     await interaction.showModal(oocModal);
 }
 
-async function ticketModalOOCEmbed(client, interaction, ticketChan) {
-    const Date = interaction.fields.getTextInputValue('ooc-date');
-    const Against = interaction.fields.getTextInputValue('ooc-against') || "Name Unknown";
-    const Rules = interaction.fields.getTextInputValue('ooc-rules');
-    const Proof = interaction.fields.getTextInputValue('ooc-proof') || "No Proof";
-    const Details = interaction.fields.getTextInputValue('ooc-details');
+async function ticketModalEmbed(client, interaction, ticketChan) {
+    const Date = interaction.fields.getTextInputValue('date-modal-ticket');
+    const Against = interaction.fields.getTextInputValue('against-modal-ticket') || "Unknown";
+    const Proof = interaction.fields.getTextInputValue('proof-modal-ticket') || "No Proof";
+    const Details = interaction.fields.getTextInputValue('details-modal-ticket');
 
     const embed = new EmbedBuilder()
         .setDescription(`<@${interaction.user.id}> **| OOC Ticket Details**`)
         .addFields(
             { name: '**Date and Time:**', value: `\`\`\`${Date}\`\`\`` },
             { name: '**OOC Against:**', value: `\`\`\`${Against}\`\`\`` },
-            { name: '**Rules Breaked:**', value: `\`\`\`${Rules}\`\`\`` },
             { name: '**Ticket Raised Because Of:**', value: `\`\`\`${Details}\`\`\`` },
             { name: '**Proof/Evidence:**', value: `\`\`\`${Proof}\`\`\`` }
         );
-    await ticketChan.send({ embeds: [embed] });
-}
-
-// Others ---------------------------------------------------
-
-async function showTicketModalOthers(client, interaction) {
-    const othersModal = new ModalBuilder()
-        .setCustomId('ticket-others-modal')
-        .setTitle('Ticket Details');
-
-    const othersDate = new TextInputBuilder()
-        .setCustomId('others-date')
-        .setLabel('Date and Time:')
-        .setPlaceholder('Approximate Time is also acceptable')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true);
-    const othersDetails = new TextInputBuilder()
-        .setCustomId('others-details')
-        .setLabel('Ticket raised because of:')
-        .setPlaceholder('Items lost/Name Change/Bugs')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(true);
-    const othersItems = new TextInputBuilder()
-        .setCustomId('others-items')
-        .setLabel('If Items Lost, Mention Them')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(false);
-    const othersProof = new TextInputBuilder()
-        .setCustomId('others-proof')
-        .setLabel('Proof')
-        .setPlaceholder('Yes/No')
-        .setStyle(TextInputStyle.Short)
-        .setRequired(false);
-
-    const firstActionRow = new ActionRowBuilder().addComponents(othersDate);
-    const secondActionRow = new ActionRowBuilder().addComponents(othersDetails);
-    const thirdActionRow = new ActionRowBuilder().addComponents(othersItems);
-    const fourthActionRow = new ActionRowBuilder().addComponents(othersProof);
-
-    othersModal.addComponents(firstActionRow, secondActionRow, thirdActionRow, fourthActionRow);
-    await interaction.showModal(othersModal);
-}
-
-async function ticketModalOthersEmbed(client, interaction, ticketChan) {
-    const Date = interaction.fields.getTextInputValue('others-date');
-    const Details = interaction.fields.getTextInputValue('others-details');
-    const Items = interaction.fields.getTextInputValue('others-items') || "No Item Lost";
-    const Proof = interaction.fields.getTextInputValue('others-proof') || "No Proof";
-
-    const embed = new EmbedBuilder()
-        .setDescription(`<@${interaction.user.id}> **| Others Ticket Details**`)
-        .addFields(
-            { name: '**Date and Time:**', value: `\`\`\`${Date}\`\`\`` },
-            { name: '**Ticket Raised Because Of:**', value: `\`\`\`${Details}\`\`\`` },
-            { name: '**Items Lost:**', value: `\`\`\`${Items}\`\`\`` },
-            { name: '**Proof/Evidence:**', value: `\`\`\`${Proof}\`\`\`` }
-        );
-
     await ticketChan.send({ embeds: [embed] });
 }
 
@@ -300,8 +233,8 @@ async function closeTicketEmbed(client, interaction) {
 
     var embed = new EmbedBuilder()
         .setColor('#206694')
-        .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
-        .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
+        .setAuthor({ name: 'Ticket', iconURL: client.user.avatarURL() })
+        .setFooter({ text: client.user.username, iconURL: client.user.avatarURL() })
         .setTimestamp();
 
     const channel = interaction.channel;
@@ -324,33 +257,24 @@ async function closeTicketEditInt(client, interaction) {
 
 //Delete Ticket ----------------------------------------------
 
-async function deleteTicketEmbedandClient(client, interaction, IdData, ticketDoc, serverAdd, chan, TicketReason) {
+async function deleteTicketEmbedandClient(client, interaction, ticketUser, ticketGuild, serverAdd, chan, TicketReason) {
     var embed = new EmbedBuilder()
-        .setAuthor({ name: 'Logs Ticket', iconURL: client.config.EMBED.IMAGE })
-        .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketDoc.userID}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${serverAdd}/transcript-${interaction.channel.id}.html)`)
+        .setAuthor({ name: 'Logs Ticket', iconURL: client.user.avatarURL() })
+        .setDescription(`📰 Logs of the ticket \`${chan.id}\` created by <@!${ticketUser.userID}> and deleted by <@!${interaction.user.id}>\n\nLogs: [**Click here to see the logs**](${serverAdd}/transcript-${interaction.channel.id}.html)`)
         .setColor('#206694')
         .setTimestamp();
 
     if (TicketReason) {
-        embed.addFields(
-            { name: 'Reason', value: `\`\`\`${TicketReason}\`\`\`` }
-        );
+        embed.addFields({ name: 'Reason', value: `\`\`\`${TicketReason}\`\`\`` });
     }
 
-    client.channels.cache.get(IdData.ticketLogChannelID).send({
-        embeds: [embed]
-    });
-
-    client.users.cache.get(ticketDoc.userID).send({
+    client.users.cache.get(ticketUser.userID).send({
         embeds: [embed]
     }).catch(error => {
         if (error.code == 50007) {
-            const logembed = new EmbedBuilder()
-                .setColor('#000000')
-                .setDescription(`Unable to DM User: <@${ticketDoc.userID}>\n\`Ticket No: ${chan.id}\``);
-
-            return client.channels.cache.get(IdData.ticketLogChannelID).send({
-                embeds: [logembed]
+            embed.addFields({ name: 'Status', value: `**Unable to DM User**` });
+            return client.channels.cache.get(ticketGuild.ticketLogID).send({
+                embeds: [embed]
             });
         }
     });
@@ -362,7 +286,7 @@ async function deleteTicketReasonModal(client, interaction) {
         .setTitle('Ticket Reason');
 
     const Reason = new TextInputBuilder()
-        .setCustomId('ticket-reason-text')
+        .setCustomId('ticket-reason-modal-text')
         .setLabel('Ticket Close Text')
         .setMaxLength(1000)
         .setStyle(TextInputStyle.Paragraph)
@@ -386,9 +310,9 @@ async function ticketBugEmbed(client, message, ticketDoc) {
     const chan = message.channel;
     const embed = new EmbedBuilder()
         .setColor('#206694')
-        .setAuthor({ name: 'Ticket', iconURL: client.config.EMBED.IMAGE })
+        .setAuthor({ name: 'Ticket', iconURL: client.user.avatarURL() })
         .setDescription(`**Created a ticket**`)
-        .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.config.EMBED.IMAGE })
+        .setFooter({ text: client.user.username, iconURL: client.user.avatarURL() })
         .setTimestamp();
 
     if (!ticketDoc) {
@@ -413,7 +337,7 @@ async function reopenEmbedEdit(interaction, message) {
 //Export ------------------------------------------------------
 
 module.exports = {
-    createTicketEmbed, showTicketModalOOC, ticketModalOOCEmbed, showTicketModalOthers, ticketModalOthersEmbed,
+    createTicketEmbed, showTicketModal, ticketModalEmbed,
     claimTicketEmbed, closeTicketEmbed, closeTicketEditInt, deleteTicketEmbedandClient, deleteTicketReasonModal,
     deleteTicketSpam, ticketBugEmbed, reopenEmbedEdit
 };

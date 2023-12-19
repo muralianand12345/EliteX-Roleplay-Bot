@@ -6,7 +6,11 @@ const {
     GatewayIntentBits,
     Partials
 } = require('discord.js');
-const Errorhandler = require("./modules/error-handler/discord-error-handler.js");
+const Discord = require('discord.js');
+const chokidar = require('chokidar');
+const { Manager } = require("magmastream");
+const logger = require('./module/logger.js');
+const cmdLogger = require('./module/commandlog.js');
 
 const client = new Client({
     intents: [
@@ -32,54 +36,57 @@ const client = new Client({
     fetchAllMembers: true
 });
 
-const Token = process.env.TOKEN;
-const WebhookId = process.env.WEBHOOK_ID;
-const WebhookToken = process.env.WEBHOOK_TOKEN;
-
-const handle = new Errorhandler(client, {
-    webhook: { id: WebhookId, token: WebhookToken },
-    stats: true,
-});
-
-const Discord = require('discord.js');
 client.setMaxListeners(20);
-client.discord = Discord;
-client.handle = handle;
 
-//logs
-const modulesDir = path.join(__dirname, 'modules');
-const files = fs.readdirSync(modulesDir);
-for (const file of files) {
-    if (path.extname(file) === '.js') {
-        const property = path.basename(file, '.js');
-        client[property] = require(path.join(modulesDir, file));
-    }
+client.logger = logger;
+client.cmdLogger = cmdLogger;
+
+//Config File | No restart needed for config changes
+const configPath = path.join(__dirname, 'config/config.json');
+let config;
+
+try {
+    config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+} catch (error) {
+    client.logger.error('Error reading initial configuration file:', error);
+    process.exit(1);
 }
 
-//configs
-const configDir = path.join(__dirname, 'config');
-const folders = fs.readdirSync(configDir);
-for (const folder of folders) {
-    const folderPath = path.join(configDir, folder);
-    if (fs.statSync(folderPath).isDirectory()) {
-        const files = fs.readdirSync(folderPath);
-        for (const file of files) {
-            if (path.extname(file) === '.json') {
-                const property = path.basename(file, '.json');
-                client[property] = require(path.join(folderPath, file));
-            }
+client.config = config;
+
+//Lavalink
+const nodes = client.config.music.lavalink.nodes;
+client.manager = new Manager({
+    nodes: nodes,
+    defaultSearchPlatform: client.config.music.lavalink.defaultsearch,
+    send: (id, payload) => {
+        const guild = client.guilds.cache.get(id);
+        if (guild) guild.shard.send(payload);
+    }
+});
+client.on("raw", (d) => client.manager.updateVoiceState(d));
+
+const watcher = chokidar.watch(configPath);
+watcher.on('change', (changedPath) => {
+    if (changedPath === configPath) {
+        try {
+            config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+            client.config = config;
+        } catch (error) {
+            client.logger.error('Error reloading configuration file:');
+            client.logger.error(error);
         }
     }
-}
+});
 
-//Handler File Read
+const Token = process.env.TOKEN;
+client.discord = Discord;
+
+//handler Read
 const handlersPath = path.join(__dirname, 'handlers');
-fs.readdirSync(handlersPath).filter((dir) => {
-    let files = fs.readdirSync(`${handlersPath}/${dir}`).filter((file) => file.endsWith(".js"));
-    for (let file of files) {
-        const handler = require(`${handlersPath}/${dir}/${file}`);
-        client.on(handler.name, (...args) => handler.execute(...args, client));
-    }
+fs.readdirSync(handlersPath).filter((file) => file.endsWith(".js")).forEach((file) => {
+    const handler = require(path.join(handlersPath, file));
+    client.on(handler.name, (...args) => handler.execute(...args, client));
 });
 
 //events Read
@@ -107,23 +114,28 @@ fs.readdirSync(eventsPath).forEach((mainDir) => {
 });
 
 client.login(Token).catch(err => {
-    console.error(`[TOKEN-CRASH] Unable to connect to the BOT's Token`.red);
-    console.error(err);
+    client.logger.error(`[TOKEN-CRASH] Unable to connect to the BOT's Token`.red);
+    client.logger.error(err);
     return process.exit();
 });
 
 module.exports = client;
 
+process.on('SIGINT', async () => {
+    client.logger.warn(`${client.user.username} is shutting down...\n-------------------------------------`);
+    process.exit();
+});
+
 //Error Handling
 process.on('unhandledRejection', async (err, promise) => {
-    handle.createrr(client, undefined, undefined, err);
+    client.logger.error(err);
 });
 process.on('uncaughtException', async (err, origin) => {
-    handle.createrr(client, undefined, undefined, err);
+    client.logger.error(err);
 });
 client.on('invalidated', () => {
-    console.log(`invalidated`);
+    client.logger.warn(`invalidated`);
 });
 client.on('invalidRequestWarning', (invalidRequestWarningData) => {
-    console.log(`invalidRequestWarning: ${invalidRequestWarningData}`);
+    client.logger.warn(`invalidRequestWarning: ${invalidRequestWarningData}`);
 });

@@ -8,11 +8,11 @@ const {
     PermissionFlagsBits
 } = require('discord.js');
 
-const channelData = require("../../events/mongodb/modals/channel.js")
-const parentData = require("../../events/mongodb/modals/ticketParent.js")
+const ticketGuildModal = require('../../events/database/modals/ticketGuild.js');
 
 module.exports = {
     cooldown: 10000,
+    owner: false,
     userPerms: ['Administrator'],
     botPerms: ['Administrator'],
 
@@ -25,173 +25,155 @@ module.exports = {
             subcommand
                 .setName('setup')
                 .setDescription('Setup the tickets system for your server!')
-                .addChannelOption(option => option
-                    .setName('channel')
-                    .setDescription('Set the channel for the ticket!')
-                    .setRequired(true)
+                .addChannelOption(option =>
+                    option.setName('ticket-channel')
+                        .setDescription('The channel where the tickets will be created!')
+                        .setRequired(true),
                 )
-                .addChannelOption(option => option
-                    .setName('logchannel')
-                    .setDescription('Set the Log channel for the ticket!')
-                    .setRequired(true)
+                .addChannelOption(option =>
+                    option.setName('ticket-log-channel')
+                        .setDescription('The channel where the tickets will be logged!')
+                        .setRequired(true),
                 )
-                .addRoleOption(option => option
-                    .setName('supportrole')
-                    .setDescription('Ticket Supporters Role!')
-                    .setRequired(true)
-                ),
+                .addChannelOption(option =>
+                    option.setName('ticket-closed-category')
+                        .setDescription('The category where the closed tickets will be moved!')
+                        .setRequired(true)
+                )
+                .addRoleOption(option =>
+                    option.setName('ticket-support-role')
+                        .setDescription('The role which will be able to see the tickets!')
+                        .setRequired(true),
+                )
 
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName('stop')
                 .setDescription('Stop the tickets system for your server!'),
-        )
-        .addSubcommand(subcommand =>
-            subcommand
-                .setName('category-setup')
-                .setDescription('Set the categorys for the ticket!')
-                .addChannelOption(option => option
-                    .setName('ooc')
-                    .setDescription('OOC Category')
-                    .setRequired(true)
-                )
-                .addChannelOption(option => option
-                    .setName('supporters')
-                    .setDescription('Supporters Pack Category')
-                    .setRequired(true)
-                )
-                /*.addChannelOption(option => option
-                    .setName('bug')
-                    .setDescription('Bugs Category')
-                    .setRequired(true)
-                )
-                .addChannelOption(option => option
-                    .setName('character')
-                    .setDescription('Character Issue Category')
-                    .setRequired(true)
-                )*/
-                .addChannelOption(option => option
-                    .setName('other')
-                    .setDescription('Other Issues Category')
-                    .setRequired(true)
-                )
-                .addChannelOption(option => option
-                    .setName('closed')
-                    .setDescription('Closed Ticket Category')
-                    .setRequired(true)
-                ),
         ),
 
     async execute(interaction, client) {
 
-        //log
-        const commandName = "TICKET";
-        client.std_log.error(client, commandName, interaction.user.id, interaction.channel.id);
-
         if (interaction.options.getSubcommand() === "setup") {
-            const channel = await interaction.options.getChannel("channel");
-            const logChannel = await interaction.options.getChannel("logchannel");
-            const suppRole = await interaction.options.getRole("supportrole");
 
-            //finding the data
-            const data = await channelData.findOne({
-                ticketGuildID: interaction.guild.id,
-            }).catch(console.error);
+            await interaction.deferReply({ ephemeral: true });
 
-            if (data) {
-                return interaction.reply({ content: 'Ticket System Already Registered!', ephemeral: true });
-            } else if (!data) {
-                let newData = new channelData({
-                    ticketGuildID: interaction.guild.id,
-                    ticketChannelID: channel.id,
-                    ticketSupportID: suppRole.id,
-                    ticketLogChannelID: logChannel.id
-                });
-                await newData.save();
-
-                const embed = new EmbedBuilder()
-                    .setColor('#6d6ee8')
-                    .setTitle("Open a Support Ticket")
-                    .setDescription('Click on the button to Raise Ticket')
-                    .setFooter({ text: client.config.EMBED.FOOTTEXT, iconURL: client.user.avatarURL() })
-                const button = new ActionRowBuilder()
-                    .addComponents(
-                        new ButtonBuilder()
-                            .setCustomId('open-ticket')
-                            .setLabel('TICKET')
-                            .setEmoji('🎫')
-                            .setStyle(ButtonStyle.Success),
-                    );
-
-                channel.send({
-                    embeds: [embed],
-                    components: [button]
-                });
-
-                return interaction.reply({ content: 'Ticket System Setup Successfully!', ephemeral: true });
+            const ticketChannel = interaction.options.getChannel('ticket-channel');
+            const ticketLogChannel = interaction.options.getChannel('ticket-log-channel');
+            const ticketSupportRole = interaction.options.getRole('ticket-support-role');
+            const ticketClosedCategory = interaction.options.getChannel('ticket-closed-category');
+            
+            //ChannelType.GuildCategory
+            function checkChan(chan, type) {
+                if (chan.type !== type) return false;
+                return true;
             }
-        } else if (interaction.options.getSubcommand() === "stop") {
-            const data = await channelData.findOne({
-                ticketGuildID: interaction.guild.id
-            }).catch(console.error);
 
-            if (data) {
-                await channelData.findOneAndRemove({
-                    ticketGuildID: interaction.guild.id
-                });
-
-                return interaction.reply({ content: 'Ticket System has been disabled from this server!', ephemeral: true });
-            } else if (!data) {
-                return interaction.reply({ content: `Ticket system isn't enabled for your server!`, ephemeral: true });
+            if (!checkChan(ticketChannel, ChannelType.GuildText) || !checkChan(ticketLogChannel, ChannelType.GuildText) || !checkChan(ticketClosedCategory, ChannelType.GuildCategory)) {
+                return await interaction.editReply({ content: 'Invalid Ticket Channel!', ephemeral: true });
             }
-        } else if (interaction.options.getSubcommand() === "category-setup") {
-            const oocPar = await interaction.options.getChannel("ooc");
-            const supPar = await interaction.options.getChannel("supporters");
-            /*const bugPar = await interaction.options.getChannel("bug");
-            const charPar = await interaction.options.getChannel("character");*/
-            const otherPar = await interaction.options.getChannel("other");
-            const closedPar = await interaction.options.getChannel("closed");
 
-            var bool = false;
-            function checkParent(chan) {
-                if (chan.type !== ChannelType.GuildCategory) {
-                    return bool = true;
-                } else {
-                    return;
-                }
-            }
-            checkParent(oocPar);
-            checkParent(supPar);
-            /*checkParent(bugPar);
-            checkParent(charPar);*/
-            checkParent(otherPar);
-            checkParent(closedPar);
+            var ticketGuildData = await ticketGuildModal.findOne({ guildID: interaction.guild.id });
 
-            if (bool == false) {
-                const data = await parentData.findOne({
+            if (!ticketGuildData) {
+                ticketGuildData = new ticketGuildModal({
                     guildID: interaction.guild.id,
-                }).catch(console.error);
-
-                if (data) {
-                    return interaction.reply({ content: 'Ticket System Already Registered!', ephemeral: true });
-                } else if (!data) {
-                    let newData = new parentData({
-                        guildID: interaction.guild.id,
-                        oocPar: oocPar.id,
-                        suppPar: supPar.id,
-                        /*bugPar: bugPar.id,
-                        charPar: charPar.id,*/
-                        otherPar: otherPar.id,
-                        closedPar: closedPar.id
-                    });
-                    await newData.save();
-
-                    return interaction.reply({ content: 'Ticket Category Setup Successfully!', ephemeral: true });
-                }
-            } else if (bool == true) {
-                return interaction.reply({ content: 'Kindly Select only Category!', ephemeral: true });
+                    category: [],
+                    closedPar: "",
+                    ticketMaxCount: 2,
+                    ticketCount: 0,
+                    ticketSupportID: "",
+                    ticketLogID: "",
+                    ticketStatus: false,
+                });
             }
+
+            var ticketConfig;
+
+            const collectorFilter = (message) => message.author.id === interaction.user.id;
+            await interaction.editReply({ content: `Enter your Ticket Category | Line by line for category | Label (Option Name) , Value (category id), Emoji`, ephemeral: true }).then(async () => {
+                await interaction.channel.awaitMessages({ filter: collectorFilter, max: 1, time: 300000, errors: ['time'] })
+                    .then(async (collected) => {
+                        await interaction.editReply({ content: 'Processing...', ephemeral: true });
+                        ticketConfig = collected.first().content;
+                    })
+                    .catch(async (collected) => {
+                        if (collected.size === 0) {
+                            await interaction.editReply({ content: 'Successfully added!', ephemeral: true });
+                        }
+                    })
+            });
+
+            var ticketConfigArray = ticketConfig.split('\n');
+            var ticketCategoryArray = [];
+
+            ticketConfigArray.forEach(async (eachCategory) => {
+                var eachCategoryArray = eachCategory.split(',');
+
+                if (eachCategoryArray.length !== 3) {
+                    return await interaction.editReply({ content: 'Invalid Category!', ephemeral: true });
+                }
+
+                var eachCategoryObject = {
+                    label: eachCategoryArray[0],
+                    value: eachCategoryArray[1].replace(/\s/g, ''),
+                    emoji: eachCategoryArray[2].replace(/\s/g, '')
+                };
+                ticketCategoryArray.push(eachCategoryObject);
+            });
+
+            ticketGuildData.closedPar = ticketClosedCategory.id;
+            ticketGuildData.category = ticketCategoryArray;
+            ticketGuildData.ticketSupportID = ticketSupportRole.id;
+            ticketGuildData.ticketLogID = ticketLogChannel.id;
+            ticketGuildData.ticketStatus = true;
+            await ticketGuildData.save();
+
+            const embedReply = new EmbedBuilder()
+                .setTitle('Ticket System')
+                .setDescription(`Ticket System has been setup!`)
+                .setColor('Green');
+
+            await interaction.editReply({ embeds: [embedReply], ephemeral: true });
+
+            const embed = new EmbedBuilder()
+                .setColor('#6d6ee8')
+                .setTitle("Open a Support Ticket")
+                .setDescription('Click on the button to Raise Ticket')
+                .setFooter({ text: `${client.user.tag}`, iconURL: client.user.avatarURL() })
+            const button = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('open-ticket')
+                        .setLabel('TICKET')
+                        .setEmoji('🎫')
+                        .setStyle(ButtonStyle.Success),
+                );
+
+            await ticketChannel.send({ embeds: [embed], components: [button] })
+
+        }
+
+        if (interaction.options.getSubcommand() === "stop") {
+
+            await interaction.deferReply({ ephemeral: true });
+
+            var ticketGuildData = await ticketGuildModal.findOne({ guildID: interaction.guild.id });
+
+            if (!ticketGuildData) {
+                return await interaction.editReply({ content: 'Ticket system is not active!', ephemeral: true });
+            }
+
+            ticketGuildData.ticketStatus = false;
+            await ticketGuildData.save();
+
+            const embedReply = new EmbedBuilder()
+                .setTitle('Ticket System')
+                .setDescription(`Ticket System has been stopped!`)
+                .setColor('Red');
+
+            await interaction.editReply({ embeds: [embedReply], ephemeral: true });
         }
     }
-};
+}

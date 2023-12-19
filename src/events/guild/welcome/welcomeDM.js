@@ -4,71 +4,50 @@ const {
     ButtonBuilder,
     ButtonStyle,
     Events
-} = require("discord.js")
+} = require("discord.js");
+
+const welcomeUserModal = require('../../database/modals/welcomeUser.js');
 
 module.exports = {
     name: Events.GuildMemberAdd,
     async execute(member, client) {
 
-        if (client.config.ENABLE.WELCOME === false) return;
-        const guilId = client.visa.GUILDID;
-        if (member.guild.id !== guilId) return;
+        if (!member.guild) return;
+        if (!client.config.welcome.welcomedm.enabled) return;
 
-        const userID = member.user.id;
-        const userName = member.user.username;
-        const userTag = member.user.discriminator;
-        const formLink = client.visa.LINK;
-
-        const embed = new EmbedBuilder()
-            .setColor('#00FF00')
-            .setThumbnail(client.visa.LOGO)
-            .setTitle(`Welcome to Iconic RP`)
-            .setDescription(`**<@${userID}>, we are delighted to have you among us. On behalf of Iconic RP Team, we would like to extend our warmest welcome!**`)
-            .setFields(
-                { name: "Step 1: Apply Form", value: `<#${client.visa.WELCOME.TAGCHAN}>` },
-                { name: "Step 2: Wait For The Reply", value: `<#${client.visa.WELCOME.REPLY}>` },
-                { name: "Step 3: Attend The VP", value: `<#${client.visa.WELCOME.VPVOICE}>` },
-            )
-
-        const sbutton = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setLabel(`Apply Here`)
-                    .setEmoji('📲')
-                    .setStyle(ButtonStyle.Link)
-                    .setURL(formLink)
-            )
-
-        var bool = 0;
-        await client.users.cache.get(userID).send({
-            embeds: [embed],
-            components: [sbutton]
-        }).catch(error => {
-            if (error.code == 50007) {
-                bool = 1;
-            }
+        var welcomeUserData = await welcomeUserModal.findOne({
+            guildId: member.guild.id
         });
 
-        if (bool == 1) {
-            const logembederr = new EmbedBuilder()
-                .setColor('#FF0000')
-                .setDescription(`Unable to DM <@${userID}> \`${userName}#${userTag}\` (Apply Form)`)
+        if (!welcomeUserData) return;
 
-            return client.channels.cache.get(client.visa.WELCOME.LOGCHAN).send({
-                embeds: [logembederr]
+        var embed = new EmbedBuilder()
+            .setColor('#00FF00')
+            .setThumbnail(`${client.user.avatarURL()}`)
+            .setTitle(`Welcome to ${member.guild.name}`)
+            .setDescription(`${welcomeUserData.welcomeMsg.description}`);
+
+        await welcomeUserData.welcomeMsg.fields.forEach(field => {
+            embed.addFields({ name: `${field.name}`, value: `${field.value}` });
+        });
+
+        if (welcomeUserData.welcomeMsg.forLinks) {
+            var button = new ActionRowBuilder()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setLabel(`Apply Here`)
+                        .setEmoji('📲')
+                        .setStyle(ButtonStyle.Link)
+                        .setURL(welcomeUserData.welcomeMsg.forLinks)
+                );
+
+            await member.user.send({ embeds: [embed], components: [button] }).catch(error => {
+                if (error.code == 50007) return;
             });
-
-        } else if (bool == 0) {
-            const logembed = new EmbedBuilder()
-                .setColor('#000000')
-                .setDescription(`DM sent to <@${userID}> \`${userName}#${userTag}\` (Apply Form)`)
-
-            return client.channels.cache.get(client.visa.WELCOME.LOGCHAN).send({
-                embeds: [logembed]
-            });
-
         } else {
-            return;
+            await member.user.send({ embeds: [embed] }).catch(error => {
+                if (error.code == 50007) return;
+            });
         }
     }
-};
+}

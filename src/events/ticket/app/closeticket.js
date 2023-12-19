@@ -8,9 +8,8 @@ const {
     ButtonStyle,
 } = require("discord.js");
 
-const ticketModel = require('../../../events/mongodb/modals/ticket.js');
-const ticketData = require("../../../events/mongodb/modals/channel.js");
-const ticketPar = require('../../../events/mongodb/modals/ticketParent.js');
+const ticketGuildModel = require('../../database/modals/ticketGuild.js');
+const ticketUserModel = require('../../database/modals/ticketUser.js');
 
 const { closeTicketChan } = require('./functions/ticketFunction.js');
 const { closeTicketEmbed, closeTicketEditInt } = require('./functions/ticketEmbed.js');
@@ -26,37 +25,18 @@ module.exports = {
 
                 await interaction.deferReply();
 
-                const IdData = await ticketData.findOne({
-                    ticketGuildID: interaction.guild.id
-                }).catch(err => console.log(err));
-
-                if (!IdData) {
-                    return;
-                }
-
-                var ticketDoc = await ticketModel.findOne({
-                    ticketData: {
-                        $elemMatch: {
-                            ticketID: interaction.channel.id
-                        }
-                    }
-                }).catch(err => console.log(err));
-
-                //For OLD Ticket
-                if (!ticketDoc) {
-                    ticketDoc = await ticketModel.findOne({
-                        ticketID: interaction.channel.id
-                    }).catch(err => console.log(err));
-                }
-
-                var ticketParents = await ticketPar.findOne({
+                var ticketData = await ticketGuildModel.findOne({
                     guildID: interaction.guild.id
-                }).catch(err => console.log(err));
+                }).catch(err => client.logger.error(err));
 
-                if (!ticketParents) {
-                    return;
-                } else if (ticketParents) {
-                    var closeTicket = ticketParents.closedPar;
+                const ticketUser = await ticketUserModel.findOne({
+                    'ticketlog.ticketId': interaction.channel.id
+                }).catch(err => client.logger.error(err));
+
+                if (!ticketData) {
+                    return await interaction.editReply({ content: 'Ticket system is not active!', ephemeral: true });
+                } else {
+                    var closeTicket = ticketData.closedPar;
                 }
 
                 const userButton = interaction.user.id;
@@ -64,12 +44,12 @@ module.exports = {
                 const row = new ActionRowBuilder()
                     .addComponents(
                         new ButtonBuilder()
-                            .setCustomId('confirm-close')
+                            .setCustomId('confirm-close-ticket')
                             .setLabel('Close ticket')
                             .setStyle(ButtonStyle.Danger),
 
                         new ButtonBuilder()
-                            .setCustomId('no')
+                            .setCustomId('no-close-ticket')
                             .setLabel('Cancel closure')
                             .setStyle(ButtonStyle.Secondary),
                     );
@@ -86,32 +66,29 @@ module.exports = {
 
                 collector.on('collect', async (i) => {
                     await i.deferUpdate();
-                    if (i.customId == 'confirm-close') {
+                    if (i.customId == 'confirm-close-ticket') {
                         try {
                             await closeTicketEditInt(client, interaction);
                             await i.editReply({
                                 content: `Ticket closed by <@!${i.user.id}>`,
                                 components: []
                             });
-
                             await closeTicketEmbed(client, interaction).then(async () => {
-                                await closeTicketChan(client, interaction, closeTicket, IdData.ticketSupportID, ticketDoc.userID);
+                                await closeTicketChan(client, interaction, closeTicket, ticketData.ticketSupportID, ticketUser.userID);
                                 collector.stop();
                             });
-
                         } catch (error) {
                             if (error.code == 10062) {
                                 const followUpContent = 'An error occurred while closing the ticket. Please try again.';
-                                console.log(`Error 86 | ${followUpContent}`);
+                                client.logger.error(`Error 86 | ${followUpContent}`);
                                 await interaction.followUp({ content: followUpContent });
                             } else {
-                                console.error(`An error occurred while editing the reply: ${error}`);
+                                client.logger.error(`An error occurred while editing the reply: ${error}`);
                             }
                         }
                     }
 
-                    if (i.customId == 'no') {
-
+                    if (i.customId == 'no-close-ticket') {
                         await i.editReply({
                             content: `**Ticket closure cancelled!** (<@${i.user.id}>)`,
                             components: []
@@ -140,9 +117,9 @@ module.exports = {
 
         } catch (error) {
             if (error.code === 10062) {
-                console.log('Unknown interaction error occurred:', error);
+                client.logger.error('Unknown interaction error occurred:', error);
             } else {
-                console.error('An error occurred:', error);
+                client.logger.error('An error occurred:', error);
             }
         }
     }

@@ -4,7 +4,7 @@ const {
     EmbedBuilder
 } = require('discord.js');
 
-const fs = require('fs');
+const fs = require('fs').promises;
 
 const discordTranscripts = require('discord-html-transcripts');
 
@@ -35,18 +35,18 @@ async function createTicketChan(client, interaction, parentCat, ticketCount, tic
     return channel;
 }
 
-const logChanID = "1109438179603402762";
+//const logChanID = "1109438179603402762";
 async function checkTicketCategory(client, interaction, category) {
     const parentCategory = interaction.guild.channels.cache.get(category);
     if (parentCategory.children.cache.size >= 50) {
-        let chan = client.channels.cache.get(logChanID);
+        /*let chan = client.channels.cache.get(logChanID);
         let embed = new EmbedBuilder()
             .setAuthor({ name: 'Ticket Category Limit' })
             .addFields(
                 { name: 'Username', value: `${interaction.user.username}` },
                 { name: 'Category', value: `${parentCategory.name}` }
             );
-        chan.send({ embeds: [embed] });
+        chan.send({ embeds: [embed] });*/
         return true;
     } else {
         return false;
@@ -123,28 +123,26 @@ async function deleteTicketLog(client, interaction, ticketLogDir, chan, type) {
             break;
     }
 
-    fs.writeFile(`${ticketLogDir}/transcript-${interaction.channel.id}.html`, htmlCode, function (err) {
-        if (err) {
-            console.log(err);
-        }
-    });
+    await fs.mkdir(ticketLogDir, { recursive: true });
+    await fs.writeFile(`${ticketLogDir}/transcript-${interaction.channel.id}.html`, htmlCode);
+
 }
 
 //Reopen --------------------------------
 
-async function reopenTicketChan(client, interaction, ticketCheck, IdData) {
+async function reopenTicketChan(client, interaction, ticketUser, ticketGuild) {
     var ticketNumber = /^\d+$/.test(interaction.channel.topic) ? parseInt(interaction.channel.topic) : 0;
-    var userInfo = client.users.cache.get(ticketCheck.userID);
+    var userInfo = client.users.cache.get(ticketUser.userID);
     channel = await interaction.channel.edit({
         name: `ticket-reopen-${ticketNumber}-${userInfo.username}`,
         permissionOverwrites: [
             {
-                id: ticketCheck.userID,
+                id: ticketUser.userID,
                 allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
                 deny: [PermissionFlagsBits.MentionEveryone]
             },
             {
-                id: IdData.ticketSupportID,
+                id: ticketGuild.ticketSupportID,
                 allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
             },
             {

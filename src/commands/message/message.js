@@ -4,14 +4,12 @@ const {
 
 module.exports = {
     name: 'msg',
-    description: "Sends user DM reply",
+    description: "Sends a message to a channel.",
     cooldown: 1000,
+    owner: false,
     userPerms: ['ModerateMembers'],
     botPerms: ['Administrator'],
-    run: async (client, message, args) => {
-
-        const commandName = `MESS_MESSAGE`;
-        client.std_log.error(client, commandName, message.author.id, message.channel.id);
+    async execute(client, message, args) {
 
         var chan = message.mentions.channels.first();
         var msg;
@@ -19,13 +17,13 @@ module.exports = {
         async function logEmbedSend(command, channelId, userId, msg) {
             const logEmbed = new EmbedBuilder()
                 .setColor('Blue')
-                .setDescription(`Command \`+msg ${command} ${msg}\``)
+                .setDescription(`Command \`${client.config.bot.prefix}msg ${command} ${msg}\``)
                 .addFields(
                     { name: 'Client', value: `<@${userId}>` },
                     { name: 'Target Channel', value: `<#${channelId}>` },
                 )
 
-            await client.channels.cache.get(client.config.MSG.LOG.CHAN).send({
+            await client.channels.cache.get(client.config.bot.logchan).send({
                 embeds: [logEmbed]
             });
         }
@@ -33,7 +31,6 @@ module.exports = {
         if (!chan) {
             chan = message.channel;
             msg = args.join(" ");
-            //return message.reply({ content: 'Channel name is not specified or tagged!'});
         } else {
             msg = args.slice(1).join(" ");
         }
@@ -49,7 +46,7 @@ module.exports = {
                 }
                 await logEmbedSend('message', chan.id, message.author.id, msg);
             } catch (error) {
-                console.error(error);
+                client.logger.error(error);
                 message.reply({ content: 'An error occurred while sending the message. Please try again later.' });
             }
         } else {
@@ -57,7 +54,7 @@ module.exports = {
                 await chan.send({ content: `${msg}` });
                 await logEmbedSend('message', chan.id, message.author.id, msg);
             } catch (error) {
-                console.error(error);
+                client.logger.error(error);
                 message.reply({ content: 'An error occurred while sending the message. Please try again later.' });
             }
         }
