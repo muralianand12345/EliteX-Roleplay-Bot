@@ -21,10 +21,15 @@ module.exports = {
         app.use('/css', express.static(path.join(__dirname, '../frontend', 'css')));
         app.use('/js', express.static(path.join(__dirname, '../frontend', 'js')));
 
+        const allowedOrigins = ['https://iconicticket.muralianand.in', 'https://muralianand.in', 'http://localhost:6969'];
         const corsOptions = {
-            origin: ['https://iconicticket.muralianand.in',
-                'https://muralianand.in',
-                'http://localhost:5002'],
+            origin: function (origin, callback) {
+                if (!origin || allowedOrigins.includes(origin)) {
+                    callback(null, true);
+                } else {
+                    callback(client.logger.error(`Not allowed by CORS ${origin}`));
+                }
+            },
             methods: 'GET,POST',
             optionsSuccessStatus: 204,
         };
@@ -39,12 +44,14 @@ module.exports = {
             resave: false,
             saveUninitialized: true,
             cookie: {
-                secure: true
+                secure: false
             },
         }));
 
-        /*const rageMP = require('./route/rage/ragemp.js');
-        app.use('/rage', rageMP);*/
+        const apiRoutes = require('./routes/app/api.js');
+        app.use('/', apiRoutes);
+        const authRoutes = require('./routes/app/auth.js');
+        app.use('/auth', authRoutes);
 
         app.get('/logout', (req, res) => {
             req.session.isLoggedIn = false;
@@ -57,6 +64,10 @@ module.exports = {
 
         app.get('/', (req, res) => {
             res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+        });
+
+        app.get('/home', (req, res) => {
+            res.send(`The home page is under development, Thank you for logging in, we will let you know once it is ready.`);
         });
 
         app.listen(Port);

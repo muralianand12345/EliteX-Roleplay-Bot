@@ -1,46 +1,40 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Iconic Roleplay Bot</title>
-        <link rel="stylesheet" href="/css/index.css">
-        <a
-            href="https://deepscan.io/dashboard#view=project&tid=21991&pid=25346&bid=791508"><img
-                src="https://deepscan.io/api/teams/21991/projects/25346/branches/791508/badge/grade.svg?token=a1fa0980263b30233c0ddf1e9c3ed778290db2ee"
-                alt="DeepScan grade"></a>
-    </head>
-    <body>
-        <header>
-            <button class="login-button" onclick="openLoginBox()">Login</button>
-            <!-- Overlay div -->
-            <div class="overlay"></div>
-            <div class="logo"></div>
-            <div class="bot-description">
-                <p>Official ICONIC Roleplay Discord Bot</p>
-                <p>Ticket | Moderation | Logs | Voice Process | Mod Mail |
-                    Welcome | Voting Poll</p>
-            </div>
-            <div class="button-container">
-                <a class="bot-link" href="https://iconicrpbot.muralianand.in"
-                    target="_blank">Explore Iconic Roleplay Bot</a>
-                <a class="discord-link" href="https://discord.gg/iconicrp"
-                    target="_blank">Join Our Discord Server</a>
-                <a class="website-link" href="https://iconicrp.in"
-                    target="_blank">Visit Our Website</a>
-            </div>
-            <div class="file-count">
-                Total Tickets Handled So Far:
-                <span class="file-count-box" id="fileCountBox">Calculating...</span>
-            </div>
-            <script src="/js/index.js"></script>
-        </header>
-        <div class="login-box" id="loginBox">
-            <span class="exit-button" onclick="closeLoginBox()">X</span>
-            <h2>Discord Login</h2>
-            <form onsubmit="submitLoginForm(event)">
-                <button type="submit">Login</button>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iconic Roleplay Discord Bot</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+
+<body>
+
+    <div class="container glass">
+        <div class="text">
+            <img src="https://cdn.discordapp.com/attachments/1096858331110457485/1204405527283630100/botimg.png"
+                alt="Profile-img">
+            <strong><span class="type"></span></strong>
+            <form onsubmit="LoginButton(event)">
+                <button class="btn"  type="submit" target="_blank">LOGIN</button>
             </form>
+            
+            <div class="file-count">
+                <p>Tickets Handled <span class="fa fa-count" id="fileCountBox">...</span></p>
+            </div>
         </div>
-    </body>
+    </div>
+
+    <section id="main">
+        <div class="bg">
+            <img src="https://cdn.discordapp.com/attachments/1096858331110457485/1204405527946199081/background.jpg">
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script src="/js/index.js"></script>
+</body>
+
 </html>

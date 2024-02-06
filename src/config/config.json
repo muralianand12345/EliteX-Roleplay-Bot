@@ -6,13 +6,13 @@
         "prefix": "-",
         "deployslash": true,
         "deployslashRemove": false,
-        "stdchan": "1123598036938002453",
-        "errchan": "1123618204032446474",
-        "logchan": "1123598036938002453",
+        "stdchan": "1204360843588931594",
+        "errchan": "1204360863666929694",
+        "logchan": "1204360843588931594",
         "cooldownMsg": "You are on `<duration>` cooldown!",
         "presence": {
             "enabled": true,
-            "status": "dnd",
+            "status": "online",
             "interval": 10000,
             "activity": [
                 {
@@ -32,10 +32,24 @@
                     "type": "Listening"
                 },
                 {
-                    "name": "#tamilcommunityrp",
-                    "type": "Competing"
+                    "name": "Rage Multiplayer!",
+                    "type": "Playing"
                 }
             ]
+        }
+    },
+    "ticket": {
+        "enabled": false
+    },
+    "web": {
+        "enalbed": true,
+        "login": {
+            "guild": {
+                "id": "1058682553898381343",
+                "inviteLink": "https://discord.gg/iconic-rp",
+                "allowRoleID": ["1058684212175192105"]
+            },
+            "webhook": "https://discord.com/api/webhooks/1204364386626437130/Ep2zIvtbdAlMURJYzVJ6z6ZgtJHcOHUhJbeImLMHz8EPuIjJFLQ3FhNAu_GhZnKEmK9z"
         }
     },
     "music": {
@@ -46,10 +60,10 @@
             "defaultsearch": "youtube",
             "nodes": [
                 {
-                    "identifier": "TarLan",
-                    "host": "localhost",
-                    "port": 2333,
-                    "password": "youshallnotpass",
+                    "identifier": "Pepper Node",
+                    "host": "49.207.177.28",
+                    "port": 46820,
+                    "password": "43K<ymTq09L(",
                     "secure": false,
                     "retryAmount": 1000,
                     "retrydelay": 10000,
@@ -61,10 +75,10 @@
     },
     "modmail": {
         "enabled": true,
-        "server": "1115161694335930508",
-        "channelid": "1123600896140525628",
+        "server": "1096848188935241878",
+        "channelid": "1122051061415428196",
         "staffname": "Iconic RP Staff",
-        "serverInvite": "https://discord.gg/iconic-roleplay-1096848188935241878"
+        "serverInvite": "https://discord.gg/iconic-rp"
     },
     "banonleave": {
         "enabled": true
@@ -76,7 +90,7 @@
         },
         "goodbyemsg": {
             "enabled": true,
-            "message": "Goodbye, {usermention}! We hope you enjoyed your stay at {server}!"
+            "message": "`{user}` | {usermention}! **Just Left {server}**!"
         },
         "welcomedm": {
             "enabled": true
@@ -84,7 +98,7 @@
     },
     "agedeclaration": {
         "enabled": true,
-        "serverInvite": "https://discord.gg/iconic-roleplay-1096848188935241878",
+        "serverInvite": "https://discord.gg/iconic-rp",
         "above18Img": "https://cdn.discordapp.com/attachments/1097420467532472340/1102470374702190623/18.png",
         "below18Img": "https://cdn.discordapp.com/attachments/1097420467532472340/1102472300181331978/18-.png"
     },
@@ -117,7 +131,7 @@
                 "👹",
                 "😾"
             ],
-            "logchannel": "1123600896140525628"
+            "logchannel": "1204360843588931594"
         }
     },
     "birthday": {
@@ -130,7 +144,7 @@
     },
     "visaform": {
         "enabled": true,
-        "logchannel": "1180115494376833166",
+        "logchannel": "1204360843588931594",
         "context": {
             "question1": {
                 "label": "What is your Discord username?",

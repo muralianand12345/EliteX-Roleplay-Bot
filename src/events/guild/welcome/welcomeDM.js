@@ -21,11 +21,17 @@ module.exports = {
 
         if (!welcomeUserData) return;
 
+        var embedDescription = welcomeUserData.welcomeMsg.description
+            .replace(/<usermention>/g, `<@${member.user.id}>`)
+            .replace(/<username>/g, `${member.user.username}`)
+            .replace(/<guildname>/g, `${member.guild.name}`)
+            .replace(/<guildsize>/g, `${member.guild.memberCount}`);
+
         var embed = new EmbedBuilder()
             .setColor('#00FF00')
             .setThumbnail(`${client.user.avatarURL()}`)
             .setTitle(`Welcome to ${member.guild.name}`)
-            .setDescription(`${welcomeUserData.welcomeMsg.description}`);
+            .setDescription(`${embedDescription}`);
 
         await welcomeUserData.welcomeMsg.fields.forEach(field => {
             embed.addFields({ name: `${field.name}`, value: `${field.value}` });

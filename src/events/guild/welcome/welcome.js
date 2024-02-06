@@ -25,7 +25,7 @@ module.exports = {
         const fontFilePath = path.join(__dirname, 'fonts', 'Sigmar-Regular.ttf');
         const imgFilePath = path.join(__dirname, 'images', 'welcome_irp.png');
         const text = 'WELCOME';
-        const attachment = await genImage(fontFilePath, imgFilePath, text);
+        const attachment = await genImage(member, fontFilePath, imgFilePath, text);
 
         await member.guild.members.fetch().then(async (fetchedMembers) => {
             const count = Array.from(fetchedMembers)

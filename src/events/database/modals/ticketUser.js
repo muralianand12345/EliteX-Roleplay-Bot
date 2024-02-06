@@ -2,7 +2,7 @@ const { Schema, model } = require('mongoose');
 
 const ticket = Schema({
     userID: { type: String, required: true },
-    recentTicketID: { type: String, required: true },
+    recentTicketID: { type: String, required: false },
     ticketlog: [{
         guildID: { type: String, required: true },
         activeStatus: { type: Boolean, default: true, required: true },

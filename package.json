@@ -1,6 +1,6 @@
 {
   "name": "iconic-bot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Advanced Iconic Roleplay Discord Bot",
   "main": "./src/index.js",
   "scripts": {
@@ -15,17 +15,19 @@
     "chokidar": "^3.5.3",
     "cors": "^2.8.5",
     "delay": "^5.0.0",
+    "discord-gamecord": "^4.4.0",
     "discord-html-transcripts": "^3.2.0",
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
     "express-session": "^1.17.3",
     "magmastream": "^2.2.3",
     "moment-timezone": "^0.5.43",
     "mongoose": "^8.0.1",
     "node-schedule": "^2.1.1",
     "nodemon": "^3.0.2",
-    "undici": "^5.28.2",
+    "undici": "^6.6.1",
     "uuid": "^9.0.1"
   },
   "repository": {

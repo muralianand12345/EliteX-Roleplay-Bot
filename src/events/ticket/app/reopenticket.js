@@ -25,7 +25,7 @@ module.exports = {
 
             if (channelCreatedTimestamp >= thresholdTimestamp) {
                 return await interaction.reply({
-                    content: 'You cannot reopen a newly created ticket! (Wait 20 minutes)',
+                    content: "You're unable to reopen a recently created ticket. Please wait for 20 minutes before attempting to do so.",
                     ephemeral: true,
                 });
             }
@@ -91,7 +91,7 @@ module.exports = {
                         setTimeout(async () => {
                             await reopenTicketChan(client, interaction, ticketUser, ticketGuild)
                                 .then(async () => {
-                                    let message = await interaction.channel.messages.fetch(matchingEntry.ticketPannelID);
+                                    let message = await interaction.channel.messages.fetch(matchingEntry.ticketPannelId);
                                     if (!message) return;
                                     await reopenEmbedEdit(interaction, message);
                                     collector.stop();

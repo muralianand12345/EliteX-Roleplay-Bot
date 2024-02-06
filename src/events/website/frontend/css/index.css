@@ -1,206 +1,239 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800,900');
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Open Sans', Arial, sans-serif;
-    background-color: #201444;
-    color: #ffffff;
-}
-
-header {
-    background-image: url('https://cdn.discordapp.com/attachments/1099720199588040824/1099784797280276570/icp_01.jpg');
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
     display: flex;
-    align-items: center;
+    min-height: 100vh;
     justify-content: center;
-    flex-direction: column;
-    text-align: center;
-    position: relative;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
 }
 
-.overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: -1;
-}
-
-.logo {
-    width: 150px;
-    height: 150px;
-    background-image: url('https://cdn.discordapp.com/attachments/1099720199588040824/1099784792821743686/ic_logo.png');
-    background-size: cover;
-    background-position: center;
-    border-radius: 50%;
-    margin-bottom: 20px;
-}
-
-.bot-description {
-    font-size: 24px;
-    margin-bottom: 20px;
-    font-family: 'Monospace';
-    font-weight: bold;
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 10px;
-    border-radius: 5px;
-    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-}
-
-.button-container {
+.container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.bot-link,
-.discord-link,
-.website-link {
-    font-size: 18px;
-    text-decoration: none;
-    color: #ffffff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    font-family: 'Roboto', Arial, sans-serif;
-}
-
-.bot-link {
-    background-color: #3498db;
-}
-
-.bot-link:hover {
-    background-color: #2980b9;
-}
-
-.discord-link {
-    background-color: #7289DA;
-}
-
-.discord-link:hover {
-    background-color: #5A68A5;
-}
-
-.website-link {
-    background-color: #27ae60;
-}
-
-.website-link:hover {
-    background-color: #219653;
-}
-
-.file-count {
-    font-size: 18px;
-    margin-top: 10px;
-    font-family: 'Roboto', Arial, sans-serif;
-}
-
-.file-count-box {
-    background-color: #ffffff;
-    color: #201444;
-    padding: 10px;
-    border-radius: 5px;
-    display: inline-block;
-}
-
-.login-box {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 75%;
+    margin: 200px;
     padding: 20px;
-    background-color: rgba(32, 20, 68, 0.9);
-    color: #ffffff;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
-    z-index: 1;
+    position: absolute;
 }
 
-.login-box.opened {
-    background-color: rgba(32, 20, 68, 0.95);
+
+/* -------------- glass effect section -------------- */
+
+.glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-.login-box h2 {
-    margin-top: 0;
-    margin-bottom: 10px;
+button {
+    text-decoration: none;
 }
 
-.login-box form {
+#main {
+    width: 100%;
+    height: 100vh;
+    background-color: #222222;
+}
+
+.bg {
+    width: 100%;
+    height: 100vh;
+}
+
+.bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.text {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
     display: flex;
+    justify-content: center;
+    align-items: center;
     flex-direction: column;
 }
 
-.login-box label {
-    font-size: 16px;
-    margin-bottom: 5px;
-}
-
-.login-box input[type="text"],
-.login-box input[type="password"] {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    background-color: #ffffff;
-    color: #000;
-}
-
-.login-box button {
-    padding: 8px 15px;
-    background-color: #201444;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.login-box button:hover {
-    background-color: #1A0C33;
-}
-
-.login-button {
-    font-size: 16px;
-    background-color: #3498db;
+.text strong {
+    font-size: 2.5rem;
+    width: 100%;
+    text-align: center;
     color: #ffffff;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: 'Roboto', Arial, sans-serif;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1;
+    line-height: 50px;
 }
 
-.login-button:hover {
-    background-color: #2980b9;
+.text P {
+    color: rgba(230, 230, 230, 0.92);
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin: 2px;
 }
 
-.exit-button {
-    font-size: 20px;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    color: #201444;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
-    font-weight: bold;
-    padding: 5px;
-    border: 1px solid #201444;
-    border-radius: 3px;
-    background-color: rgba(255, 255, 255, 0.1);
+.btn {
+    margin-top: 15px;
+    width: 200px;
+    height: 45px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    margin-top: 10px;
+    box-shadow: 2px 2px 39px rgba(0, 0, 0, 0.2);
 }
 
-.exit-button:hover {
-    color: #1A0C33;
-    opacity: 1;
+.btn:hover {
+    background-color: #d83737;
+    transition: all ease 0.6s;
+}
+
+.text strong span {
+    /* color: #00ffe7; */
+    color: #ff8100;
+    border: 1px #ff8100;
+}
+
+.text img {
+    margin: 18px;
+    margin-top: 6px;
+    padding: 3px;
+    height: 142px;
+    width: 140px;
+    position: relative;
+    border-radius: 50%;
+    justify-content: center;
+    text-align: center;
+}
+
+
+/* ----------------- file-count section --------------- */
+
+.file-count {
+    margin-top: 9px;
+    padding: 16px;
+}
+
+.file-count button {
+    margin: 9px;
+}
+
+.fa {
+    padding: 10px;
+    font-size: 25px;
+    width: 50px;
+    text-align: center;
+    justify-content: center;
+    text-decoration: none;
+    margin: 5px 2px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    box-shadow: 2px 2px 39px rgba(0, 0, 0, 0.2);
+}
+
+.fa-count {
+    color: white;
+    transition: all ease 0.3s;
+}
+
+.fa-count:hover {
+    background: #50abf0;
+    transition: all ease-out 0.3s;
+}
+
+/*--------------------- responsive web-section ----------------- */
+
+@media (max-width:780px) {
+    .container {
+        width: 90%;
+        height: 70%;
+    }
+    .text strong {
+        font-size: 2rem;
+        line-height: 40px;
+        padding: 0px 10px;
+    }
+    .text p {
+        font-size: 1rem;
+    }
+    .btn {
+        width: 180px;
+        height: 44px;
+    }
+    .file-count {
+        margin-top: 18px;
+    }
+}
+
+@media (max-width: 520px) {
+    .container {
+        width: 90%;
+        height: 70%;
+    }
+    .text strong {
+        font-size: 1.6rem;
+        line-height: 30px;
+    }
+    .text p {
+        width: 90%;
+    }
+    .btn {
+        margin-top: 20px;
+        font-size: 0.9rem;
+        width: 150px;
+        height: 45px;
+    }
+    .file-count {
+        margin-top: 10px;
+    }
+    .fa {
+        font-size: 18px;
+        width: 50px;
+    }
+}
+
+@media(max-width:400px) {
+    .container {
+        width: 90%;
+        height: 60%;
+    }
+    .text strong {
+        font-size: 1.4rem;
+        line-height: 33px;
+    }
+}
+
+@media(max-width:360px) {
+    .container {
+        width: 90%;
+        height: 60%;
+    }
+    .text strong {
+        font-size: 1.1rem;
+        line-height: 30px;
+    }
+    .text p {
+        font-size: 0.8rem;
+    }
+    .btn {
+        font-size: 0.8rem;
+    }
+    .file-count button {
+        margin: 8px;
+    }
 }

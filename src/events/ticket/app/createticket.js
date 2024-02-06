@@ -24,6 +24,8 @@ module.exports = {
 
         if (interaction.customId === "open-ticket") {
 
+            if (!client.config.ticket.enabled) return interaction.reply({ content: `${interaction.guild.name}'s Ticket system is currently disabled!`, ephemeral: true });
+            
             await interaction.deferReply({ ephemeral: true });
 
             //Database ----------------------------------------
@@ -43,7 +45,7 @@ module.exports = {
             if (ticketUser) {
                 const activeTickets = ticketUser.ticketlog.filter(ticket => ticket.activeStatus);
                 if (activeTickets.length >= ticketGuild.ticketMaxCount) {
-                    return await interaction.editReply({ content: 'You have reached the maximum amount of tickets!', ephemeral: true });
+                    return await interaction.editReply({ content: `You are limited to opening \`${ticketGuild.ticketMaxCount}\` tickets. Please close any existing tickets before creating a new one.`, ephemeral: true });
                 }
             } else {
                 ticketUser = new ticketUserModel({

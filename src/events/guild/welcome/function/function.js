@@ -6,7 +6,7 @@ const Canvas = require('@napi-rs/canvas');
 const fs = require('fs');
 const { request } = require('undici');
 
-async function genImage(fontPath, imgPath, text) {
+async function genImage(member, fontPath, imgPath, text) {
 
     const fontFile = fs.readFileSync(fontPath);
     Canvas.GlobalFonts.registerFromPath(fontFile.toString(), 'Sigmar-Regular');

@@ -1,6 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     fetchFileCount();
+    TypeWriter();
 });
+
+async function TypeWriter() {
+    return new Typed('.type', {
+        strings: ['Iconic Roleplay', 'Rage Multiplayer', 'Tamil Roleplay', 'Iconic Ticket Bot', 'Hello There!'],
+        typeSpeed: 100,
+        backSpeed: 70,
+        loop: true,
+    });
+}
 
 async function fetchFileCount() {
     const response = await fetch('/filecount');
@@ -14,22 +24,12 @@ function updateFileCount(count) {
     fileCountBox.textContent = count;
 }
 
-function openLoginBox() {
-    const loginBox = document.getElementById('loginBox');
-    loginBox.style.display = 'block';
-}
 
-function closeLoginBox() {
-    const loginBox = document.getElementById('loginBox');
-    loginBox.style.display = 'none';
-}
-
-
-async function submitLoginForm(event) {
+async function LoginButton(event) {
     event.preventDefault();
 
     try {
-        window.location.href = "https://discord.com/api/oauth2/authorize?client_id=905841414401851404&redirect_uri=http%3A%2F%2Flocalhost%3A5002%2Fdiscordauth&response_type=code&scope=identify";
+        window.location.href = "https://discord.com/api/oauth2/authorize?client_id=905841414401851404&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A6969%2Fauth%2Fdiscordauth&scope=identify";
     } catch (error) {
         client.logger.error('Error during login:', error);
         alert('An error occurred during login. Please try again later.');
