@@ -48,6 +48,9 @@ module.exports = {
             },
         }));
 
+        const imageDir = path.join(__dirname, 'images');
+        app.use('/assets/images', express.static(imageDir));
+
         const apiRoutes = require('./routes/app/api.js');
         app.use('/', apiRoutes);
         const authRoutes = require('./routes/app/auth.js');
@@ -55,7 +58,7 @@ module.exports = {
 
         app.get('/logout', (req, res) => {
             req.session.isLoggedIn = false;
-            res.redirect('/login');
+            res.redirect('/');
         });
 
         app.get('/error', checkLoggedIn, (req, res) => {
@@ -66,8 +69,9 @@ module.exports = {
             res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
         });
 
-        app.get('/home', (req, res) => {
+        app.get('/home', checkLoggedIn, (req, res) => {
             res.send(`The home page is under development, Thank you for logging in, we will let you know once it is ready.`);
+            //res.sendFile(path.join(__dirname, '../frontend', 'home.html'));
         });
 
         app.listen(Port);

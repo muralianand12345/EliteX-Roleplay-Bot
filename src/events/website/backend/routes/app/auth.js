@@ -41,7 +41,7 @@ router.get('/discordauth', limiter, async (req, res) => {
                     code,
                     grant_type: 'authorization_code',
                     redirect_uri: `${ServerAdd}/auth/discordauth`,
-                    scope: 'identify',
+                    scope: 'identify email connections guilds',
                 }).toString(),
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -68,12 +68,14 @@ router.get('/discordauth', limiter, async (req, res) => {
                     discordId: userData.id,
                     discordUsername: userData.username,
                     discordAvatar: userData.avatar,
+                    email: userData.email,
                 });
 
                 await newUser.save();
             } else {
                 user.discordUsername = userData.username;
                 user.discordAvatar = userData.avatar;
+                user.email = userData.email;
                 await user.save();
             }
 
@@ -83,6 +85,7 @@ router.get('/discordauth', limiter, async (req, res) => {
                 .setFields(
                     { name: `User Tag`, value: `<@${userData.id}>` },
                     { name: `UserID`, value: `${userData.id}` },
+                    { name: `User Email`, value: `${userData.email}` }
                 );
             await webhookClientLogin.send({
                 username: 'User Login',
@@ -105,6 +108,7 @@ router.get('/discordauth', limiter, async (req, res) => {
                     .setFields(
                         { name: `User Tag`, value: `<@${userData.id}>` },
                         { name: `UserID`, value: `${userData.id}` },
+                        { name: `User Email`, value: `${userData.email}` }
                     );
 
                 await webhookClientLogin.send({

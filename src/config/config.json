@@ -47,13 +47,15 @@
             "guild": {
                 "id": "1058682553898381343",
                 "inviteLink": "https://discord.gg/iconic-rp",
-                "allowRoleID": ["1058684212175192105"]
+                "allowRoleID": [
+                    "1058684212175192105"
+                ]
             },
             "webhook": "https://discord.com/api/webhooks/1204364386626437130/Ep2zIvtbdAlMURJYzVJ6z6ZgtJHcOHUhJbeImLMHz8EPuIjJFLQ3FhNAu_GhZnKEmK9z"
         }
     },
     "music": {
-        "enabled": true,
+        "enabled": false,
         "embedcolor": "Blue",
         "image": "https://images2.alphacoders.com/110/thumb-1920-1109233.jpg",
         "lavalink": {
@@ -145,6 +147,10 @@
     "visaform": {
         "enabled": true,
         "logchannel": "1204360843588931594",
+        "visabutton": {
+            "visarole": "1096863473792716961",
+            "communityrole": "1096856106749394994"
+        },
         "context": {
             "question1": {
                 "label": "What is your Discord username?",
@@ -187,5 +193,23 @@
                 "min": 1
             }
         }
+    },
+    "jobrole": {
+        "enabled": true,
+        "logchannel": "1204360843588931594",
+        "roles": [
+            {
+                "head": "",
+                "role": ""
+            },
+            {
+                "head": "",
+                "role": ""
+            },
+            {
+                "head": "",
+                "role": ""
+            }
+        ]
     }
 }

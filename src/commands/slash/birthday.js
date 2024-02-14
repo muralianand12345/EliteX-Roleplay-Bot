@@ -1,6 +1,10 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonStyle,
+    ComponentType,
+    ButtonBuilder
 } = require('discord.js');
 
 const birthdayData = require("../../events/database/modals/birthday.js");
@@ -52,12 +56,27 @@ module.exports = {
             subcommand
                 .setName('remove')
                 .setDescription('Remove your birthday')
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('display')
+                .setDescription('Displays all/your birthday')
+                .addStringOption(option => option
+                    .setName('type')
+                    .setDescription('All/Your birthday')
+                    .setRequired(true)
+                    .addChoices(
+                        { name: 'Your', value: 'your' },
+                        { name: 'All', value: 'all' }
+                    )
+                )
+
         ),
     async execute(interaction, client) {
 
         await interaction.deferReply();
 
-        const embed = new EmbedBuilder()
+        var embed = new EmbedBuilder()
             .setAuthor({ name: 'Birthday', iconURL: client.user.displayAvatarURL() })
             .setTimestamp();
 
@@ -89,7 +108,7 @@ module.exports = {
                 });
             }
 
-            if (year && year > 2020 || year && year < 1950 || year && year.toString().length !== 4 ) {
+            if (year && year > 2020 || year && year < 1950 || year && year.toString().length !== 4) {
                 embed.setColor('Red').setDescription(`Invalid year!`);
                 return await interaction.editReply({
                     embeds: [embed]
@@ -154,6 +173,134 @@ module.exports = {
             return await interaction.editReply({
                 embeds: [embed]
             });
+        }
+
+        if (interaction.options.getSubcommand() === "display") {
+
+            const monthDic = {
+                1: "January",
+                2: "February",
+                3: "March",
+                4: "April",
+                5: "May",
+                6: "June",
+                7: "July",
+                8: "August",
+                9: "September",
+                10: "October",
+                11: "November",
+                12: "December"
+            };
+
+            if (interaction.options.getString('type') === "your") {
+
+                const birthdayDoc = await birthdayData.findOne({
+                    userID: interaction.user.id
+                }).catch(err => client.logger.error(err));
+
+                if (!birthdayDoc) {
+                    embed.setColor('Red').setDescription(`You don't have a birthday set!`);
+                    return await interaction.editReply({
+                        embeds: [embed]
+                    });
+                }
+
+                if (birthdayDoc.year) {
+                    embed.setColor('Green')
+                        .setDescription(`Your birthday is on \`${birthdayDoc.day} ${monthDic[birthdayDoc.month]} ${birthdayDoc.year}\`\nYou are \`${new Date().getFullYear() - birthdayDoc.year}\` years old`);
+                } else {
+                    embed.setColor('Green')
+                        .setDescription(`Your birthday is on \`${birthdayDoc.day} ${monthDic[birthdayDoc.month]}\``);
+                }
+
+                return await interaction.editReply({
+                    embeds: [embed]
+                });
+            }
+
+            if (interaction.options.getString('type') === "all") {
+
+                const birthdayDoc = await birthdayData.find().catch(err => client.logger.error(err));
+
+                if (!birthdayDoc) {
+                    embed.setColor('Red').setDescription(`No one has a birthday set!`);
+                    return await interaction.editReply({
+                        embeds: [embed]
+                    });
+                }
+
+                var row = new ActionRowBuilder()
+                    .addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('birthday-page-previous')
+                            .setEmoji('⬅️')
+                            .setStyle(ButtonStyle.Secondary),
+                        new ButtonBuilder()
+                            .setCustomId('birthday-page-next')
+                            .setEmoji('➡️')
+                            .setStyle(ButtonStyle.Secondary)
+                    )
+
+                var field = [];
+
+                birthdayDoc.sort((a, b) => a.month - b.month || a.day - b.day).forEach((doc, index) => {
+                    if (doc.year) {
+                        field.push(`**${index + 1}** | **User:** <@${doc.userID}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]} ${doc.year}\` | **Age:** \`${new Date().getFullYear() - doc.year}\``);
+                    } else {
+                        field.push(`**${index + 1}** | **User:** <@${doc.userID}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}\``);
+                    }
+                });
+
+                if (!field.length) {
+                    embed.setColor('Red').setDescription(`No one has a birthday set!`);
+                    return await interaction.editReply({
+                        embeds: [embed]
+                    });
+                }
+
+                embed.setColor('Green').setDescription(field.slice(0, 25).join('\n'));
+
+                msg = await interaction.editReply({
+                    embeds: [embed],
+                    components: [row]
+                });
+
+                const collector = await msg.createMessageComponentCollector({
+                    componentType: ComponentType.Button,
+                    time: 25000
+                });
+
+                collector.on("collect", async (i) => {
+                    if (i.user.id === interaction.user.id) {
+                        if (i.customId == "birthday-page-next") {
+                            embed.setColor('Green').setDescription(field.slice(25, 50).join('\n'));
+                            await i.update({ embeds: [embed] });
+                        }
+                        if (i.customId == "birthday-page-previous") {
+                            embed.setColor('Green').setDescription(field.slice(0, 25).join('\n'));
+                            await i.update({ embeds: [embed] });
+                        }
+                    }
+                });
+
+                collector.on("end", async () => {
+                    row = new ActionRowBuilder()
+                        .addComponents(
+                            new ButtonBuilder()
+                                .setCustomId('birthday-page-previous')
+                                .setEmoji('⬅️')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setDisabled(true),
+                            new ButtonBuilder()
+                                .setCustomId('birthday-page-next')
+                                .setEmoji('➡️')
+                                .setStyle(ButtonStyle.Secondary)
+                                .setDisabled(true)
+                        )
+                    await msg.edit({ components: [row] });
+                });
+
+            }
         }
     },
 };
