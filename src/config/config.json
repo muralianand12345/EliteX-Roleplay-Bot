@@ -134,6 +134,9 @@
                 "😾"
             ],
             "logchannel": "1204360843588931594"
+        },
+        "promotion": {
+            "enabled": true
         }
     },
     "birthday": {

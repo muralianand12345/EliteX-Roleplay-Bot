@@ -135,6 +135,8 @@ module.exports = {
             const botErrorEmbed = new EmbedBuilder()
                 .setColor('#ED4245')
                 .setDescription('An internal error occurred. Please contact the bot developers.');
+
+            if (interaction.deferred) return interaction.editReply({ embeds: [botErrorEmbed], ephemeral: true });
             return interaction.reply({ embeds: [botErrorEmbed], ephemeral: true });
         }
     }
