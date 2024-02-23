@@ -33,6 +33,7 @@
 
 - **Button Role:**
   - Age declaration role.
+  - Visa holder role.
   - More soon!
 
 - **Visa Application: (RP Exclusive Feature)**
@@ -45,12 +46,18 @@
   - Welcome message with Image.
   - Goodbye message.
   - DM Welcome message.
+  - Promotion/Youtube ban and moderation.
 
 - **Dashboard:**
   - Under development:
     - New React.js font page.
     - Config bot in webpage.
   - Currently html and css (partially working).
+
+- **Logging:**
+  - Terminal log:
+    - Creates a `<date>.log` in seperate month folders.
+    - Logs users int, command, error, music, debug, and more. 
 
 ## Before You Start:
 - This code has some redundancies and is frequently updated. Do not copy and paste the code without a good understanding of it.
