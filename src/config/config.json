@@ -41,6 +41,10 @@
     "ticket": {
         "enabled": false
     },
+    "bugreport": {
+        "enabled": true,
+        "webhook": "https://discord.com/api/webhooks/1215189973469503569/gNExP3MqdSpD_esJTbPkk0pskofvJUXWYB4ZHEfLheKqiPYXmmHIt_1xVjYbSKapiP3D"
+    },
     "web": {
         "enalbed": true,
         "login": {
@@ -55,7 +59,7 @@
         }
     },
     "music": {
-        "enabled": false,
+        "enabled": true,
         "embedcolor": "Blue",
         "image": "https://images2.alphacoders.com/110/thumb-1920-1109233.jpg",
         "lavalink": {

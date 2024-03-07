@@ -4,4 +4,4 @@ yarn.lock
 logs/*
 .git
 /src/events/website/ticket-logs/*
-/src/config/config.json
+./src/config/config.json
