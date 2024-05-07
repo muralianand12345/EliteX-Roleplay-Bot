@@ -144,6 +144,8 @@ module.exports = {
                     setTimeout(() => {
                         msg.delete();
                     }, 5000);
+                }).catch(() => { 
+                    client.logger.error(`[PROMOTION] Unable to delete message from ${message.author.tag} (${message.author.id}) in ${message.guild.name} (${message.guild.id})`);
                 });
                 return;
             } else {

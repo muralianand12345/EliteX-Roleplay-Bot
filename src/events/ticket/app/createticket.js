@@ -25,7 +25,7 @@ module.exports = {
         if (interaction.customId === "open-ticket") {
 
             if (!client.config.ticket.enabled) return interaction.reply({ content: `${interaction.guild.name}'s Ticket system is currently disabled!`, ephemeral: true });
-            
+
             await interaction.deferReply({ ephemeral: true });
 
             //Database ----------------------------------------
@@ -90,6 +90,17 @@ module.exports = {
                 if (i.user.id === interaction.user.id) {
 
                     if (i.values[0]) {
+
+                        //Open Beta
+                        if (i.values[0] === client.config.betatester.category) {
+                            if (!interaction.member.roles.cache.has(client.config.betatester.role)) {
+                                return await i.reply({
+                                    content: 'Sorry, the ticket category is not available for you! Try again later.',
+                                    ephemeral: true,
+                                });
+                            }
+                        }
+
                         if (await checkTicketCategory(client, interaction, i.values[0])) {
                             return await i.reply({
                                 content: 'Sorry, the ticket category is full! Try again later.',

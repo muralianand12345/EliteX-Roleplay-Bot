@@ -1,5 +1,3 @@
-//Need Testing
-
 const { Events } = require("discord.js");
 const {
     EmbedBuilder,

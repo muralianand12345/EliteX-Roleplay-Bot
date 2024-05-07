@@ -39,11 +39,17 @@
         }
     },
     "ticket": {
-        "enabled": false
+        "enabled": true
     },
     "bugreport": {
         "enabled": true,
         "webhook": "https://discord.com/api/webhooks/1215189973469503569/gNExP3MqdSpD_esJTbPkk0pskofvJUXWYB4ZHEfLheKqiPYXmmHIt_1xVjYbSKapiP3D"
+    },
+    "betatester": {
+        "enabled": true,
+        "category": "1236389134629732385",
+        "role": "1236384948240515196",
+        "channel": ""
     },
     "web": {
         "enalbed": true,
@@ -66,11 +72,11 @@
             "defaultsearch": "youtube",
             "nodes": [
                 {
-                    "identifier": "Pepper Node",
-                    "host": "49.207.177.28",
-                    "port": 46820,
-                    "password": "43K<ymTq09L(",
-                    "secure": false,
+                    "identifier": "Pepper Server",
+                    "host": "lavalink.muralianand.in",
+                    "port": 25599,
+                    "password": "mysparkedserver",
+                    "secure": true,
                     "retryAmount": 1000,
                     "retrydelay": 10000,
                     "resumeStatus": false,
@@ -140,7 +146,7 @@
             "logchannel": "1204360843588931594"
         },
         "promotion": {
-            "enabled": true
+            "enabled": false
         }
     },
     "birthday": {
@@ -218,5 +224,101 @@
                 "role": ""
             }
         ]
+    },
+    "dark": {
+        "war": {
+            "enabled": true,
+            "channelid": "1210472242836676608",
+            "reqchannelid": "1218138186954440735",
+            "announcechannel": "1204361488832139274",
+            "gangs": [
+                "1217903327665324272",
+                "1217903377506242570",
+                "1217903361928724650",
+                "1217903345088594080"
+            ],
+            "gangLeader": [
+                "1217903391846563921"
+            ],
+            "timer_days": 1,
+            "timeOptions": {
+                "weekdays": [
+                    {
+                        "label": "5pm to 6pm",
+                        "emoji": "🕔"
+                    },
+                    {
+                        "label": "6pm to 7pm",
+                        "emoji": "🕕"
+                    },
+                    {
+                        "label": "7pm to 8pm",
+                        "emoji": "🕖"
+                    },
+                    {
+                        "label": "8pm to 9pm",
+                        "emoji": "🕗"
+                    },
+                    {
+                        "label": "9pm to 10pm",
+                        "emoji": "🕘"
+                    },
+                    {
+                        "label": "10pm to 11pm",
+                        "emoji": "🕙"
+                    }
+                ],
+                "weekend": [
+                    {
+                        "label": "11am to 12pm",
+                        "emoji": "🕚"
+                    },
+                    {
+                        "label": "12pm to 1pm",
+                        "emoji": "🕛"
+                    },
+                    {
+                        "label": "1pm to 2pm",
+                        "emoji": "🕐"
+                    },
+                    {
+                        "label": "2pm to 3pm",
+                        "emoji": "🕑"
+                    },
+                    {
+                        "label": "3pm to 4pm",
+                        "emoji": "🕒"
+                    },
+                    {
+                        "label": "4pm to 5pm",
+                        "emoji": "🕓"
+                    },
+                    {
+                        "label": "5pm to 6pm",
+                        "emoji": "🕔"
+                    },
+                    {
+                        "label": "6pm to 7pm",
+                        "emoji": "🕕"
+                    },
+                    {
+                        "label": "7pm to 8pm",
+                        "emoji": "🕖"
+                    },
+                    {
+                        "label": "8pm to 9pm",
+                        "emoji": "🕗"
+                    },
+                    {
+                        "label": "9pm to 10pm",
+                        "emoji": "🕘"
+                    },
+                    {
+                        "label": "10pm to 11pm",
+                        "emoji": "🕙"
+                    }
+                ]
+            }
+        }
     }
 }
