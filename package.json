@@ -1,34 +1,11 @@
 {
   "name": "iconic-bot",
-  "version": "1.3.1",
+  "version": "2.0.0",
   "description": "Advanced Iconic Roleplay Discord Bot",
-  "main": "./src/index.js",
+  "main": "./build/index.js",
   "scripts": {
     "start": "nodemon ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Murali Anand",
-  "license": "ISC",
-  "dependencies": {
-    "@napi-rs/canvas": "^0.1.44",
-    "chalk": "^4.1.2",
-    "chokidar": "^3.5.3",
-    "cors": "^2.8.5",
-    "delay": "^5.0.0",
-    "discord-gamecord": "^4.4.0",
-    "discord-html-transcripts": "^3.2.0",
-    "discord.js": "^14.14.1",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "express-rate-limit": "^7.1.5",
-    "express-session": "^1.17.3",
-    "magmastream": "^2.2.3",
-    "moment-timezone": "^0.5.43",
-    "mongoose": "^8.0.1",
-    "node-schedule": "^2.1.1",
-    "nodemon": "^3.0.2",
-    "undici": "^6.6.1",
-    "uuid": "^9.0.1"
   },
   "repository": {
     "type": "git",
@@ -38,5 +15,22 @@
     "url": "https://github.com/muralianand12345/Iconic-Roleplay-Bot/issues"
   },
   "homepage": "https://github.com/muralianand12345/Iconic-Roleplay-Bot#readme",
-  "nodeVersion": "18.18.0"
+  "author": "Murali Anand",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "4.1.2",
+    "chokidar": "^3.6.0",
+    "discord-html-transcripts": "^3.2.0",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.3.1",
+    "ms": "^2.1.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/ms": "^0.7.34",
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
+  }
 }

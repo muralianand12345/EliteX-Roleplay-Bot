@@ -3,116 +3,43 @@
         "owners": [
             "678402714765361182"
         ],
-        "prefix": "-",
-        "deployslash": true,
-        "deployslashRemove": false,
-        "stdchan": "1204360843588931594",
-        "errchan": "1204360863666929694",
-        "logchan": "1204360843588931594",
-        "cooldownMsg": "You are on `<duration>` cooldown!",
-        "presence": {
-            "enabled": true,
-            "status": "online",
-            "interval": 10000,
-            "activity": [
-                {
-                    "name": "Indian Community",
-                    "type": "Competing"
-                },
-                {
-                    "name": "Iconic RolePlay ❤️",
-                    "type": "Playing"
-                },
-                {
-                    "name": "your Feedback and Suggestions!",
-                    "type": "Listening"
-                },
-                {
-                    "name": "<usersize> Users!",
-                    "type": "Listening"
-                },
-                {
-                    "name": "Rage Multiplayer!",
-                    "type": "Playing"
-                }
+        "prefix": "+",
+        "disableMessage": false,
+        "register_specific_commands": {
+            "enabled": false,
+            "commands": [
+                "ping"
             ]
-        }
+        },
+        "stdchan": "",
+        "logchan": "",
+        "cooldownMsg": "You are on `<duration>` cooldown!"
     },
     "ticket": {
         "enabled": true
     },
     "bugreport": {
         "enabled": true,
-        "webhook": "https://discord.com/api/webhooks/1215189973469503569/gNExP3MqdSpD_esJTbPkk0pskofvJUXWYB4ZHEfLheKqiPYXmmHIt_1xVjYbSKapiP3D"
-    },
-    "betatester": {
-        "enabled": true,
-        "category": "1236389134629732385",
-        "role": "1236384948240515196",
-        "channel": ""
-    },
-    "web": {
-        "enalbed": true,
-        "login": {
-            "guild": {
-                "id": "1058682553898381343",
-                "inviteLink": "https://discord.gg/iconic-rp",
-                "allowRoleID": [
-                    "1058684212175192105"
-                ]
-            },
-            "webhook": "https://discord.com/api/webhooks/1204364386626437130/Ep2zIvtbdAlMURJYzVJ6z6ZgtJHcOHUhJbeImLMHz8EPuIjJFLQ3FhNAu_GhZnKEmK9z"
-        }
-    },
-    "music": {
-        "enabled": true,
-        "embedcolor": "Blue",
-        "image": "https://images2.alphacoders.com/110/thumb-1920-1109233.jpg",
-        "lavalink": {
-            "defaultsearch": "youtube",
-            "nodes": [
-                {
-                    "identifier": "Pepper Server",
-                    "host": "lavalink.muralianand.in",
-                    "port": 25599,
-                    "password": "mysparkedserver",
-                    "secure": true,
-                    "retryAmount": 1000,
-                    "retrydelay": 10000,
-                    "resumeStatus": false,
-                    "resumeTimeout": 1000
-                }
-            ]
-        }
+        "webhook": ""
     },
     "modmail": {
         "enabled": true,
-        "server": "1096848188935241878",
-        "channelid": "1122051061415428196",
-        "staffname": "Iconic RP Staff",
+        "server": "",
+        "channelid": "",
+        "staffname": "Iconic Support Staff",
         "serverInvite": "https://discord.gg/iconic-rp"
-    },
-    "banonleave": {
-        "enabled": true
-    },
-    "welcome": {
-        "welcomeuser": {
-            "enabled": true,
-            "message": "<a:welcome:1097130355137454181> {usermention} **Welcome to {server}** <a:welcome:1097130355137454181>\n\n<a:party:1097134575764914296> You are the {count} member of {server} <a:party:1097134575764914296>"
-        },
-        "goodbyemsg": {
-            "enabled": true,
-            "message": "`{user}` | {usermention}! **Just Left {server}**!"
-        },
-        "welcomedm": {
-            "enabled": true
-        }
     },
     "agedeclaration": {
         "enabled": true,
         "serverInvite": "https://discord.gg/iconic-rp",
-        "above18Img": "https://cdn.discordapp.com/attachments/1097420467532472340/1102470374702190623/18.png",
-        "below18Img": "https://cdn.discordapp.com/attachments/1097420467532472340/1102472300181331978/18-.png"
+        "above18Img": "",
+        "below18Img": ""
+    },
+    "visaform": {
+        "visabutton": {
+            "visarole": "",
+            "communityrole": ""
+        }
     },
     "moderation": {
         "reactionmod": {
@@ -142,183 +69,7 @@
                 "👺",
                 "👹",
                 "😾"
-            ],
-            "logchannel": "1204360843588931594"
-        },
-        "promotion": {
-            "enabled": false
-        }
-    },
-    "birthday": {
-        "enabled": true,
-        "wishat": "5 0 * * *",
-        "timezone": "Asia/Kolkata",
-        "webhooks": [
-            "https://discord.com/api/webhooks/1180478301614121001/vKhbeN4XraXDCzqCiKentpiSSGo50F_nasp4KgGqm5YZda5_ZSrFhCGbEvONScOQcr1t"
-        ]
-    },
-    "visaform": {
-        "enabled": true,
-        "logchannel": "1204360843588931594",
-        "visabutton": {
-            "visarole": "1096863473792716961",
-            "communityrole": "1096856106749394994"
-        },
-        "context": {
-            "question1": {
-                "label": "What is your Discord username?",
-                "style": "short",
-                "placeholder": "Username#0000",
-                "required": true,
-                "max": 100,
-                "min": 1
-            },
-            "question2": {
-                "label": "What is your Discord ID?",
-                "style": "short",
-                "placeholder": "123456789012345678",
-                "required": true,
-                "max": 100,
-                "min": 1
-            },
-            "question3": {
-                "label": "What is your age?",
-                "style": "short",
-                "placeholder": "18",
-                "required": true,
-                "max": 100,
-                "min": 1
-            },
-            "question4": {
-                "label": "What is your Rockstar Social Club ID?",
-                "style": "short",
-                "placeholder": "United States",
-                "required": true,
-                "max": 100,
-                "min": 1
-            },
-            "question5": {
-                "label": "What is your occupation?",
-                "style": "short",
-                "placeholder": "Employed at Iconic Roleplay",
-                "required": true,
-                "max": 100,
-                "min": 1
-            }
-        }
-    },
-    "jobrole": {
-        "enabled": true,
-        "logchannel": "1204360843588931594",
-        "roles": [
-            {
-                "head": "",
-                "role": ""
-            },
-            {
-                "head": "",
-                "role": ""
-            },
-            {
-                "head": "",
-                "role": ""
-            }
-        ]
-    },
-    "dark": {
-        "war": {
-            "enabled": true,
-            "channelid": "1210472242836676608",
-            "reqchannelid": "1218138186954440735",
-            "announcechannel": "1204361488832139274",
-            "gangs": [
-                "1217903327665324272",
-                "1217903377506242570",
-                "1217903361928724650",
-                "1217903345088594080"
-            ],
-            "gangLeader": [
-                "1217903391846563921"
-            ],
-            "timer_days": 1,
-            "timeOptions": {
-                "weekdays": [
-                    {
-                        "label": "5pm to 6pm",
-                        "emoji": "🕔"
-                    },
-                    {
-                        "label": "6pm to 7pm",
-                        "emoji": "🕕"
-                    },
-                    {
-                        "label": "7pm to 8pm",
-                        "emoji": "🕖"
-                    },
-                    {
-                        "label": "8pm to 9pm",
-                        "emoji": "🕗"
-                    },
-                    {
-                        "label": "9pm to 10pm",
-                        "emoji": "🕘"
-                    },
-                    {
-                        "label": "10pm to 11pm",
-                        "emoji": "🕙"
-                    }
-                ],
-                "weekend": [
-                    {
-                        "label": "11am to 12pm",
-                        "emoji": "🕚"
-                    },
-                    {
-                        "label": "12pm to 1pm",
-                        "emoji": "🕛"
-                    },
-                    {
-                        "label": "1pm to 2pm",
-                        "emoji": "🕐"
-                    },
-                    {
-                        "label": "2pm to 3pm",
-                        "emoji": "🕑"
-                    },
-                    {
-                        "label": "3pm to 4pm",
-                        "emoji": "🕒"
-                    },
-                    {
-                        "label": "4pm to 5pm",
-                        "emoji": "🕓"
-                    },
-                    {
-                        "label": "5pm to 6pm",
-                        "emoji": "🕔"
-                    },
-                    {
-                        "label": "6pm to 7pm",
-                        "emoji": "🕕"
-                    },
-                    {
-                        "label": "7pm to 8pm",
-                        "emoji": "🕖"
-                    },
-                    {
-                        "label": "8pm to 9pm",
-                        "emoji": "🕗"
-                    },
-                    {
-                        "label": "9pm to 10pm",
-                        "emoji": "🕘"
-                    },
-                    {
-                        "label": "10pm to 11pm",
-                        "emoji": "🕙"
-                    }
-                ]
-            }
+            ]
         }
     }
 }
