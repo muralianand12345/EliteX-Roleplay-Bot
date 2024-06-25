@@ -100,8 +100,8 @@ const event: BotEvent = {
         const chan = client.channels.cache.get(welcomeUserData.channelId) as TextChannel;
         if (!chan) return;
 
-        const fontFilePath: string = path.join('assets', 'SigmarOne-Regular.ttf');
-        const imgFilePath: string = path.join('assets', 'welcome_irp.png');
+        const fontFilePath: string = path.join(__dirname, '../.././../../assets/', 'Sigmar-Regular.ttf');
+        const imgFilePath: string = path.join(__dirname, '../.././../../assets/', 'welcome_irp.png');
         if (!fontFilePath || !imgFilePath) return;
 
         const text: string = "WELCOME";

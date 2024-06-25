@@ -42,7 +42,7 @@ const command: SlashCommand = {
         currentOverwrites.push({
             id: target.id,
             allow: PermissionFlagsBits.SendMessages | PermissionFlagsBits.ViewChannel,
-            deny: 0 as any,
+            deny: 0n,
         });
 
         await chan.edit({

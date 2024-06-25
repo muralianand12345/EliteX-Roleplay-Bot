@@ -39,7 +39,7 @@ const event: BotEvent = {
 
                 await ticketUser.ticketlog.forEach(async (ticket: ITicketLog) => {
                     if (!interaction.guild.channels.cache.get(ticket.ticketId)) {
-                        client.logger.info(`Ticket Channel Missing | UserId: ${ticketUser} | TicketId: ${ticket.ticketId}`);
+                        client.logger.info(`Ticket Channel Missing | UserId: ${ticketUser.userId} | TicketId: ${ticket.ticketId}`);
                         ticketUser.ticketlog = ticketUser.ticketlog.filter((t: ITicketLog) => t.ticketId !== ticket.ticketId);
                         await ticketUser.save();
                     }
