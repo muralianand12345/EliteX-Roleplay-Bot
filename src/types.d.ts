@@ -143,3 +143,11 @@ export interface IAgeDeclaration extends mongoose.Document {
     below18: string,
     count: number
 }
+
+export interface IBirthday extends mongoose.Document {
+    userId: string,
+    day: number,
+    month: number,
+    year: number,
+    age: number
+}

@@ -44,44 +44,33 @@ const closeTicketChan = async (client: Client, interaction: Interaction, parentC
     const user = await interaction.guild?.members.fetch(userID).catch(() => null);
     if (interaction.channel?.type !== ChannelType.GuildText) return;
     if (!interaction.guild) return;
+
+    const permissions = [
+        {
+            id: ticketSupport,
+            deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+        },
+        {
+            id: interaction.guild.roles.everyone,
+            deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
+        },
+    ];
+
     if (user) {
-        const channel = await interaction.channel?.edit({
-            name: `ticket-closed`,
-            parent: parentCat,
-            permissionOverwrites: [
-                {
-                    id: userID,
-                    deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-                },
-                {
-                    id: ticketSupport,
-                    allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-                },
-                {
-                    id: interaction.guild.roles.everyone,
-                    deny: [PermissionFlagsBits.ViewChannel],
-                },
-            ],
+        permissions.unshift({
+            id: userID,
+            deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
         });
-        return channel;
-    } else {
-        const channel = await interaction.channel?.edit({
-            name: `ticket-closed`,
-            parent: parentCat,
-            permissionOverwrites: [
-                {
-                    id: ticketSupport,
-                    allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel],
-                },
-                {
-                    id: interaction.guild.roles.everyone,
-                    deny: [PermissionFlagsBits.ViewChannel],
-                },
-            ],
-        });
-        return channel;
     }
-}
+
+    const channel = await interaction.channel?.edit({
+        name: `ticket-closed`,
+        parent: parentCat,
+        permissionOverwrites: permissions,
+    });
+
+    return channel;
+};
 
 const deleteTicketLog = async (client: Client, interaction: Interaction, ticketLogDir: string, chan: TextChannel, type: string) => {
     let htmlCode;

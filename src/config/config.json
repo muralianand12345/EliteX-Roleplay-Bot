@@ -41,6 +41,28 @@
             "communityrole": ""
         }
     },
+    "birthday": {
+        "enabled": true,
+        "wishat": "1 0 * * *",
+        "timezone": "Asia/Kolkata",
+        "webhooks": [
+            "https://discord.com/api/webhooks/"
+        ]
+    },
+    "welcome": {
+        "welcomeuser": {
+            "enabled": true,
+            "guildId": "1096848188935241878",
+            "channelId": "1097116659241721917",
+            "message": "<a:welcome:1097130355137454181> {usermention} **Welcome to {server}** <a:welcome:1097130355137454181>\n\n<a:party:1097134575764914296> You are the {count} member of {server} <a:party:1097134575764914296>"
+        },
+        "goodbyemsg": {
+            "enabled": true,
+            "guildId": "1096848188935241878",
+            "channelId": "1096854041910333532",
+            "message": "`{user}` | {usermention}! **Just Left {server}**!"
+        }
+    },
     "moderation": {
         "reactionmod": {
             "enabled": true,

@@ -20,6 +20,6 @@ const event: BotEvent = {
         app.use(express.static(ticketLogDir));
         app.listen(Port);
     }
-}
+};
 
 export default event;
