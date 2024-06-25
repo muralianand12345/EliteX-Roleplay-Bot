@@ -1,5 +1,4 @@
 import { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, TextChannel } from 'discord.js';
-
 import ticketGuildModal from '../../events/database/schema/ticketGuild';
 import { SlashCommand } from '../../types';
 
@@ -20,8 +19,8 @@ const command: SlashCommand = {
 
         if (!interaction.guild) return interaction.reply({ content: 'This command can only be executed in a guild!' });
         const chan = interaction.channel as TextChannel;
-        if (!chan) return interaction.reply({ content: 'Error Occured, try again.' });
-        if (!chan.name.includes('ticket')) return interaction.reply({ content: 'This command can only be exectued in a ticket channel.' });
+        if (!chan) return interaction.reply({ content: 'Error Occurred, try again.' });
+        if (!chan.name.includes('ticket')) return interaction.reply({ content: 'This command can only be executed in a ticket channel.' });
 
         await interaction.deferReply({ ephemeral: true });
 
@@ -34,21 +33,27 @@ const command: SlashCommand = {
         const target = interaction.options.getUser('target');
         if (!target) return await interaction.editReply({ content: 'No target selected or not available.' });
 
-        chan.edit({
-            permissionOverwrites: [
-                {
-                    id: target.id,
-                    allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ViewChannel]
-                }
-            ]
-        }).then(async (c) => {
-            let embed = new EmbedBuilder()
-                .setAuthor({ name: client.user?.username || "Iconic RP", iconURL: client.user?.displayAvatarURL() })
-                .setDescription(`<@${target.id} has been added to the ticket!`);
+        const currentOverwrites = chan.permissionOverwrites.cache.map(overwrite => ({
+            id: overwrite.id,
+            allow: overwrite.allow.bitfield,
+            deny: overwrite.deny.bitfield,
+        }));
 
-            await c.send({ embeds: [embed] });
+        currentOverwrites.push({
+            id: target.id,
+            allow: PermissionFlagsBits.SendMessages | PermissionFlagsBits.ViewChannel,
+            deny: 0 as any,
         });
 
+        await chan.edit({
+            permissionOverwrites: currentOverwrites
+        });
+
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: client.user?.username || "Iconic RP", iconURL: client.user?.displayAvatarURL() })
+            .setDescription(`<@${target.id}> has been added to the ticket!`);
+
+        await chan.send({ embeds: [embed] });
         await interaction.editReply({ content: `Added <@${target.id}> to the ticket!` });
     }
 };
