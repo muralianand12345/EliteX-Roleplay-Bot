@@ -123,7 +123,7 @@ const event: BotEvent = {
                 .replace(/{server}/g, member.guild.name)
                 .replace(/{membercount}/g, currCount);
 
-            await client.channels.cache.get(chan).send({
+            await chan.send({
                 content: msg,
                 files: [attachment]
             });
