@@ -33,6 +33,7 @@ const event: BotEvent = {
                 await deleteTicketSpam(client, interaction);
             } else {
                 buttonCooldown.add(interaction.user.id);
+                setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000);
 
                 const guild = client.guilds.cache.get(interaction.guildId);
                 const chan = guild.channels.cache.get(interaction.channelId);
@@ -63,7 +64,6 @@ const event: BotEvent = {
                             });
                     }, 2000);
                 }
-                setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000);
             }
         }
 
@@ -87,6 +87,7 @@ const event: BotEvent = {
                 await deleteTicketSpam(client, interaction);
             } else {
                 buttonCooldown.add(interaction.user.id);
+                setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000);
 
                 const TicketReason = interaction.fields.getTextInputValue('ticket-reason-modal-text');
 
@@ -119,7 +120,6 @@ const event: BotEvent = {
                             });
                     }, 2000);
                 }
-                setTimeout(() => buttonCooldown.delete(interaction.user.id), 2000);
             }
         }
     }
