@@ -1,4 +1,4 @@
-import { Events } from "discord.js";
+import { ButtonInteraction, Events, TextChannel } from "discord.js";
 import { config } from "dotenv";
 import path from "path";
 
@@ -55,7 +55,26 @@ const event: BotEvent = {
             }
         };
 
-        if (interaction.customId == "delete-ticket") {
+        const handleTicketError = async (interaction: ButtonInteraction, chan: TextChannel) => {
+            try {
+                await interaction.editReply({
+                    content: 'An error occurred. Deleting the channel ...'
+                });
+
+                setTimeout(async () => {
+                    chan.delete()
+                        .catch((error) => {
+                            if (error.code === 10003) {
+                                return; // Channel not found error
+                            }
+                        });
+                }, 2000);
+            } catch (err) {
+                client.logger.error('Error handling ticket error:', err);
+            }
+        };
+
+        if (interaction.customId === "delete-ticket") {
             await interaction.deferReply({ ephemeral: true });
 
             try {
@@ -91,23 +110,26 @@ const event: BotEvent = {
                         setTimeout(async () => {
                             chan.delete()
                                 .catch((error: Error | any) => {
-                                    if (error.code == 10003) {
-                                        return; //channel not found error
+                                    if (error.code === 10003) {
+                                        return; // Channel not found error
                                     }
                                 });
                         }, 2000);
                     }
                 }
             } catch (err) {
-                client.logger.error('Error during ticket deletion:', err);
+                const guild = client.guilds.cache.get(interaction.guildId);
+                const chan = guild.channels.cache.get(interaction.channelId);
+                if (chan == null) return;
+                await handleTicketError(interaction, chan);
             }
         }
 
-        if (interaction.customId == "delete-ticket-reason") {
+        if (interaction.customId === "delete-ticket-reason") {
             await deleteTicketReasonModal(client, interaction);
         }
 
-        if (interaction.customId == "ticket-reason-modal") {
+        if (interaction.customId === "ticket-reason-modal") {
             await interaction.deferReply({ ephemeral: true });
 
             try {
@@ -145,15 +167,18 @@ const event: BotEvent = {
                         setTimeout(async () => {
                             chan.delete()
                                 .catch((error: Error | any) => {
-                                    if (error.code == 10003) {
-                                        return; //channel not found error
+                                    if (error.code === 10003) {
+                                        return; // Channel not found error
                                     }
                                 });
                         }, 2000);
                     }
                 }
             } catch (err) {
-                client.logger.error('Error during ticket deletion:', err);
+                const guild = client.guilds.cache.get(interaction.guildId);
+                const chan = guild.channels.cache.get(interaction.channelId);
+                if (chan == null) return;
+                await handleTicketError(interaction, chan);
             }
         }
     }
