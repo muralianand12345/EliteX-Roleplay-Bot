@@ -1,4 +1,4 @@
-import { Client, SlashCommandBuilder, CommandInteraction, Collection, PermissionResolvable, Message, AutocompleteInteraction, ChatInputCommandInteraction, ActivityType, Channel } from "discord.js"
+import { Client, SlashCommandBuilder, CommandInteraction, Collection, ActivityType, PermissionResolvable, Message, AutocompleteInteraction, ChatInputCommandInteraction, ActivityType, Channel } from "discord.js"
 import mongoose from "mongoose"
 import discord from "discord.js"
 
@@ -52,6 +52,11 @@ export interface Command {
     owner?: boolean,
     premium?: boolean,
     execute: (client: Client, message: Message, args: Array<string>) => void
+}
+
+export interface Activity {
+    name: string,
+    type: ActivityType
 }
 
 //db

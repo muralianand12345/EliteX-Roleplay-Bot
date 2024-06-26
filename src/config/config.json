@@ -13,7 +13,33 @@
         },
         "stdchan": "",
         "logchan": "",
-        "cooldownMsg": "You are on `<duration>` cooldown!"
+        "cooldownMsg": "You are on `<duration>` cooldown!",
+        "presence": {
+            "enabled": true,
+            "interval": 10000,
+            "activity": [
+                {
+                    "name": "Indian Community",
+                    "type": "Competing"
+                },
+                {
+                    "name": "Iconic RolePlay ❤️",
+                    "type": "Playing"
+                },
+                {
+                    "name": "your Feedback and Suggestions!",
+                    "type": "Listening"
+                },
+                {
+                    "name": "<usersize> Users!",
+                    "type": "Listening"
+                },
+                {
+                    "name": "Rage Multiplayer!",
+                    "type": "Playing"
+                }
+            ]
+        }
     },
     "ticket": {
         "enabled": true
