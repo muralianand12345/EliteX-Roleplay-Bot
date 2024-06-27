@@ -204,72 +204,62 @@ const command: SlashCommand = {
                             return await interaction.editReply({ embeds: [embed] });
                         }
 
-                        const pageSize = 25;
-                        const totalPages = Math.ceil(birthdayDocs.length / pageSize);
+                        const rows = new ActionRowBuilder<ButtonBuilder>()
+                            .addComponents(
+                                new ButtonBuilder()
+                                    .setCustomId('birthday-page-previous')
+                                    .setEmoji('⬅️')
+                                    .setStyle(ButtonStyle.Secondary),
+                                new ButtonBuilder()
+                                    .setCustomId('birthday-page-next')
+                                    .setEmoji('➡️')
+                                    .setStyle(ButtonStyle.Secondary)
+                            );
 
-                        let currentPage = 1;
+                        const fields: string[] = birthdayDocs.sort((a: IBirthday, b: IBirthday) => a.month - b.month || a.day - b.day).map((doc: IBirthday, index: number) => {
+                            const age = doc.year ? ` | **Age:** \`${new Date().getFullYear() - doc.year}\`` : '';
+                            return `**${index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}${doc.year ? ` ${doc.year}` : ''}\`${age}`;
+                        });
 
-                        const updateEmbed = async () => {
-                            const startIndex = (currentPage - 1) * pageSize;
-                            const endIndex = startIndex + pageSize;
-                            const displayedDocs = birthdayDocs.slice(startIndex, endIndex);
+                        if (!fields.length) {
+                            embed.setColor('Red').setDescription('No one has a birthday set!');
+                            return await interaction.editReply({ embeds: [embed] });
+                        }
 
-                            const fields: string[] = displayedDocs
-                                .sort((a: IBirthday, b: IBirthday) => a.month - b.month || a.day - b.day)
-                                .map((doc: IBirthday, index: number) => {
-                                    const age = doc.year ? ` | **Age:** \`${new Date().getFullYear() - doc.year}\`` : '';
-                                    return `**${startIndex + index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}${doc.year ? ` ${doc.year}` : ''}\`${age}`;
-                                });
+                        embed.setColor('Green').setDescription(fields.slice(0, 25).join('\n'));
 
-                            if (!fields.length) {
-                                embed.setColor('Red').setDescription('No one has a birthday set!');
-                                return await interaction.editReply({ embeds: [embed] });
-                            }
+                        const msg = await interaction.editReply({ embeds: [embed], components: [rows] });
 
-                            embed.setColor('Green').setDescription(fields.join('\n'));
+                        let currentPage = 0;
+                        const itemsPerPage = 25;
 
-                            const rows = new ActionRowBuilder<ButtonBuilder>()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setCustomId('birthday-page-previous')
-                                        .setEmoji('⬅️')
-                                        .setStyle(ButtonStyle.Secondary)
-                                        .setDisabled(currentPage === 1),
-                                    new ButtonBuilder()
-                                        .setCustomId('birthday-page-next')
-                                        .setEmoji('➡️')
-                                        .setStyle(ButtonStyle.Secondary)
-                                        .setDisabled(currentPage === totalPages)
-                                );
+                        const collector = msg.createMessageComponentCollector({
+                            componentType: ComponentType.Button,
+                            time: 60000
+                        });
 
-                            const msg = await interaction.editReply({ embeds: [embed], components: [rows] });
-
-                            const collector = msg.createMessageComponentCollector({
-                                componentType: ComponentType.Button,
-                                time: 25000
-                            });
-
-                            collector.on('collect', async i => {
-                                if (i.user.id === interaction.user.id) {
-                                    if (i.customId === 'birthday-page-next' && currentPage < totalPages) {
-                                        currentPage++;
-                                        await updateEmbed();
-                                    }
-                                    if (i.customId === 'birthday-page-previous' && currentPage > 1) {
-                                        currentPage--;
-                                        await updateEmbed();
-                                    }
+                        collector.on('collect', async i => {
+                            if (i.user.id === interaction.user.id) {
+                                if (i.customId === 'birthday-page-next') {
+                                    currentPage = Math.min(currentPage + 1, Math.ceil(fields.length / itemsPerPage) - 1);
                                 }
-                            });
+                                if (i.customId === 'birthday-page-previous') {
+                                    currentPage = Math.max(currentPage - 1, 0);
+                                }
 
-                            collector.on('end', async () => {
-                                rows.components.forEach(component => component.setDisabled(true));
-                                await msg.edit({ components: [rows] });
-                            });
-                        };
+                                const start = currentPage * itemsPerPage;
+                                const end = start + itemsPerPage;
+                                embed.setColor('Green').setDescription(fields.slice(start, end).join('\n'));
+                                embed.setFooter({ text: `Page ${currentPage + 1}/${Math.ceil(fields.length / itemsPerPage)}` });
 
-                        await updateEmbed();
-                        break;
+                                await i.update({ embeds: [embed] });
+                            }
+                        });
+
+                        collector.on('end', async () => {
+                            rows.components.forEach(component => component.setDisabled(true));
+                            await msg.edit({ components: [rows] });
+                        });
                     }
                 }
             }
