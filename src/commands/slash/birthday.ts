@@ -239,38 +239,68 @@ const command: SlashCommand = {
 
                         embed.setColor('Green').setDescription(fields.slice(0, 25).join('\n'));
 
-                        const msg = await interaction.editReply({ embeds: [embed], components: [rows] });
-
-                        let currentPage = 0;
-                        const itemsPerPage = 25;
-
-                        const collector = msg.createMessageComponentCollector({
-                            componentType: ComponentType.Button,
-                            time: 60000
-                        });
-
-                        collector.on('collect', async i => {
-                            if (i.user.id === interaction.user.id) {
-                                if (i.customId === 'birthday-page-next') {
-                                    currentPage = Math.min(currentPage + 1, Math.ceil(fields.length / itemsPerPage) - 1);
-                                }
-                                if (i.customId === 'birthday-page-previous') {
-                                    currentPage = Math.max(currentPage - 1, 0);
-                                }
-
-                                const start = currentPage * itemsPerPage;
-                                const end = start + itemsPerPage;
-                                embed.setColor('Green').setDescription(fields.slice(start, end).join('\n'));
-                                embed.setFooter({ text: `Page ${currentPage + 1}/${Math.ceil(fields.length / itemsPerPage)}` });
-
-                                await i.update({ embeds: [embed] });
+                        let msg;
+                        try {
+                            msg = await interaction.editReply({ embeds: [embed], components: [rows] });
+                        } catch (error: Error | any) {
+                            if (error.code === 10008) {
+                                console.log('Message was deleted before initial reply.');
+                                return;
+                            } else {
+                                console.error('Error sending initial message:', error);
+                                return;
                             }
-                        });
+                        }
 
-                        collector.on('end', async () => {
-                            rows.components.forEach(component => component.setDisabled(true));
-                            await msg.edit({ components: [rows] });
-                        });
+                        if (msg) {
+
+                            let currentPage = 0;
+                            const itemsPerPage = 25;
+
+                            const collector = msg.createMessageComponentCollector({
+                                componentType: ComponentType.Button,
+                                time: 60000
+                            });
+
+                            collector.on('collect', async i => {
+                                try {
+                                    if (i.user.id === interaction.user.id) {
+                                        if (i.customId === 'birthday-page-next') {
+                                            currentPage = Math.min(currentPage + 1, Math.ceil(fields.length / itemsPerPage) - 1);
+                                        }
+                                        if (i.customId === 'birthday-page-previous') {
+                                            currentPage = Math.max(currentPage - 1, 0);
+                                        }
+
+                                        const start = currentPage * itemsPerPage;
+                                        const end = start + itemsPerPage;
+                                        embed.setColor('Green').setDescription(fields.slice(start, end).join('\n'));
+                                        embed.setFooter({ text: `Page ${currentPage + 1}/${Math.ceil(fields.length / itemsPerPage)}` });
+
+                                        await i.update({ embeds: [embed] });
+                                    }
+                                } catch (error: Error | any) {
+                                    if (error.code === 10008) {
+                                        collector.stop();
+                                    } else {
+                                        console.error('Error in collector:', error);
+                                    }
+                                }
+                            });
+
+                            collector.on('end', async () => {
+                                try {
+                                    rows.components.forEach(component => component.setDisabled(true));
+                                    await msg.edit({ components: [rows] });
+                                } catch (error: Error | any) {
+                                    if (error.code === 10008) {
+                                        console.log('Message was deleted before collector could end.');
+                                    } else {
+                                        console.error('Error ending collector:', error);
+                                    }
+                                }
+                            });
+                        }
                     }
                 }
             }
