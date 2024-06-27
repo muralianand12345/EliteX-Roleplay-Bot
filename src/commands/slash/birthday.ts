@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonStyle, ComponentType, ButtonBuilder } from 'discord.js';
 
 import birthdayModel from '../../events/database/schema/birthday';
-import { SlashCommand } from '../../types';
+import { SlashCommand, IBirthday } from '../../types';
 
 const command: SlashCommand = {
     cooldown: 10000,
@@ -63,7 +63,6 @@ const command: SlashCommand = {
                 )
         ),
     async execute(interaction, client) {
-
         const embed = new EmbedBuilder()
             .setAuthor({ name: 'Birthday', iconURL: client.user?.displayAvatarURL() })
             .setTimestamp();
@@ -73,45 +72,38 @@ const command: SlashCommand = {
         switch (interaction.options.getSubcommand()) {
             case 'set': {
                 const date = interaction.options.getInteger('date');
-                const month_string: string = interaction.options.getString('month') || "";
-                const year_string: string | null = interaction.options.getString('year') || null;
-                if (!date || !month_string) {
+                const monthString: string = interaction.options.getString('month') || "";
+                const yearString: string | null = interaction.options.getString('year') || null;
+                if (!date || !monthString) {
                     return interaction.editReply({ content: 'Please provide all the required options' });
                 }
-                const month: number = parseInt(month_string);
-                const year: number | null = year_string ? parseInt(year_string) : null;
-                var userAge
+                const month: number = parseInt(monthString);
+                const year: number | null = yearString ? parseInt(yearString) : null;
 
-                if (date > 31 || date < 1) {
-                    embed.setColor('Red').setDescription(`Invalid date!`);
-                    return await interaction.editReply({
-                        embeds: [embed]
-                    });
+                // Validate date, month, and year
+                if (date < 1 || date > 31) {
+                    embed.setColor('Red').setDescription('Invalid date!');
+                    return await interaction.editReply({ embeds: [embed] });
                 }
 
-                if (month === 2 && date > 29) {
-                    embed.setColor('Red').setDescription(`Invalid date!`);
-                    return await interaction.editReply({
-                        embeds: [embed]
-                    });
+                const maxDaysInMonth = new Date(year || new Date().getFullYear(), month, 0).getDate();
+                if (date > maxDaysInMonth) {
+                    embed.setColor('Red').setDescription('Invalid date for the given month!');
+                    return await interaction.editReply({ embeds: [embed] });
                 }
 
-                if (month === 4 && date > 30 || month === 6 && date > 30 || month === 9 && date > 30 || month === 11 && date > 30) {
-                    embed.setColor('Red').setDescription(`Invalid date!`);
-                    return await interaction.editReply({
-                        embeds: [embed]
-                    });
+                if (year && (year > new Date().getFullYear() || year < 1900)) {
+                    embed.setColor('Red').setDescription('Invalid year!');
+                    return await interaction.editReply({ embeds: [embed] });
                 }
 
-                if (year && year > 2020 || year && year < 1950 || year && year.toString().length !== 4) {
-                    embed.setColor('Red').setDescription(`Invalid year!`);
-                    return await interaction.editReply({
-                        embeds: [embed]
-                    });
-                }
-
+                let userAge: number | null = null;
                 if (year) {
-                    userAge = new Date().getFullYear() - year;
+                    const today = new Date();
+                    userAge = today.getFullYear() - year;
+                    if (today.getMonth() + 1 < month || (today.getMonth() + 1 === month && today.getDate() < date)) {
+                        userAge--;
+                    }
                 }
 
                 const birthdayMsg = `${date}/${month}`;
@@ -142,62 +134,44 @@ const command: SlashCommand = {
                 }
 
                 embed.setColor('Green').setDescription(`Your birthday has been set to ${birthdayMsg}`);
-                return await interaction.editReply({
-                    embeds: [embed]
-                });
+                return await interaction.editReply({ embeds: [embed] });
             }
 
-            case "remove": {
+            case 'remove': {
                 const birthdayDoc = await birthdayModel.findOne({
                     userId: interaction.user.id
                 }).catch(err => client.logger.error(err));
 
                 if (!birthdayDoc) {
-                    embed.setColor('Red').setDescription(`You don't have a birthday set!`);
-                    return await interaction.editReply({
-                        embeds: [embed]
-                    });
+                    embed.setColor('Red').setDescription('You don\'t have a birthday set!');
+                    return await interaction.editReply({ embeds: [embed] });
                 } else {
                     await birthdayModel.findOneAndDelete({
                         userId: interaction.user.id
                     }).catch(err => client.logger.error(err));
                 }
 
-                embed.setColor('Orange').setDescription(`Your birthday has been removed!`);
-                return await interaction.editReply({
-                    embeds: [embed]
-                });
+                embed.setColor('Orange').setDescription('Your birthday has been removed!');
+                return await interaction.editReply({ embeds: [embed] });
             }
 
-            case "display": {
-                const monthDic: any = {
-                    1: "January",
-                    2: "February",
-                    3: "March",
-                    4: "April",
-                    5: "May",
-                    6: "June",
-                    7: "July",
-                    8: "August",
-                    9: "September",
-                    10: "October",
-                    11: "November",
-                    12: "December"
+            case 'display': {
+                const monthDic: Record<number, string> = {
+                    1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
+                    7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'
                 };
 
                 const type = interaction.options.getString('type');
 
                 switch (type) {
-                    case "your": {
+                    case 'your': {
                         const birthdayDoc = await birthdayModel.findOne({
                             userId: interaction.user.id
                         }).catch(err => client.logger.error(err));
 
                         if (!birthdayDoc) {
-                            embed.setColor('Red').setDescription(`You don't have a birthday set!`);
-                            return await interaction.editReply({
-                                embeds: [embed]
-                            });
+                            embed.setColor('Red').setDescription('You don\'t have a birthday set!');
+                            return await interaction.editReply({ embeds: [embed] });
                         }
 
                         if (birthdayDoc.year) {
@@ -208,22 +182,18 @@ const command: SlashCommand = {
                                 .setDescription(`Your birthday is on \`${birthdayDoc.day} ${monthDic[birthdayDoc.month]}\``);
                         }
 
-                        return await interaction.editReply({
-                            embeds: [embed]
-                        });
+                        return await interaction.editReply({ embeds: [embed] });
                     }
 
-                    case "all": {
-                        const birthdayDoc = await birthdayModel.find().catch((err: Error) => client.logger.error(err));
+                    case 'all': {
+                        const birthdayDocs = await birthdayModel.find().catch(err => client.logger.error(err));
 
-                        if (!birthdayDoc) {
-                            embed.setColor('Red').setDescription(`No one has a birthday set!`);
-                            return await interaction.editReply({
-                                embeds: [embed]
-                            });
+                        if (!birthdayDocs || birthdayDocs.length === 0) {
+                            embed.setColor('Red').setDescription('No one has a birthday set!');
+                            return await interaction.editReply({ embeds: [embed] });
                         }
 
-                        var row = new ActionRowBuilder<ButtonBuilder>()
+                        const rows = new ActionRowBuilder<ButtonBuilder>()
                             .addComponents(
                                 new ButtonBuilder()
                                     .setCustomId('birthday-page-previous')
@@ -233,71 +203,49 @@ const command: SlashCommand = {
                                     .setCustomId('birthday-page-next')
                                     .setEmoji('➡️')
                                     .setStyle(ButtonStyle.Secondary)
-                            )
+                            );
 
-                        var field: any = [];
-
-                        birthdayDoc.sort((a: any, b: any) => a.month - b.month || a.day - b.day).forEach((doc: any, index: number) => {
-                            if (doc.year) {
-                                field.push(`**${index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]} ${doc.year}\` | **Age:** \`${new Date().getFullYear() - doc.year}\``);
-                            } else {
-                                field.push(`**${index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}\``);
-                            }
+                        const fields: string[] = birthdayDocs.sort((a: IBirthday, b: IBirthday) => a.month - b.month || a.day - b.day).map((doc: IBirthday, index: number) => {
+                            const age = doc.year ? ` | **Age:** \`${new Date().getFullYear() - doc.year}\`` : '';
+                            return `**${index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}${doc.year ? ` ${doc.year}` : ''}\`${age}`;
                         });
 
-                        if (!field.length) {
-                            embed.setColor('Red').setDescription(`No one has a birthday set!`);
-                            return await interaction.editReply({
-                                embeds: [embed]
-                            });
+                        if (!fields.length) {
+                            embed.setColor('Red').setDescription('No one has a birthday set!');
+                            return await interaction.editReply({ embeds: [embed] });
                         }
 
-                        embed.setColor('Green').setDescription(field.slice(0, 25).join('\n'));
+                        embed.setColor('Green').setDescription(fields.slice(0, 25).join('\n'));
 
-                        const msg = await interaction.editReply({
-                            embeds: [embed],
-                            components: [row]
-                        });
+                        const msg = await interaction.editReply({ embeds: [embed], components: [rows] });
 
-                        const collector = await msg.createMessageComponentCollector({
+                        const collector = msg.createMessageComponentCollector({
                             componentType: ComponentType.Button,
                             time: 25000
                         });
 
-                        collector.on("collect", async (i) => {
+                        collector.on('collect', async i => {
                             if (i.user.id === interaction.user.id) {
-                                if (i.customId == "birthday-page-next") {
-                                    embed.setColor('Green').setDescription(field.slice(25, 50).join('\n'));
+                                if (i.customId === 'birthday-page-next') {
+                                    embed.setColor('Green').setDescription(fields.slice(25, 50).join('\n'));
                                     await i.update({ embeds: [embed] });
                                 }
-                                if (i.customId == "birthday-page-previous") {
-                                    embed.setColor('Green').setDescription(field.slice(0, 25).join('\n'));
+                                if (i.customId === 'birthday-page-previous') {
+                                    embed.setColor('Green').setDescription(fields.slice(0, 25).join('\n'));
                                     await i.update({ embeds: [embed] });
                                 }
                             }
                         });
 
-                        collector.on("end", async () => {
-                            row = new ActionRowBuilder<ButtonBuilder>()
-                                .addComponents(
-                                    new ButtonBuilder()
-                                        .setCustomId('birthday-page-previous')
-                                        .setEmoji('⬅️')
-                                        .setStyle(ButtonStyle.Secondary)
-                                        .setDisabled(true),
-                                    new ButtonBuilder()
-                                        .setCustomId('birthday-page-next')
-                                        .setEmoji('➡️')
-                                        .setStyle(ButtonStyle.Secondary)
-                                        .setDisabled(true)
-                                )
-                            await msg.edit({ components: [row] });
+                        collector.on('end', async () => {
+                            rows.components.forEach(component => component.setDisabled(true));
+                            await msg.edit({ components: [rows] });
                         });
                     }
                 }
             }
         }
     }
-}
+};
 
 export default command;

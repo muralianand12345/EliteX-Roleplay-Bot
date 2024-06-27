@@ -29,12 +29,21 @@ const event: BotEvent = {
                 if (usersWithBirthdayToday.length > 0) {
                     usersWithBirthdayToday.forEach(async (user) => {
                         try {
+                            const guild = client.guilds.cache.get(client.config.birthday.guildId);
+                            if (!guild) return;
+                            const member = guild.members.cache.get(user.userId);
+                            if (!member) return await birthdayModel.deleteOne({ userId: user.userId });
+
                             embed.setDescription(`**Happy Birthday** <@${user.userId}>**!** 🎉🎂`);
                             webhookChan.send({
                                 username: `${client.user.username}`,
                                 avatarURL: `${client.user.displayAvatarURL()}`,
                                 embeds: [embed]
-                            })
+                            });
+
+                            if (user.year) {
+                                await birthdayModel.updateOne({ userId: user.userId }, { year: user.year + 1 });
+                            }
                         } catch (error) {
                             client.logger.error(`Error sending birthday wishes: ${error}`);
                         }

@@ -71,6 +71,7 @@
         "enabled": true,
         "wishat": "1 0 * * *",
         "timezone": "Asia/Kolkata",
+        "guildId": "1096848188935241878",
         "webhooks": [
             "https://discord.com/api/webhooks/"
         ]
