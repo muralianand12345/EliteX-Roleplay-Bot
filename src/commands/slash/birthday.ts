@@ -1,5 +1,4 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonStyle, ComponentType, ButtonBuilder } from 'discord.js';
-
 import birthdayModel from '../../events/database/schema/birthday';
 import { SlashCommand, IBirthday } from '../../types';
 
@@ -73,12 +72,11 @@ const command: SlashCommand = {
             case 'set': {
                 const date = interaction.options.getInteger('date');
                 const monthString: string = interaction.options.getString('month') || "";
-                const yearString: string | null = interaction.options.getString('year') || null;
+                const year: number | null = interaction.options.getInteger('year');
                 if (!date || !monthString) {
                     return interaction.editReply({ content: 'Please provide all the required options' });
                 }
                 const month: number = parseInt(monthString);
-                const year: number | null = yearString ? parseInt(yearString) : null;
 
                 // Validate date, month, and year
                 if (date < 1 || date > 31) {
