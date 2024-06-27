@@ -217,14 +217,22 @@ const command: SlashCommand = {
                             );
 
                         const fields: string[] = birthdayDocs.sort((a: IBirthday, b: IBirthday) => a.month - b.month || a.day - b.day).map((doc: IBirthday, index: number) => {
-                            const today = new Date();
-                            const birthDate = new Date(doc.year, doc.month - 1, doc.day);
-                            let age = today.getFullYear() - birthDate.getFullYear();
-                            const m = today.getMonth() - birthDate.getMonth();
-                            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                                age--;
+
+                            var user_age: number | null = null;
+                            if (doc.year) {
+                                const today = new Date();
+                                const birthDate = new Date(doc.year, doc.month - 1, doc.day);
+                                user_age = today.getFullYear() - birthDate.getFullYear();
+                                const m = today.getMonth() - birthDate.getMonth();
+
+                                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                                    user_age--;
+                                }
                             }
+
+                            const age = user_age ? ` || **Age:** \`${new Date().getFullYear() - user_age}\`` : '';
                             return `**${index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}${doc.year ? ` ${doc.year}` : ''}\`${age}`;
+
                         });
 
                         if (!fields.length) {
