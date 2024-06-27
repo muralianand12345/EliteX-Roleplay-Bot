@@ -72,11 +72,12 @@ const command: SlashCommand = {
             case 'set': {
                 const date = interaction.options.getInteger('date');
                 const monthString: string = interaction.options.getString('month') || "";
-                const year: number | null = interaction.options.getInteger('year');
+                const yearString: number | null = interaction.options.getInteger('year');
                 if (!date || !monthString) {
                     return interaction.editReply({ content: 'Please provide all the required options' });
                 }
                 const month: number = parseInt(monthString);
+                const year: number | null = yearString ? yearString : null;
 
                 // Validate date, month, and year
                 if (date < 1 || date > 31) {
@@ -98,8 +99,11 @@ const command: SlashCommand = {
                 let userAge: number | null = null;
                 if (year) {
                     const today = new Date();
-                    userAge = today.getFullYear() - year;
-                    if (today.getMonth() + 1 < month || (today.getMonth() + 1 === month && today.getDate() < date)) {
+                    const birthDate = new Date(year, month - 1, date);
+                    userAge = today.getFullYear() - birthDate.getFullYear();
+                    const m = today.getMonth() - birthDate.getMonth();
+
+                    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
                         userAge--;
                     }
                 }
@@ -173,8 +177,17 @@ const command: SlashCommand = {
                         }
 
                         if (birthdayDoc.year) {
+                            const today = new Date();
+                            const birthDate = new Date(birthdayDoc.year, birthdayDoc.month - 1, birthdayDoc.day);
+                            let age = today.getFullYear() - birthDate.getFullYear();
+                            const m = today.getMonth() - birthDate.getMonth();
+
+                            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                                age--;
+                            }
+
                             embed.setColor('Green')
-                                .setDescription(`Your birthday is on \`${birthdayDoc.day} ${monthDic[birthdayDoc.month]} ${birthdayDoc.year}\`\nYou are \`${new Date().getFullYear() - birthdayDoc.year}\` years old`);
+                                .setDescription(`Your birthday is on \`${birthdayDoc.day} ${monthDic[birthdayDoc.month]} ${birthdayDoc.year}\`\nYou are \`${age}\` years old`);
                         } else {
                             embed.setColor('Green')
                                 .setDescription(`Your birthday is on \`${birthdayDoc.day} ${monthDic[birthdayDoc.month]}\``);
@@ -191,54 +204,69 @@ const command: SlashCommand = {
                             return await interaction.editReply({ embeds: [embed] });
                         }
 
-                        const rows = new ActionRowBuilder<ButtonBuilder>()
-                            .addComponents(
-                                new ButtonBuilder()
-                                    .setCustomId('birthday-page-previous')
-                                    .setEmoji('⬅️')
-                                    .setStyle(ButtonStyle.Secondary),
-                                new ButtonBuilder()
-                                    .setCustomId('birthday-page-next')
-                                    .setEmoji('➡️')
-                                    .setStyle(ButtonStyle.Secondary)
-                            );
+                        const pageSize = 25;
+                        const totalPages = Math.ceil(birthdayDocs.length / pageSize);
 
-                        const fields: string[] = birthdayDocs.sort((a: IBirthday, b: IBirthday) => a.month - b.month || a.day - b.day).map((doc: IBirthday, index: number) => {
-                            const age = doc.year ? ` | **Age:** \`${new Date().getFullYear() - doc.year}\`` : '';
-                            return `**${index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}${doc.year ? ` ${doc.year}` : ''}\`${age}`;
-                        });
+                        let currentPage = 1;
 
-                        if (!fields.length) {
-                            embed.setColor('Red').setDescription('No one has a birthday set!');
-                            return await interaction.editReply({ embeds: [embed] });
-                        }
+                        const updateEmbed = async () => {
+                            const fields: string[] = birthdayDocs
+                                .sort((a: IBirthday, b: IBirthday) => a.month - b.month || a.day - b.day)
+                                .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                                .map((doc: IBirthday, index: number) => {
+                                    const age = doc.year ? ` | **Age:** \`${new Date().getFullYear() - doc.year}\`` : '';
+                                    return `**${index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}${doc.year ? ` ${doc.year}` : ''}\`${age}`;
+                                });
 
-                        embed.setColor('Green').setDescription(fields.slice(0, 25).join('\n'));
-
-                        const msg = await interaction.editReply({ embeds: [embed], components: [rows] });
-
-                        const collector = msg.createMessageComponentCollector({
-                            componentType: ComponentType.Button,
-                            time: 25000
-                        });
-
-                        collector.on('collect', async i => {
-                            if (i.user.id === interaction.user.id) {
-                                if (i.customId === 'birthday-page-next') {
-                                    embed.setColor('Green').setDescription(fields.slice(25, 50).join('\n'));
-                                    await i.update({ embeds: [embed] });
-                                }
-                                if (i.customId === 'birthday-page-previous') {
-                                    embed.setColor('Green').setDescription(fields.slice(0, 25).join('\n'));
-                                    await i.update({ embeds: [embed] });
-                                }
+                            if (!fields.length) {
+                                embed.setColor('Red').setDescription('No one has a birthday set!');
+                                return await interaction.editReply({ embeds: [embed] });
                             }
-                        });
 
-                        collector.on('end', async () => {
-                            rows.components.forEach(component => component.setDisabled(true));
-                            await msg.edit({ components: [rows] });
-                        });
+                            embed.setColor('Green').setDescription(fields.join('\n'));
+
+                            const rows = new ActionRowBuilder<ButtonBuilder>()
+                                .addComponents(
+                                    new ButtonBuilder()
+                                        .setCustomId('birthday-page-previous')
+                                        .setEmoji('⬅️')
+                                        .setStyle(ButtonStyle.Secondary)
+                                        .setDisabled(currentPage === 1),
+                                    new ButtonBuilder()
+                                        .setCustomId('birthday-page-next')
+                                        .setEmoji('➡️')
+                                        .setStyle(ButtonStyle.Secondary)
+                                        .setDisabled(currentPage === totalPages)
+                                );
+
+                            const msg = await interaction.editReply({ embeds: [embed], components: [rows] });
+
+                            const collector = msg.createMessageComponentCollector({
+                                componentType: ComponentType.Button,
+                                time: 25000
+                            });
+
+                            collector.on('collect', async i => {
+                                if (i.user.id === interaction.user.id) {
+                                    if (i.customId === 'birthday-page-next' && currentPage < totalPages) {
+                                        currentPage++;
+                                        await updateEmbed();
+                                    }
+                                    if (i.customId === 'birthday-page-previous' && currentPage > 1) {
+                                        currentPage--;
+                                        await updateEmbed();
+                                    }
+                                }
+                            });
+
+                            collector.on('end', async () => {
+                                rows.components.forEach(component => component.setDisabled(true));
+                                await msg.edit({ components: [rows] });
+                            });
+                        };
+
+                        await updateEmbed();
+                        break;
                     }
                 }
             }
