@@ -210,12 +210,15 @@ const command: SlashCommand = {
                         let currentPage = 1;
 
                         const updateEmbed = async () => {
-                            const fields: string[] = birthdayDocs
+                            const startIndex = (currentPage - 1) * pageSize;
+                            const endIndex = startIndex + pageSize;
+                            const displayedDocs = birthdayDocs.slice(startIndex, endIndex);
+
+                            const fields: string[] = displayedDocs
                                 .sort((a: IBirthday, b: IBirthday) => a.month - b.month || a.day - b.day)
-                                .slice((currentPage - 1) * pageSize, currentPage * pageSize)
                                 .map((doc: IBirthday, index: number) => {
                                     const age = doc.year ? ` | **Age:** \`${new Date().getFullYear() - doc.year}\`` : '';
-                                    return `**${index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}${doc.year ? ` ${doc.year}` : ''}\`${age}`;
+                                    return `**${startIndex + index + 1}** | **User:** <@${doc.userId}> | **Birthday:** \`${doc.day} ${monthDic[doc.month]}${doc.year ? ` ${doc.year}` : ''}\`${age}`;
                                 });
 
                             if (!fields.length) {
