@@ -244,10 +244,10 @@ const command: SlashCommand = {
                             msg = await interaction.editReply({ embeds: [embed], components: [rows] });
                         } catch (error: Error | any) {
                             if (error.code === 10008) {
-                                console.log('Message was deleted before initial reply.');
+                                client.logger.log('Message was deleted before initial reply.');
                                 return;
                             } else {
-                                console.error('Error sending initial message:', error);
+                                client.logger.error('Error sending initial message:', error);
                                 return;
                             }
                         }
@@ -283,7 +283,7 @@ const command: SlashCommand = {
                                     if (error.code === 10008) {
                                         collector.stop();
                                     } else {
-                                        console.error('Error in collector:', error);
+                                        client.logger.error('Error in collector:', error);
                                     }
                                 }
                             });
@@ -294,9 +294,9 @@ const command: SlashCommand = {
                                     await msg.edit({ components: [rows] });
                                 } catch (error: Error | any) {
                                     if (error.code === 10008) {
-                                        console.log('Message was deleted before collector could end.');
+                                        client.logger.log('Message was deleted before collector could end.');
                                     } else {
-                                        console.error('Error ending collector:', error);
+                                        client.logger.error('Error ending collector:', error);
                                     }
                                 }
                             });
