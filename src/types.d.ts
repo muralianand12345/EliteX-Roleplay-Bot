@@ -156,3 +156,10 @@ export interface IBirthday extends mongoose.Document {
     year: number,
     age: number
 }
+
+export interface IPhoneNumber extends mongoose.Document {
+    userId: string,
+    phonenumber: number,
+    status: boolean,
+    timestamp: Date
+}
