@@ -5,7 +5,7 @@ import PhoneModal from "../../events/database/schema/phoneNumber";
 
 const command: SlashCommand = {
     cooldown: 10000,
-    owner: false,
+    owner: true,
     data: new SlashCommandBuilder()
         .setName('phonenumber')
         .setDescription('Request Phone Number change (Ticket)')
