@@ -93,11 +93,11 @@
             },
             {
                 "id": "visa-application-text-player-bio",
-                "question": "Explain in detail of your character's backstory",
+                "question": "Character's backstory",
                 "placeholder": null,
                 "style": "paragraph",
                 "required": true,
-                "min": 100,
+                "min": 200,
                 "max": 2000
             }
         ],
