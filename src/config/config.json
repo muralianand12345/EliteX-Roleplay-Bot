@@ -62,9 +62,49 @@
         "below18Img": ""
     },
     "visaform": {
-        "visabutton": {
-            "visarole": "",
-            "communityrole": ""
+        "enabled": true,
+        "form": [
+            {
+                "id": "visa-application-text-ig-name",
+                "question": "In-Game Name",
+                "placeholder": "Enter your In-Game Name",
+                "style": "short",
+                "required": true,
+                "min": 3,
+                "max": 30
+            },
+            {
+                "id": "visa-application-text-ooc-age",
+                "question": "Your OOC Age",
+                "placeholder": "Enter your OOC Age | Eg: 18",
+                "style": "short",
+                "required": true,
+                "min": 0,
+                "max": 2
+            },
+            {
+                "id": "visa-application-text-rp-exp",
+                "question": "How long have you been roleplaying?",
+                "placeholder": "Enter your Roleplay Experience | Eg: 1 Year",
+                "style": "short",
+                "required": true,
+                "min": 0,
+                "max": 5
+            },
+            {
+                "id": "visa-application-text-player-bio",
+                "question": "Explain in detail of your character's backstory",
+                "placeholder": null,
+                "style": "paragraph",
+                "required": true,
+                "min": 100,
+                "max": 2000
+            }
+        ],
+        "channels": {
+            "immigration": "",
+            "accepted": "",
+            "rejected": ""
         }
     },
     "birthday": {

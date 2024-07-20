@@ -14,12 +14,12 @@ const command: Command = {
         const embed = new EmbedBuilder()
             .setColor('Blue')
             .setAuthor({ name: client.user?.username || "Iconic RP", iconURL: client.user?.displayAvatarURL() })
-            .setDescription("```Get Visa Holder Role```");
+            .setDescription("```Visa Application Form```");
 
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('visa-get')
+                    .setCustomId('visa-application')
                     .setLabel('Visa Holder')
                     .setStyle(ButtonStyle.Secondary)
             );
