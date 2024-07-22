@@ -61,6 +61,15 @@
         "above18Img": "",
         "below18Img": ""
     },
+    "role_command": {
+        "enabled": true,
+        "admin_roles": [],
+        "roles": {
+            "visa-holder": "123456789012345678",
+            "townfolks": "123456789012345678",
+            "community": "12321312312312312"
+        }
+    },
     "visaform": {
         "enabled": true,
         "form": [
