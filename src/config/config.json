@@ -64,6 +64,7 @@
     "role_command": {
         "enabled": true,
         "admin_roles": [],
+        "log_webhook": "https://discord.com/api/webhooks//S6I_71pMFPk8VbJkmp-j2gwFNzV1v6-KSVXfcDQIUzyB",
         "roles": {
             "visa-holder": "123456789012345678",
             "townfolks": "123456789012345678",

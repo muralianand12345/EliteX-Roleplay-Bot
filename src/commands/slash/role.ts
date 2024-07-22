@@ -1,4 +1,4 @@
-import { GuildMember, SlashCommandBuilder } from 'discord.js';
+import { GuildMember, SlashCommandBuilder, WebhookClient, EmbedBuilder } from 'discord.js';
 import { SlashCommand } from '../../types';
 
 const command: SlashCommand = {
@@ -41,6 +41,8 @@ const command: SlashCommand = {
             return interaction.editReply({ content: 'You do not have permission to use this command.' });
         }
 
+        const webhook = new WebhookClient({ url: config_role.log_webhook });
+
         const targetUser = interaction.options.getUser('user', true);
         const targetMember = await interaction.guild.members.fetch(targetUser.id).catch(() => null);
         if (!targetMember) return interaction.editReply({ content: 'Target member not found.' });
@@ -49,17 +51,34 @@ const command: SlashCommand = {
             const role = interaction.guild?.roles.cache.get(roleId);
             if (!role) return interaction.editReply({ content: 'Role not found.' });
 
+            let action: 'Removed' | 'Added';
             if (targetMember.roles.cache.has(role.id)) {
                 await targetMember.roles.remove(role);
-                return interaction.editReply({ content: `Removed the role ${role.name} from ${targetUser.username}.` });
+                action = 'Removed';
             } else {
                 await targetMember.roles.add(role);
+                action = 'Added';
                 if (communityRoleId) {
                     const communityRole = interaction.guild?.roles.cache.get(communityRoleId);
                     if (communityRole) await targetMember.roles.remove(communityRole);
                 }
-                return interaction.editReply({ content: `Added the role ${role.name} to ${targetUser.username}.` });
             }
+
+            const embed = new EmbedBuilder()
+                .setColor(action === 'Added' ? 0x00FF00 : 0xFF0000)
+                .setTitle(`Role ${action}`)
+                .addFields(
+                    { name: 'Executor', value: executor.user.tag, inline: true },
+                    { name: 'Target User', value: targetUser.tag, inline: true },
+                    { name: 'Role', value: role.name, inline: true },
+                    { name: 'Action', value: action, inline: true },
+                    { name: 'Time', value: new Date().toUTCString(), inline: true }
+                )
+                .setTimestamp();
+
+            await webhook.send({ embeds: [embed] });
+
+            return interaction.editReply({ content: `${action} the role ${role.name} ${action === 'Added' ? 'to' : 'from'} ${targetUser.username}.` });
         };
 
         switch (roleName) {
