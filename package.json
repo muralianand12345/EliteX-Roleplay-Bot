@@ -18,8 +18,11 @@
   "author": "Murali Anand",
   "license": "MIT",
   "dependencies": {
+    "@langchain/community": "^0.2.20",
     "@langchain/groq": "^0.0.15",
+    "@langchain/openai": "^0.2.5",
     "@napi-rs/canvas": "^0.1.53",
+    "@upstash/redis": "^1.33.0",
     "chalk": "4.1.2",
     "chokidar": "^3.6.0",
     "discord-html-transcripts": "^3.2.0",

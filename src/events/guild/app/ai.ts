@@ -5,6 +5,7 @@ import { ChatGroq } from "@langchain/groq";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { BufferMemory } from "langchain/memory";
 import { ConversationChain } from "langchain/chains";
+import { UpstashRedisChatMessageHistory } from "@langchain/community/stores/message/upstash_redis";
 import { config } from "dotenv";
 
 import { BotEvent } from "../../../types";
@@ -17,35 +18,18 @@ const model = new ChatGroq({
     model: "llama3-70b-8192",
 });
 
-const MEMORY_DIR = path.join(__dirname, '..', '..', '..', 'memory');
-fs.mkdir(MEMORY_DIR, { recursive: true }).catch(console.error);
-
-const loadMemory = async (userId: string): Promise<BufferMemory> => {
-    const filePath = path.join(MEMORY_DIR, `${userId}.json`);
-    try {
-        const data = await fs.readFile(filePath, 'utf8');
-        const savedMemory = JSON.parse(data);
-        return new BufferMemory({
-            chatHistory: savedMemory.chatHistory || [],
-            returnMessages: true,
-            memoryKey: "history",
-            inputKey: "input",
-        });
-    } catch (error) {
-        return new BufferMemory({
-            returnMessages: true,
-            memoryKey: "history",
-            inputKey: "input",
-        });
-    }
-};
-
-const saveMemory = async (userId: string, memory: BufferMemory) => {
-    const filePath = path.join(MEMORY_DIR, `${userId}.json`);
-    const chatHistory = await memory.chatHistory.getMessages();
-    const data = JSON.stringify({ chatHistory });
-    await fs.writeFile(filePath, data, 'utf8');
-};
+const createMemory = (userId: string) => new BufferMemory({
+    chatHistory: new UpstashRedisChatMessageHistory({
+        sessionId: userId,
+        config: {
+            url: process.env.UPSTASH_REDIS_URL, 
+            token: process.env.UPSTASH_REDIS_TOKEN,
+        },
+    }),
+    returnMessages: true,
+    memoryKey: "history",
+    inputKey: "input",
+});
 
 const event: BotEvent = {
     name: Events.MessageCreate,
@@ -58,7 +42,7 @@ const event: BotEvent = {
         if (message.channel.id !== chatChan) return;
         if (message.author.bot) return;
 
-        const memory = await loadMemory(message.author.id);
+        const memory = createMemory(message.author.id);
 
         const SYSTEM_PROMPT: string = `
             You are Iconic Roleplay Bot, a helpful support assistant for the Iconic Roleplay community.
@@ -92,7 +76,6 @@ const event: BotEvent = {
             if (!responseContent) return;
     
             await message.reply(responseContent);
-            await saveMemory(message.author.id, memory);
         } catch (error) {
             client.logger.error(error);
             await message.reply('Failed to process the query. Please try again later.');
