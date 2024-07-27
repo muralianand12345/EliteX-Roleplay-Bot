@@ -39,7 +39,8 @@ const event: BotEvent = {
     name: Events.MessageCreate,
     async execute(message: Message, client: Client) {
 
-        const chatChan = ""
+        if (!client.config.ai.enabled) return;
+        const chatChan = client.config.ai.channel;
         if (!chatChan) return;
         if (!message.channel) return;
         if (message.channel.id !== chatChan) return;

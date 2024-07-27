@@ -48,6 +48,10 @@
         "enabled": true,
         "webhook": ""
     },
+    "ai": {
+        "enabled": true,
+        "channel": ""
+    },
     "modmail": {
         "enabled": true,
         "server": "",
