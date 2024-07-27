@@ -18,10 +18,6 @@ const command: Command = {
     botPerms: ['Administrator'],
     async execute(client, message, args) {
 
-        const msg = args.join(" ");
-
-        if (!msg) return message.reply({ content: 'No message!' });
-
         const markdownPath = path.join(__dirname, '..', '..', '..', 'vector-store', 'data', 'server_info.md');
         const storagePath = path.join(__dirname, '..', '..', '..', 'vector-store');
 
