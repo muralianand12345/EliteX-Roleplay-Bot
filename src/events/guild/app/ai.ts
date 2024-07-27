@@ -58,7 +58,7 @@ const event: BotEvent = {
 
             const prompt = ChatPromptTemplate.fromMessages([
                 ['system', SYSTEM_PROMPT],
-                new MessagesPlaceholder("history"),
+                new MessagesPlaceholder(message.author.id),
                 ['human', '{input}']
             ]);    
 
