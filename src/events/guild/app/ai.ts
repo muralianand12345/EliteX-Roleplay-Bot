@@ -1,14 +1,19 @@
 import { Events, Message, Client } from "discord.js";
+import { MongoClient } from "mongodb";
+import { MongoDBChatMessageHistory } from "@langchain/mongodb";
 import { ChatGroq } from "@langchain/groq";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
 import { BufferMemory } from "langchain/memory";
 import { ConversationChain } from "langchain/chains";
-import { UpstashRedisChatMessageHistory } from "@langchain/community/stores/message/upstash_redis";
 import { config } from "dotenv";
 
 import { BotEvent } from "../../../types";
 
 config();
+
+const mongoClient = new MongoClient(process.env.MONGO_URI || "", {
+    driverInfo: { name: "langchainjs" },
+});
 
 const model = new ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
@@ -16,68 +21,67 @@ const model = new ChatGroq({
     model: "llama3-70b-8192",
 });
 
-const createMemory = (userId: string) => new BufferMemory({
-    chatHistory: new UpstashRedisChatMessageHistory({
-        sessionId: userId,
-        config: {
-            url: process.env.UPSTASH_REDIS_URL, 
-            token: process.env.UPSTASH_REDIS_TOKEN,
-        },
-    }),
-    returnMessages: true,
-    memoryKey: "history",
-    inputKey: "input",
-});
-
 const event: BotEvent = {
     name: Events.MessageCreate,
     async execute(message: Message, client: Client) {
 
         if (!client.config.ai.enabled) return;
-        const chatChan = client.config.ai.channel;
+        const chatChan = "1058682738695213106"//client.config.ai.channel;
         if (!chatChan) return;
         if (!message.channel) return;
         if (message.channel.id !== chatChan) return;
         if (message.author.bot) return;
 
-        const memory = createMemory(message.author.id);
+        await mongoClient.connect();
+        const collection = mongoClient.db("langchain").collection("memory");
+
+        const memory = new BufferMemory({
+            chatHistory: new MongoDBChatMessageHistory({
+                collection,
+                sessionId: message.author.id,
+            }),
+        });
 
         const SYSTEM_PROMPT: string = `
             You are Iconic Roleplay Bot, a helpful support assistant for the Iconic Roleplay community.
-            You will answer the user's questions and query related to FiveM and RedM servers.
+            You will answer the user's questions and queries related to FiveM and RedM servers.
 
-            Guildlines for the chat:
+            Guidelines for the chat:
                 - Be polite and respectful to the users.
                 - Do not share any personal information.
                 - Do not share any sensitive information.
                 - If the user's question is not related to FiveM or RedM or any Roleplay, ask them to give more information.
-                - If the user is not satisfied with the answer, ask them to contact the support team or raise ticket.
+                - If the user is not satisfied with the answer, ask them to contact the support team or raise a ticket.
         `;
 
-        const prompt = ChatPromptTemplate.fromMessages([
-            ['system', SYSTEM_PROMPT],
-            ['human', '{input}']
-        ]);
-
         try {
-            const chain = new ConversationChain({
+
+            const prompt = ChatPromptTemplate.fromMessages([
+                ['system', SYSTEM_PROMPT],
+                new MessagesPlaceholder("history"),
+                ['human', '{input}']
+            ]);    
+
+            const chain = new ConversationChain({ 
+                llm: model, 
                 memory: memory,
-                prompt: prompt,
-                llm: model,
+                prompt: prompt
             });
 
             const response = await chain.invoke({
-                input: `The user ${message.author.username} asked: ${message.content}`
+                input: `${message.content}`
             });
-    
-            const responseContent = String(response.text);
+
+            const responseContent = String(response.response);
             if (!responseContent) return;
-    
+
             await message.reply(responseContent);
         } catch (error) {
             client.logger.error(error);
             await message.reply('Failed to process the query. Please try again later.');
-        }    
+        } finally {
+            await mongoClient.close();
+        }
     }
 }
 
