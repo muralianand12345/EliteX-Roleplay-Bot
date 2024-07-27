@@ -13,6 +13,8 @@ config();
 
 const model = new ChatGroq({
     apiKey: process.env.GROQ_API_KEY,
+    temperature: 0.2,
+    model: "llama3-70b-8192",
 });
 
 const MEMORY_DIR = path.join(__dirname, '..', '..', '..', 'memory');
