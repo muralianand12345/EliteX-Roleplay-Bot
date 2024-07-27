@@ -130,3 +130,7 @@ dist
 
 #build version
 build
+
+# config
+/config/config.json
+/config/config-build.json

@@ -18,6 +18,7 @@
   "author": "Murali Anand",
   "license": "MIT",
   "dependencies": {
+    "@huggingface/inference": "2",
     "@langchain/community": "^0.2.20",
     "@langchain/groq": "^0.0.15",
     "@langchain/mongodb": "^0.0.4",
@@ -30,6 +31,7 @@
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "faiss-node": "^0.5.1",
     "langchain": "^0.2.11",
     "moment-timezone": "^0.5.45",
     "mongodb": "^6.8.0",

@@ -41,7 +41,7 @@ client.slashCommands = new Collection<string, SlashCommand>()
 client.commands = new Collection<string, Command>()
 client.cooldowns = new Collection<string, number>()
 
-const configPath = path.join(__dirname, 'config/config.json');
+const configPath = path.join(__dirname, '..', 'config', 'config.json');
 let config: JSON | any;
 
 try {

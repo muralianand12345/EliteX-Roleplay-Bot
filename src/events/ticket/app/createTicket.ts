@@ -37,17 +37,24 @@ const event: BotEvent = {
 
             if (ticketUser) {
 
-                await ticketUser.ticketlog.forEach(async (ticket: ITicketLog) => {
+                const updatePromises = ticketUser.ticketlog.map(async (ticket: ITicketLog) => {
                     if (!interaction.guild.channels.cache.get(ticket.ticketId)) {
                         client.logger.info(`Ticket Channel Missing | UserId: ${ticketUser.userId} | TicketId: ${ticket.ticketId}`);
-                        ticketUser.ticketlog = ticketUser.ticketlog.filter((t: ITicketLog) => t.ticketId !== ticket.ticketId);
-                        await ticketUser.save();
+                        return null;
                     }
+                    return ticket;
                 });
+
+                const updatedTicketlog = await Promise.all(updatePromises);
+                ticketUser.ticketlog = updatedTicketlog.filter((ticket): ticket is ITicketLog => ticket !== null);
+                await ticketUser.save();
 
                 const activeTickets = ticketUser.ticketlog.filter((ticket: ITicketLog) => ticket.activeStatus);
                 if (activeTickets.length >= ticketGuild.ticketMaxCount) {
-                    return await interaction.editReply({ content: `You are limited to opening \`${ticketGuild.ticketMaxCount}\` tickets. Please close any existing tickets before creating a new one.`, ephemeral: true });
+                    return await interaction.editReply({ 
+                        content: `You are limited to opening \`${ticketGuild.ticketMaxCount}\` tickets. Please close any existing tickets before creating a new one.`, 
+                        ephemeral: true 
+                    });
                 }
             } else {
                 ticketUser = new ticketUserModel({
