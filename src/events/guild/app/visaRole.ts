@@ -3,7 +3,7 @@ import { BotEvent } from "../../../types";
 
 const event: BotEvent = {
     name: Events.InteractionCreate,
-    async execute(interaction: Interaction, client) {
+    async execute(interaction: Interaction, client: Client) {
         if (!interaction.isButton() && !interaction.isModalSubmit()) return;
 
         if (interaction.customId === 'visa-application') {
