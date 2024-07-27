@@ -40,6 +40,8 @@ const event: BotEvent = {
                 collection,
                 sessionId: message.author.id,
             }),
+            returnMessages: true, 
+            memoryKey: "iconic-history"
         });
 
         const SYSTEM_PROMPT: string = `
@@ -58,7 +60,7 @@ const event: BotEvent = {
 
             const prompt = ChatPromptTemplate.fromMessages([
                 ['system', SYSTEM_PROMPT],
-                new MessagesPlaceholder(message.author.id),
+                new MessagesPlaceholder("iconic-history"),
                 ['human', '{input}']
             ]);    
 
