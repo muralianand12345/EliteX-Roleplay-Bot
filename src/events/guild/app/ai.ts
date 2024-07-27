@@ -26,7 +26,7 @@ const event: BotEvent = {
     async execute(message: Message, client: Client) {
 
         if (!client.config.ai.enabled) return;
-        const chatChan = "1058682738695213106"//client.config.ai.channel;
+        const chatChan = client.config.ai.channel;
         if (!chatChan) return;
         if (!message.channel) return;
         if (message.channel.id !== chatChan) return;
