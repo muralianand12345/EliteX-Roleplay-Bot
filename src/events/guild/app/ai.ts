@@ -64,7 +64,7 @@ const event: BotEvent = {
 
         const prompt = ChatPromptTemplate.fromMessages([
             ['system', SYSTEM_PROMPT],
-            ['human', 'The user {name} asked: {input}']
+            ['human', '{input}']
         ]);
 
         try {
@@ -75,8 +75,7 @@ const event: BotEvent = {
             });
 
             const response = await chain.call({
-                name: message.author.username,
-                input: message.content
+                input: `The user ${message.author.username} asked: ${message.content}`
             });
     
             const responseContent = String(response.response);
