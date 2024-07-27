@@ -1,5 +1,3 @@
-import fs from "fs/promises";
-import path from "path";
 import { Events, Message, Client } from "discord.js";
 import { ChatGroq } from "@langchain/groq";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
@@ -68,11 +66,11 @@ const event: BotEvent = {
                 llm: model,
             });
 
-            const response = await chain.call({
+            const response = await chain.invoke({
                 input: `The user ${message.author.username} asked: ${message.content}`
             });
     
-            const responseContent = String(response.response);
+            const responseContent = String(response.text);
             if (!responseContent) return;
     
             await message.reply(responseContent);
