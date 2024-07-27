@@ -25,15 +25,25 @@ const loadMemory = async (userId: string): Promise<BufferMemory> => {
     try {
         const data = await fs.readFile(filePath, 'utf8');
         const savedMemory = JSON.parse(data);
-        return new BufferMemory(savedMemory);
+        return new BufferMemory({
+            chatHistory: savedMemory.chatHistory || [],
+            returnMessages: true,
+            memoryKey: "history",
+            inputKey: "input",
+        });
     } catch (error) {
-        return new BufferMemory();
+        return new BufferMemory({
+            returnMessages: true,
+            memoryKey: "history",
+            inputKey: "input",
+        });
     }
 };
 
 const saveMemory = async (userId: string, memory: BufferMemory) => {
     const filePath = path.join(MEMORY_DIR, `${userId}.json`);
-    const data = JSON.stringify(memory);
+    const chatHistory = await memory.chatHistory.getMessages();
+    const data = JSON.stringify({ chatHistory });
     await fs.writeFile(filePath, data, 'utf8');
 };
 
