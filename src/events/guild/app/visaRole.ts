@@ -189,13 +189,11 @@ const aiReviewApplication = async (application: string): Promise<string> => {
             - Your response should not contain any introduction or any other introductory text.
 
         **Example Response**:
-            \`\`\`json
             {
                 "status": "approved",
                 "reason": "Very well explained and detailed backstory",
                 "points": 8
             }
-            \`\`\`
     `;
 
     try {
@@ -205,7 +203,7 @@ const aiReviewApplication = async (application: string): Promise<string> => {
         ]);
     
         const chain = prompt.pipe(llm);
-        const result = await chain.invoke({ input: application });
+        const result = await chain.invoke({ application: application });
     
         let response: string;
         if (typeof result.content === 'string') {
@@ -218,7 +216,7 @@ const aiReviewApplication = async (application: string): Promise<string> => {
             response = JSON.stringify(result.content);
         }
 
-        console.log(response);
+        console.log('AI Response:', response);
 
         const parsedResponse = JSON.parse(response);
         if (!parsedResponse.status || !parsedResponse.reason || !parsedResponse.points) {
