@@ -177,6 +177,7 @@ const aiReviewApplication = async (application: string): Promise<string> => {
             - The application can be any language, but it should be understandable.
             - The backstory should be at least 150 words long.
             - The user's Ingame name should be a valid name.
+            - The user's backstory should not contain words like multiple "-" or "===" or "___" or any worlds to bypass the word limit.
         
         **Note**:
             - Your response should be a JSON object with the following keys:
