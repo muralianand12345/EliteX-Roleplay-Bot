@@ -43,7 +43,7 @@ const handleVisaApplication = async (interaction: ButtonInteraction, client: Cli
 
 const handleVisaApplicationSubmission = async (interaction: ModalSubmitInteraction, client: Client) => {
     try {
-        await interaction.deferUpdate();
+        await interaction.deferReply({ ephemeral: true });
 
         const applicationChannel = client.channels.cache.get(client.config.visaform.channels.immigration) as TextChannel;
         let applicationContent = '';
@@ -64,7 +64,7 @@ const handleVisaApplicationSubmission = async (interaction: ModalSubmitInteracti
         } else {
             await interaction.reply({ content: 'Your application has been submitted successfully!', ephemeral: true });
         }
-        
+
     } catch (error) {
         await handleError(interaction, client, 'Failed to submit visa application', error);
     }
