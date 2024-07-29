@@ -1,18 +1,24 @@
 import { Events, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ButtonBuilder, ButtonStyle, TextChannel, Interaction, ButtonInteraction, ModalSubmitInteraction, Client, User } from 'discord.js';
-import { ChatGroq } from "@langchain/groq";
-import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
-import { MessageContent } from "@langchain/core/messages";
-import { config } from 'dotenv';
-
 import { BotEvent } from "../../../types";
 
-const llm = new ChatGroq({
-    apiKey: process.env.GROQ_API_KEY,
-    temperature: 0.2,
-    model: "llama3-groq-70b-8192-tool-use-preview",
-});
+const event: BotEvent = {
+    name: Events.InteractionCreate,
+    async execute(interaction: Interaction, client: Client) {
+        if (!interaction.isButton() && !interaction.isModalSubmit()) return;
 
-const handleVisaApplication = async (interaction: ButtonInteraction, client: Client) => {
+        if (interaction.customId === 'visa-application') {
+            await handleVisaApplication(interaction as ButtonInteraction, client);
+        } else if (interaction.customId === 'visa-application-modal') {
+            await handleVisaApplicationSubmission(interaction as ModalSubmitInteraction, client);
+        } else if (interaction.customId === 'visa-application-accept') {
+            await handleVisaDecision(interaction as ButtonInteraction, client, true);
+        } else if (interaction.customId === 'visa-application-reject') {
+            await handleVisaDecision(interaction as ButtonInteraction, client, false);
+        }
+    }
+};
+
+async function handleVisaApplication(interaction: ButtonInteraction, client: Client) {
     try {
         if (!interaction.guild || interaction.user.bot) return;
         if (!client.config.visaform.enabled) {
@@ -41,38 +47,24 @@ const handleVisaApplication = async (interaction: ButtonInteraction, client: Cli
     } catch (error) {
         await handleError(interaction, client, 'Failed to create visa application modal', error);
     }
-};
+}
 
-const handleVisaApplicationSubmission = async (interaction: ModalSubmitInteraction, client: Client) => {
+async function handleVisaApplicationSubmission(interaction: ModalSubmitInteraction, client: Client) {
     try {
         await interaction.deferUpdate();
 
         const applicationChannel = client.channels.cache.get(client.config.visaform.channels.immigration) as TextChannel;
-        let applicationContent = '';
-        for (const field of client.config.visaform.form) {
-            const answer = interaction.fields.getTextInputValue(field.id);
-            applicationContent += `${field.question}: ${answer}\n\n`;
-        }
-        const aiReview = await aiReviewApplication(applicationContent);
-        const review = JSON.parse(aiReview);
-
-        const applicationEmbed = createApplicationEmbed(interaction, client, review);
+        const applicationEmbed = createApplicationEmbed(interaction, client);
         const actionRow = createActionRow();
 
         await applicationChannel.send({ embeds: [applicationEmbed], components: [actionRow] });
-        
-        // Check if the interaction has already been replied to
-        if (interaction.replied) {
-            await interaction.followUp({ content: 'Your application has been submitted successfully!', ephemeral: true });
-        } else {
-            await interaction.editReply({ content: 'Your application has been submitted successfully!' });
-        }
+        await interaction.editReply({ content: 'Your application has been submitted successfully!' });
     } catch (error) {
         await handleError(interaction, client, 'Failed to submit visa application', error);
     }
-};
+}
 
-const handleVisaDecision = async (interaction: ButtonInteraction, client: Client, isAccepted: boolean) => {
+async function handleVisaDecision(interaction: ButtonInteraction, client: Client, isAccepted: boolean) {
     try {
         await interaction.deferUpdate();
 
@@ -103,9 +95,9 @@ const handleVisaDecision = async (interaction: ButtonInteraction, client: Client
     } catch (error) {
         await handleError(interaction, client, `Failed to ${isAccepted ? 'accept' : 'reject'} visa application`, error);
     }
-};
+}
 
-const createApplicationEmbed = (interaction: ModalSubmitInteraction, client: Client, aiReview: any) => {
+function createApplicationEmbed(interaction: ModalSubmitInteraction, client: Client) {
     const applicationEmbed = new EmbedBuilder()
         .setTitle('New Visa Application')
         .setColor('#0099ff')
@@ -118,15 +110,10 @@ const createApplicationEmbed = (interaction: ModalSubmitInteraction, client: Cli
         applicationEmbed.addFields({ name: field.question, value: answer });
     }
 
-    applicationEmbed.addFields({ 
-        name: 'AI Review', 
-        value: `Status: ${aiReview.status}\nReason: ${aiReview.reason}\nPoints: ${aiReview.points}/10` 
-    });
-
     return applicationEmbed;
-};
+}
 
-const createActionRow = () => {
+function createActionRow() {
     const acceptButton = new ButtonBuilder()
         .setCustomId('visa-application-accept')
         .setLabel('Accept')
@@ -138,9 +125,9 @@ const createActionRow = () => {
         .setStyle(ButtonStyle.Danger);
 
     return new ActionRowBuilder<ButtonBuilder>().addComponents(acceptButton, rejectButton);
-};
+}
 
-const createDecisionEmbed = (user: User, isAccepted: boolean, client: Client) => {
+function createDecisionEmbed(user: User, isAccepted: boolean, client: Client) {
     return new EmbedBuilder()
         .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL() })
         .setTitle(`Visa Application ${isAccepted ? 'Accepted' : 'Rejected'}`)
@@ -150,105 +137,13 @@ const createDecisionEmbed = (user: User, isAccepted: boolean, client: Client) =>
             'We regret to inform you that your visa application has been rejected. Please review your application, ensure you have answered all questions in detail and reapply.')
         .setFooter({ text: client.user?.username || 'Iconic RP' })
         .setTimestamp();
-};
+}
 
-const handleError = async (interaction: Interaction, client: Client, message: string, error: any) => {
+async function handleError(interaction: Interaction, client: Client, message: string, error: any) {
     client.logger.error(`${message} | ${error}`);
     if (interaction.isRepliable()) {
-        try {
-            if (interaction.deferred || interaction.replied) {
-                await interaction.followUp({ content: `${message}. Please try again later.`, ephemeral: true });
-            } else {
-                await interaction.reply({ content: `${message}. Please try again later.`, ephemeral: true });
-            }
-        } catch (replyError) {
-            console.error('Failed to send error message to user:', replyError);
-        }
+        await interaction.reply({ content: `${message}. Please try again later.`, ephemeral: true });
     }
-};
-
-const aiReviewApplication = async (application: string): Promise<string> => {
-    const SYSTEM_PROMPT: string = `
-        You are a visa application reviewer for a roleplay server named "Iconic Roleplay".
-        Your primary function is to review user's visa applications and choose to approve or deny them.
-        
-        **Application Review Guidelines**:
-            - The application should not have any empty fields.
-            - The application backstory should be meaningful and not contain any inappropriate content.
-            - If the application contains any inappropriate content, you should deny it.
-            - If the user's application backstory is good, you should approve it.
-            - The backstory should be at least 150 words long.
-            - The user's Ingame name should be a valid name.
-        
-        **Note**:
-            - Your response should be a JSON object with the following keys:
-                - "status": "approved" or "denied"
-                - "reason": "Your reason for approving or denying the application in a few words"
-                - "points": "The number of points you want to award the user out of 10"
-            - Response should not have any empty fields or invalid values.
-            - Your response should not contain any introduction or any other introductory text.
-
-        **Example Response**:
-            {
-                "status": "approved",
-                "reason": "Very well explained and detailed backstory",
-                "points": 8
-            }
-    `;
-
-    try {
-        const prompt = ChatPromptTemplate.fromMessages([
-            ['system', SYSTEM_PROMPT],
-            ['human', '{input}']
-        ]);
-    
-        const chain = prompt.pipe(llm);
-        const result = await chain.invoke({ application: application });
-    
-        let response: string;
-        if (typeof result.content === 'string') {
-            response = result.content;
-        } else if (Array.isArray(result.content)) {
-            response = result.content.map(item => 
-                typeof item === 'string' ? item : JSON.stringify(item)
-            ).join(' ');
-        } else {
-            response = JSON.stringify(result.content);
-        }
-
-        console.log('AI Response:', response);
-
-        const parsedResponse = JSON.parse(response);
-        if (!parsedResponse.status || !parsedResponse.reason || !parsedResponse.points) {
-            throw new Error('Invalid AI response format');
-        }
-    
-        return response;
-    } catch (error) {
-        console.error('AI review failed:', error);
-        return JSON.stringify({
-            status: "denied",
-            reason: "Unable to process application due to technical issues",
-            points: 0
-        });
-    }
-};
-
-const event: BotEvent = {
-    name: Events.InteractionCreate,
-    execute: async (interaction: Interaction, client: Client) => {
-        if (!interaction.isButton() && !interaction.isModalSubmit()) return;
-
-        if (interaction.customId === 'visa-application') {
-            await handleVisaApplication(interaction as ButtonInteraction, client);
-        } else if (interaction.customId === 'visa-application-modal') {
-            await handleVisaApplicationSubmission(interaction as ModalSubmitInteraction, client);
-        } else if (interaction.customId === 'visa-application-accept') {
-            await handleVisaDecision(interaction as ButtonInteraction, client, true);
-        } else if (interaction.customId === 'visa-application-reject') {
-            await handleVisaDecision(interaction as ButtonInteraction, client, false);
-        }
-    }
-};
+}
 
 export default event;
