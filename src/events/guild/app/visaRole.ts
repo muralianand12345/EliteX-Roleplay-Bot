@@ -58,12 +58,13 @@ const handleVisaApplicationSubmission = async (interaction: ModalSubmitInteracti
         const actionRow = createActionRow();
 
         await applicationChannel.send({ embeds: [applicationEmbed], components: [actionRow] });
-        
-        if (interaction.replied) {
-            await interaction.followUp({ content: 'Your application has been submitted successfully!', ephemeral: true });
-        } else {
+
+        if (interaction.deferred) {
             await interaction.editReply({ content: 'Your application has been submitted successfully!' });
+        } else {
+            await interaction.reply({ content: 'Your application has been submitted successfully!', ephemeral: true });
         }
+        
     } catch (error) {
         await handleError(interaction, client, 'Failed to submit visa application', error);
     }
