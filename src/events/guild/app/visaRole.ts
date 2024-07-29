@@ -60,7 +60,13 @@ const handleVisaApplicationSubmission = async (interaction: ModalSubmitInteracti
         const actionRow = createActionRow();
 
         await applicationChannel.send({ embeds: [applicationEmbed], components: [actionRow] });
-        await interaction.editReply({ content: 'Your application has been submitted successfully!' });
+        
+        // Check if the interaction has already been replied to
+        if (interaction.replied) {
+            await interaction.followUp({ content: 'Your application has been submitted successfully!', ephemeral: true });
+        } else {
+            await interaction.editReply({ content: 'Your application has been submitted successfully!' });
+        }
     } catch (error) {
         await handleError(interaction, client, 'Failed to submit visa application', error);
     }
@@ -149,7 +155,15 @@ const createDecisionEmbed = (user: User, isAccepted: boolean, client: Client) =>
 const handleError = async (interaction: Interaction, client: Client, message: string, error: any) => {
     client.logger.error(`${message} | ${error}`);
     if (interaction.isRepliable()) {
-        await interaction.reply({ content: `${message}. Please try again later.`, ephemeral: true });
+        try {
+            if (interaction.deferred || interaction.replied) {
+                await interaction.followUp({ content: `${message}. Please try again later.`, ephemeral: true });
+            } else {
+                await interaction.reply({ content: `${message}. Please try again later.`, ephemeral: true });
+            }
+        } catch (replyError) {
+            console.error('Failed to send error message to user:', replyError);
+        }
     }
 };
 
@@ -203,10 +217,22 @@ const aiReviewApplication = async (application: string): Promise<string> => {
         } else {
             response = JSON.stringify(result.content);
         }
+
+        console.log(response);
+
+        const parsedResponse = JSON.parse(response);
+        if (!parsedResponse.status || !parsedResponse.reason || !parsedResponse.points) {
+            throw new Error('Invalid AI response format');
+        }
     
         return response;
     } catch (error) {
-        throw new Error('Failed to process AI review');
+        console.error('AI review failed:', error);
+        return JSON.stringify({
+            status: "denied",
+            reason: "Unable to process application due to technical issues",
+            points: 0
+        });
     }
 };
 
