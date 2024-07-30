@@ -1,7 +1,8 @@
 import { Client, SlashCommandBuilder, CommandInteraction, Collection, ActivityType, PermissionResolvable, Message, AutocompleteInteraction, ChatInputCommandInteraction, ActivityType, Channel } from "discord.js"
 import mongoose from "mongoose"
 import discord from "discord.js"
-
+import { BufferMemoryInput } from "langchain/memory"
+ 
 declare module "discord.js" {
     export interface Client {
         slashCommands: Collection<string, SlashCommand>
@@ -57,6 +58,10 @@ export interface Command {
 export interface Activity {
     name: string,
     type: ActivityType
+}
+
+export interface LimitedBufferMemoryOptions extends BufferMemoryInput {
+    maxHistory: number;
 }
 
 //db

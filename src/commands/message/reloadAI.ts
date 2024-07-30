@@ -1,9 +1,6 @@
 import path from 'path';
 import { config } from 'dotenv';
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
-import { FaissStore } from "@langchain/community/vectorstores/faiss";
-import { UnstructuredLoader } from "@langchain/community/document_loaders/fs/unstructured";
+import { VectorStore } from '../../utils/ai/ai_functions';
 
 import { Command } from '../../types';
 
@@ -18,29 +15,20 @@ const command: Command = {
     botPerms: ['Administrator'],
     async execute(client, message, args) {
 
+        await message.channel.sendTyping();
+
         const markdownPath = path.join(__dirname, '..', '..', '..', 'vector-store', 'data', 'server_info.md');
-        const storagePath = path.join(__dirname, '..', '..', '..', 'vector-store');
 
-        const loader = new UnstructuredLoader(markdownPath, {
-            apiKey: process.env.UNSTRUCTURED_API_KEY,
-            apiUrl: process.env.UNSTRUCTURED_API_URL,
-            chunkingStrategy: "by_title"
-        });
+        const vectorStore = new VectorStore();
+        await vectorStore.initialize();
 
-        const docs = await loader.load();
-        const textSplitter = new RecursiveCharacterTextSplitter({
-            chunkSize: 1000,
-            chunkOverlap: 200,
-        });
-
-        const splits = await textSplitter.splitDocuments(docs);
-        const vectorStore = await FaissStore.fromDocuments(
-            splits,
-            new HuggingFaceInferenceEmbeddings({ apiKey: process.env.HUGGINGFACEHUB_API_KEY })
-        );
-        await vectorStore.save(storagePath);
-
-        await message.reply({ content: 'AI data reloaded!' });
+        try {
+            await vectorStore.reloadData(markdownPath);
+            await message.reply({ content: 'AI data reloaded successfully!' });
+        } catch (error: Error | any) {
+            client.logger.error(`Error reloading AI data: ${error}`);
+            await message.reply({ content: 'An error occurred while reloading AI data!' });
+        }
     },
 }
 

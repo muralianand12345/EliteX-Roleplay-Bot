@@ -1,14 +1,10 @@
 import { Events, EmbedBuilder, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ButtonBuilder, ButtonStyle, TextChannel, Interaction, ButtonInteraction, ModalSubmitInteraction, Client, User } from 'discord.js';
-import { ChatGroq } from "@langchain/groq";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { gen_model } from '../../../utils/ai/langchain_models';
 
 import { BotEvent } from "../../../types";
 
-const llm = new ChatGroq({
-    apiKey: process.env.GROQ_API_KEY,
-    temperature: 0.2,
-    model: "llama3-groq-70b-8192-tool-use-preview",
-});
+let model: Awaited<ReturnType<typeof gen_model>>;
 
 const handleVisaApplication = async (interaction: ButtonInteraction, client: Client) => {
     try {
@@ -59,11 +55,7 @@ const handleVisaApplicationSubmission = async (interaction: ModalSubmitInteracti
 
         await applicationChannel.send({ embeds: [applicationEmbed], components: [actionRow] });
 
-        if (interaction.deferred) {
-            await interaction.editReply({ content: 'Your application has been submitted successfully!' });
-        } else {
-            await interaction.reply({ content: 'Your application has been submitted successfully!', ephemeral: true });
-        }
+        await interaction.editReply({ content: 'Your application has been submitted successfully!' });
 
     } catch (error) {
         await handleError(interaction, client, 'Failed to submit visa application', error);
@@ -154,9 +146,9 @@ const handleError = async (interaction: Interaction, client: Client, message: st
     client.logger.error(`${message} | ${error}`);
     if (interaction.isRepliable()) {
         try {
-            if (interaction.deferred || interaction.replied) {
-                await interaction.followUp({ content: `${message}. Please try again later.`, ephemeral: true });
-            } else {
+            if (interaction.deferred) {
+                await interaction.editReply({ content: `${message}. Please try again later.` });
+            } else if (!interaction.replied) {
                 await interaction.reply({ content: `${message}. Please try again later.`, ephemeral: true });
             }
         } catch (replyError) {
@@ -200,19 +192,24 @@ const aiReviewApplication = async (application: string): Promise<string> => {
     `;
 
     try {
+
         const prompt = ChatPromptTemplate.fromMessages([
             ['system', SYSTEM_PROMPT],
             ['human', '{input}']
         ]);
+
+        if (!model) {
+            model = await gen_model(0.2, "llama3-groq-70b-8192-tool-use-preview");
+        }
     
-        const chain = prompt.pipe(llm);
-        const result = await chain.invoke({ input: `${application}` });
+        const chain = prompt.pipe(model);
+        const result: any = await chain.invoke({ input: `${application}` });
 
         let response: string;
         if (typeof result.content === 'string') {
             response = result.content;
         } else if (Array.isArray(result.content)) {
-            response = result.content.map(item => 
+            response = result.content.map((item: any) => 
                 typeof item === 'string' ? item : JSON.stringify(item)
             ).join(' ');
         } else {
@@ -239,14 +236,18 @@ const event: BotEvent = {
     execute: async (interaction: Interaction, client: Client) => {
         if (!interaction.isButton() && !interaction.isModalSubmit()) return;
 
-        if (interaction.customId === 'visa-application') {
-            await handleVisaApplication(interaction as ButtonInteraction, client);
-        } else if (interaction.customId === 'visa-application-modal') {
-            await handleVisaApplicationSubmission(interaction as ModalSubmitInteraction, client);
-        } else if (interaction.customId === 'visa-application-accept') {
-            await handleVisaDecision(interaction as ButtonInteraction, client, true);
-        } else if (interaction.customId === 'visa-application-reject') {
-            await handleVisaDecision(interaction as ButtonInteraction, client, false);
+        try {
+            if (interaction.customId === 'visa-application') {
+                await handleVisaApplication(interaction as ButtonInteraction, client);
+            } else if (interaction.customId === 'visa-application-modal') {
+                await handleVisaApplicationSubmission(interaction as ModalSubmitInteraction, client);
+            } else if (interaction.customId === 'visa-application-accept') {
+                await handleVisaDecision(interaction as ButtonInteraction, client, true);
+            } else if (interaction.customId === 'visa-application-reject') {
+                await handleVisaDecision(interaction as ButtonInteraction, client, false);
+            }
+        } catch (error) {
+            await handleError(interaction, client, 'An error occurred while processing the interaction', error);
         }
     }
 };

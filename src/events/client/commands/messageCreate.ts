@@ -85,7 +85,7 @@ const event: BotEvent = {
                             .setDescription(`${coolMsg}`)
                             .setColor('#ED4245');
                         return message.channel.send({ embeds: [coolEmbed] }).then((msg: Message) => {
-                            setTimeout(function () {
+                            setTimeout(() => {
                                 msg.delete();
                             }, 4000);
                         });
@@ -97,7 +97,7 @@ const event: BotEvent = {
                                 .setDescription(`🚫 <@${message.author.id}>, You don't have permission to use this command!`)
                                 .setColor('#ED4245')
                             return message.channel.send({ embeds: [ownerEmbed] }).then((msg: Message) => {
-                                setTimeout(function () {
+                                setTimeout(() => {
                                     msg.delete();
                                 }, 4000);
                             });
@@ -110,7 +110,7 @@ const event: BotEvent = {
                                 .setDescription(`🚫 ${message.author}, You don't have \`${command.userPerms}\` permissions to use this command!`)
                                 .setColor('#ED4245');
                             return message.reply({ embeds: [userPerms] }).then((msg: Message) => {
-                                setTimeout(function () {
+                                setTimeout(() => {
                                     msg.delete();
                                 }, 4000);
                             });
@@ -121,7 +121,7 @@ const event: BotEvent = {
                                 .setDescription(`🚫 ${message.author}, I don't have \`${command.botPerms}\` permissions to use this command!`)
                                 .setColor('#ED4245');
                             return message.reply({ embeds: [botPerms] }).then((msg: Message) => {
-                                setTimeout(function () {
+                                setTimeout(() => {
                                     msg.delete();
                                 }, 4000);
                             });
@@ -147,7 +147,7 @@ const event: BotEvent = {
                                 .setDescription(`🚫 <@${message.author.id}>, You don't have permission to use this command!`)
                                 .setColor('#ED4245')
                             return message.channel.send({ embeds: [ownerEmbed] }).then((msg: Message) => {
-                                setTimeout(function () {
+                                setTimeout(() => {
                                     msg.delete();
                                 }, 4000);
                             });
@@ -160,7 +160,7 @@ const event: BotEvent = {
                                 .setDescription(`🚫 ${message.author}, You don't have \`${command.userPerms}\` permissions to use this command!`)
                                 .setColor('#ED4245');
                             return message.reply({ embeds: [userPerms] }).then((msg: Message) => {
-                                setTimeout(function () {
+                                setTimeout(() => {
                                     msg.delete();
                                 }, 4000);
                             });
@@ -171,7 +171,7 @@ const event: BotEvent = {
                                 .setDescription(`🚫 ${message.author}, I don't have \`${command.botPerms}\` permissions to use this command!`)
                                 .setColor('#ED4245');
                             return message.reply({ embeds: [botPerms] }).then((msg: Message) => {
-                                setTimeout(function () {
+                                setTimeout(() => {
                                     msg.delete();
                                 }, 4000);
                             });
@@ -203,7 +203,7 @@ const event: BotEvent = {
                         .setURL('https://discord.gg/XzE9hSbsNb')
                 );
             return message.reply({ embeds: [botErrorEmbed], components: [botErrorButton], ephemeral: true }).then((msg: Message) => {
-                setTimeout(function () {
+                setTimeout(() => {
                     msg.delete();
                 }, 4000);
             });

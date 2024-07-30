@@ -97,7 +97,7 @@ const event: BotEvent = {
                         }).catch(async (err: Error | any) => {
                             if (err.code == 10008) {
                                 await interaction.channel.send({ content: '**ERROR: Interaction Not Found!**' }).then((msg: Message) => {
-                                    setTimeout(function () {
+                                    setTimeout(() => {
                                         msg.delete();
                                     }, 4000);
                                 });
