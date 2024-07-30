@@ -72,7 +72,7 @@ const event: BotEvent = {
         await mongoClient.connect();
         const collection = mongoClient.db("langchain").collection("memory");
 
-        const retriever = vectorStore.asRetriever();
+        const retriever = vectorStore.asRetriever({ k: 5 });
         const retrievedDocs = await retriever.invoke(message.content);
         const context = retrievedDocs.map(doc => doc.pageContent).join("\n\n");
 

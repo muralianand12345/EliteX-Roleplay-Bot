@@ -118,7 +118,7 @@ const createApplicationEmbed = (interaction: ModalSubmitInteraction, client: Cli
 
     applicationEmbed.addFields({ 
         name: 'AI Review',
-        value: `**Status:** ${aiReview.status}\n**Reason:** ${aiReview.reason}\n**Points:** ${aiReview.points}/10` 
+        value: `**Status:** ${aiReview.status}\n**Summary:** ${aiReview.summary}\n**Reason:** ${aiReview.reason}\n**Points:** ${aiReview.points}/10` 
     });
 
     return applicationEmbed;
@@ -178,20 +178,24 @@ const aiReviewApplication = async (application: string): Promise<string> => {
             - The application can be any language, but it should be understandable.
             - The backstory should be at least 150 words long.
             - The user's Ingame name should be a valid name.
+            - The user's backstory is limited to 1024 characters and they cannot exceed this limit.
             - The user's backstory should not contain words like multiple "-" or "===" or "___" or any worlds to bypass the word limit.
         
         **Note**:
             - Your response should be a JSON object with the following keys:
                 - "status": "approved" or "denied"
-                - "reason": "Your reason for approving or denying the application within 120 characters"
+                - "summary": "A small summary of the application within 300 characters"
+                - "reason": "Your reason for approving or denying the application within 450 characters"
                 - "points": "The number of points you want to award the user out of 10"
             - Response should not have any empty fields or invalid values.
             - Your response should not contain any introduction or any other introductory text.
             - Dont be too strict, but also dont be too lenient.
+            - As our discord fields are limited to 1000 characters, please keep the overall response within that limit.
 
         **Example Response**:
             "status": "approved",
-            "reason": "Very well explained and detailed backstory, still room for improvement",
+            "summary": "John was a thief who turned into a hero after saving a village from bandits. He is now seeking a new life in the city.",
+            "reason": "The application backstory is meaningful and well-written. Could have been a bit longer and more detailed.",
             "points": 8
     `;
 
