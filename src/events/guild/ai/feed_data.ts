@@ -12,8 +12,7 @@ const event: BotEvent = {
         
         if (!client.config.ai.enabled) return;
         const channel_data_list = client.config.ai.channel_data_list;
-        if (!channel_data_list) return;
-        if (!channel_data_list.includes(message.channel.id) || message.author.bot) return;
+        if (!channel_data_list || !channel_data_list.includes(message.channel.id) || message.author.bot) return;
 
         const msg_channel = message.channel as  TextChannel | VoiceChannel | ThreadChannel | NewsChannel;
         const msg_user = message.author as User;

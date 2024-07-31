@@ -19,7 +19,7 @@ const event: BotEvent = {
 
         if (!client.config.ai.enabled) return;
         const chatChan = client.config.ai.channel;
-        if (!chatChan || !message.channel || message.channel.id !== chatChan || message.author.bot) return;
+        if (!chatChan || !message.channel || chatChan.includes(message.channel.id) || message.author.bot) return;
         if (message.content.startsWith(client.config.bot.prefix)) return;
 
         if (!model) {
@@ -94,7 +94,9 @@ const event: BotEvent = {
                     - Always offer to connect the user with a technical support team for in-depth issues.
 
                 Maintain conversation continuity by referring to previous messages when relevant, but always focus on the current query.
-                Note that you only have a chat memory of last 10 messages, so try to keep the conversation concise and relevant.
+                Note: 
+                    - That you only have a chat memory of last 10 messages, so try to keep the conversation concise and relevant.
+                    - If someone is not satisfied with the answer you provide, suggest they contact the @murlee by mentioning him in the chat.
 
                 Remember, your goal is to be helpful, informative, and to enhance the user's experience with Iconic Roleplay. If you're unsure about any information, it's better to admit uncertainty and suggest official resources rather than provide potentially incorrect information.
                 `;

@@ -50,7 +50,9 @@
     },
     "ai": {
         "enabled": true,
-        "channel": ""
+        "channel": [
+            " "
+        ]
     },
     "modmail": {
         "enabled": true,
