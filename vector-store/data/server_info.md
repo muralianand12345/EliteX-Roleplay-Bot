@@ -197,7 +197,7 @@ g) Disregarding RP Consequences:
   3. Can be used for quick questions and minor problems
 
 #### Support Ticket
-- Purpose: For more severe issues, OOC problems, bugs, or supporter-related queries
+- Purpose: For more severe issues, OOC problems, report bugs, supporter-related queries, In game issue and reports and more Roleplay related issues.
 - How to Use:
   1. Go to https://discord.com/channels/1096848188935241878/1204093563089068042
   2. Click the embed button to request a ticket
