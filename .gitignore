@@ -134,3 +134,6 @@ build
 # config
 /config/config.json
 /config/config-build.json
+
+/vector-store/docstore.json
+/vector-store/faiss.index
