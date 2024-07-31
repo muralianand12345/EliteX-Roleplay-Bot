@@ -97,6 +97,7 @@ const event: BotEvent = {
                 Note: 
                     - That you only have a chat memory of last 10 messages, so try to keep the conversation concise and relevant.
                     - If someone is not satisfied with the answer you provide, suggest they contact the @murlee by mentioning him in the chat.
+                    - You cannot create a ticket for this instead you can redirect them to raise ticket by clicking on the ticket embed button at https://discord.com/channels/1096848188935241878/1204093563089068042 channel and choose the appropriate category and fill the form.
 
                 Remember, your goal is to be helpful, informative, and to enhance the user's experience with Iconic Roleplay. If you're unsure about any information, it's better to admit uncertainty and suggest official resources rather than provide potentially incorrect information.
                 `;
