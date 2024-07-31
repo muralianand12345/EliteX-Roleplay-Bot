@@ -10,7 +10,7 @@ const getMentioned = (message: Message) => {
         .map(role => role.name)
         .join(', ');
     const userJoinDate = member.joinedAt?.toDateString();
-    const userDetailText = `Username: ${message.author.username} | User ID: ${message.author.id} | User Tag: ${message.author.tag} | User Avatar: ${message.author.displayAvatarURL()}`;
+    const userDetailText = `Server Name: ${member.nickname} [Use this name to mention user] | Discord Name ${message.author.username} | User ID: ${message.author.id} | User Tag: ${message.author.tag} | User Avatar: ${message.author.displayAvatarURL()}`;
 
     //Channel
     const channel = message.channel as TextChannel;

@@ -76,6 +76,7 @@ const event: BotEvent = {
                     When referring to users, channels, or roles:
                         - Use their names without @ or # symbols
                         - Provide relevant details from the Discord Context when appropriate
+                        - To mention a user, use their Display name or Server name if available
                         - Do not expose user IDs or other sensitive information directly
 
                 Context:
