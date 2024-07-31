@@ -19,11 +19,11 @@ const event: BotEvent = {
 
         if (!client.config.ai.enabled) return;
         const chatChan = client.config.ai.channel;
-        if (!chatChan || !message.channel || chatChan.includes(message.channel.id) || message.author.bot) return;
+        if (!chatChan || !message.channel || !chatChan.includes(message.channel.id) || message.author.bot) return;
         if (message.content.startsWith(client.config.bot.prefix)) return;
 
         if (!model) {
-            model = await gen_model(0.2, "llama-3.1-70b-versatile"); //llama3-70b-8192 llama-3.1-70b-versatile
+            model = await gen_model(0.2, "llama3-groq-70b-8192-tool-use-preview"); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
         }
 
         await message.channel.sendTyping();
