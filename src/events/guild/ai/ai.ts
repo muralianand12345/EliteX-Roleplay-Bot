@@ -23,7 +23,7 @@ const event: BotEvent = {
         if (message.content.startsWith(client.config.bot.prefix)) return;
 
         if (!model) {
-            model = await gen_model(0.2, "llama3-70b-8192");
+            model = await gen_model(0.2, "llama-3.1-70b-versatile"); //llama3-70b-8192 llama-3.1-70b-versatile
         }
 
         await message.channel.sendTyping();

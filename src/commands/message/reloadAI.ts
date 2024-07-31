@@ -23,7 +23,8 @@ const command: Command = {
         await vectorStore.initialize();
 
         try {
-            await vectorStore.reloadData(markdownPath);
+            const override = args[0] === '--override';
+            await vectorStore.reloadData(markdownPath, override);
             await message.reply({ content: 'AI data reloaded successfully!' });
         } catch (error: Error | any) {
             client.logger.error(`Error reloading AI data: ${error}`);

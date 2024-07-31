@@ -116,7 +116,53 @@ class VectorStore {
         }
     }
 
-    async reloadData(markdownPath: string) {
+    async checkDataExists(content: string): Promise<boolean> {
+        if (!this.vectorStore) {
+            return false; 
+        }
+        const results = await this.vectorStore.similaritySearch(content, 1);
+        return results.length > 0 && results[0].pageContent === content;
+    }
+
+    async addOrUpdateData(content: string, metadata: Record<string, any> = {}, override: boolean = false) {
+        if (!this.vectorStore) {
+            this.vectorStore = await FaissStore.fromTexts([content], [metadata], this.embeddings);
+            await this.vectorStore.save(this.directory);
+            return;
+        }
+
+        const exists = await this.checkDataExists(content);
+
+        if (exists && !override) {
+            return;
+        }
+
+        const textSplitter = new RecursiveCharacterTextSplitter({
+            chunkSize: 1000,
+            chunkOverlap: 200,
+        });
+
+        const docs = await textSplitter.createDocuments([content], [metadata]);
+
+        if (exists && override) {
+            try {
+                const existingDocs = await this.vectorStore.similaritySearch(content, 1);
+                if (existingDocs.length > 0) {
+                    const existingDoc = existingDocs[0];
+                    if (existingDoc.metadata && existingDoc.metadata.id) {
+                        await this.vectorStore.delete({ ids: [existingDoc.metadata.id] });
+                    }
+                }
+            } catch (error) {
+                console.error("Error deleting existing document. Proceeding with addition.", error);
+            }
+        }
+
+        await this.vectorStore.addDocuments(docs);
+        await this.vectorStore.save(this.directory);
+    }
+
+    async reloadData(markdownPath: string, override: boolean = false) {
         try {
             const loader = new UnstructuredLoader(markdownPath, {
                 apiKey: process.env.UNSTRUCTURED_API_KEY,
@@ -131,9 +177,21 @@ class VectorStore {
             });
 
             const splits = await textSplitter.splitDocuments(docs);
-            this.vectorStore = await FaissStore.fromDocuments(splits, this.embeddings);
+
+            if (splits.length === 0) {
+                return;
+            }
+            
+            if (!this.vectorStore) {
+                this.vectorStore = await FaissStore.fromDocuments([splits[0]], this.embeddings);
+                splits.shift();
+            } 
+
+            for (const doc of splits) {
+                await this.addOrUpdateData(doc.pageContent, doc.metadata, override);
+            }
+            
             await this.vectorStore.save(this.directory);
-            console.log("Vector store created and saved successfully.");
         } catch (error: any) {
             console.error("Error reloading data:", error.message);
             throw error;
@@ -150,4 +208,10 @@ class VectorStore {
     }
 }
 
-export { splitMessage, initializeMongoClient, createConversationChain, VectorStore };
+async function processNewData(content: string, metadata: Record<string, any> = {}, override: boolean = false) {
+    const vectorStore = new VectorStore();
+    await vectorStore.initialize();
+    await vectorStore.addOrUpdateData(content, metadata, override);
+}
+
+export { splitMessage, initializeMongoClient, createConversationChain, VectorStore, processNewData };
