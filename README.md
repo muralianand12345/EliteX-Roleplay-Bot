@@ -2,13 +2,16 @@
 **An advanced Ticket Bot for Roleplay servers**
 
 ## Table of Contents
-- [Bot Features](#bot-features)
-- [Software and Applications used](#software-and-applications-used)
-- [Before you start](#before-you-start)
-- [Installation](#installation)
-- [About Code](#about-code)
-  - [Common Bugs](#common-bugs)
-  - [Developer](#developer)
+- [Discord Ticket Bot](#discord-ticket-bot)
+  - [Table of Contents](#table-of-contents)
+  - [Bot Features](#bot-features)
+  - [Software and Applications used](#software-and-applications-used)
+  - [Before you start](#before-you-start)
+  - [Installation:](#installation)
+  - [About Code:](#about-code)
+    - [Common Bugs:](#common-bugs)
+    - [Developer](#developer)
+    - [Version](#version)
 
 ## Bot Features
 - Multi-Guild bot, can be used to do ticket supporting on multiple servers.
@@ -53,5 +56,16 @@ tsc
 
 ### Developer
 - Murali Anand (murlee#0)
+
+### Version
+
+💠 x1.x2.x3.x3
+
+- x1 - Major update<br>
+- x2 - Minor updates and new feature<br>
+- x3 - Major bug fix and improvements<br>
+- x4 - Minor bug fix<br>
+- beta - testing
+
 
 [**Page Up**](#discord-ticket-bot)
