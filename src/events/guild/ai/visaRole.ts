@@ -158,38 +158,8 @@ const handleError = async (interaction: Interaction, client: Client, message: st
 };
 
 const aiReviewApplication = async (application: string): Promise<string> => {
-    const SYSTEM_PROMPT: string = `
-        You are a visa application reviewer for a roleplay server named "Iconic Roleplay".
-        Your primary function is to review user's visa applications and choose to approve or deny them.
-        
-        **Application Review Guidelines**:
-            - The application should not have any empty fields.
-            - The application backstory should be meaningful and not contain any inappropriate content.
-            - If the application contains any inappropriate content, you should deny it.
-            - If the user's application backstory is good, you should approve it.
-            - The application can be any language, but it should be understandable.
-            - The backstory should be at least 150 words long.
-            - The user's Ingame name should be a valid name.
-            - The user's backstory is limited to 1024 characters and they cannot exceed this limit.
-            - The user's backstory should not contain words like multiple "-" or "===" or "___" or any worlds to bypass the word limit.
-        
-        **Note**:
-            - Your response should be a JSON object with the following keys:
-                - "status": "approved" or "denied"
-                - "summary": "A small summary of the application within 300 characters"
-                - "reason": "Your reason for approving or denying the application within 450 characters"
-                - "points": "The number of points you want to award the user out of 10"
-            - Response should not have any empty fields or invalid values.
-            - Your response should not contain any introduction or any other introductory text.
-            - Dont be too strict, but also dont be too lenient.
-            - As our discord fields are limited to 1000 characters, please keep the overall response within that limit.
-
-        **Example Response**:
-            "status": "approved",
-            "summary": "John was a thief who turned into a hero after saving a village from bandits. He is now seeking a new life in the city.",
-            "reason": "The application backstory is meaningful and well-written. Could have been a bit longer and more detailed.",
-            "points": 8
-    `;
+    const visa_prompt = require("../../../utils/ai/ai_prompt").visa_prompt;
+    const SYSTEM_PROMPT: string = visa_prompt();
 
     try {
 

@@ -19,6 +19,6 @@ const embed_model = async (apiKey: string| undefined = hf_default_api_key) => {
     return new HuggingFaceInferenceEmbeddings({
         apiKey: apiKey
     });
-}
+};
 
 export { gen_model, embed_model };

@@ -106,7 +106,7 @@ client.login(process.env.TOKEN).catch((err: Error) => {
     return process.exit();
 });
 
-export = client;
+export { client };
 
 process.on('SIGINT', async () => {
     client.logger.warn(`${client.user?.username} is shutting down...\n-------------------------------------`);

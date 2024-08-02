@@ -19,7 +19,7 @@ const command: Command = {
 
         const markdownPath = path.join(__dirname, '..', '..', '..', 'vector-store', 'data', 'server_info.md');
 
-        const vectorStore = new VectorStore();
+        const vectorStore = new VectorStore(client);
         await vectorStore.initialize();
 
         try {

@@ -51,7 +51,7 @@ const getMentioned = (message: Message) => {
         ${mentionedChannels}
         Mentioned Roles:
         ${mentionedRoles}
-        `;
+    `;
 }
 
 export { getMentioned };

@@ -1,5 +1,6 @@
 import path from "path";
 import fs from 'fs/promises';
+import { Client } from "discord.js";
 import { config } from 'dotenv';
 import { MongoClient } from "mongodb";
 import { MongoDBChatMessageHistory } from "@langchain/mongodb";
@@ -38,7 +39,7 @@ class LimitedBufferMemory extends BufferMemory {
             }
         }
     }
-}
+};
 
 const splitMessage = (message: string, maxLength = 1900): string[] => {
     const result = [];
@@ -47,16 +48,16 @@ const splitMessage = (message: string, maxLength = 1900): string[] => {
         message = message.substring(maxLength);
     }
     return result;
-}
+};
 
 const initializeMongoClient = () => {
     return new MongoClient(process.env.MONGO_URI || "", {
         driverInfo: { name: "langchainjs" },
     });
-}
+};
 
-const createConversationChain = async(model: ChatGroq, mongoClient: MongoClient, systemPrompt: string, userId: string, memory_enabled: boolean = true, maxHistory: number = 10) => {
-    const collection = mongoClient.db("langchain").collection("memory");
+const createConversationChain = async (client: Client, model: ChatGroq, mongoClient: MongoClient, systemPrompt: string, userId: string, memory_enabled: boolean = true, maxHistory: number = 10) => {
+    const collection = mongoClient.db(client.config.ai.database.db_name).collection(client.config.ai.database.collection_name);
 
     let memory = undefined;
     let prompt: ChatPromptTemplate;
@@ -67,13 +68,13 @@ const createConversationChain = async(model: ChatGroq, mongoClient: MongoClient,
                 sessionId: userId,
             }),
             returnMessages: true,
-            memoryKey: "iconic-history",
-            maxHistory: maxHistory 
+            memoryKey: client.config.ai.database.memory_key,
+            maxHistory: maxHistory
         });
 
         prompt = ChatPromptTemplate.fromMessages([
             ['system', systemPrompt],
-            new MessagesPlaceholder("iconic-history"),
+            new MessagesPlaceholder(client.config.ai.database.memory_key),
             ['human', '{input}']
         ]);
     } else {
@@ -82,23 +83,23 @@ const createConversationChain = async(model: ChatGroq, mongoClient: MongoClient,
             ['human', '{input}']
         ]);
     }
-    
+
     return new ConversationChain({
         llm: model,
         memory: memory,
         prompt: prompt,
         outputParser: new StringOutputParser()
     });
-}
+};
 
 class VectorStore {
     private vectorStore: FaissStore | null = null;
     private embeddings: HuggingFaceInferenceEmbeddings;
     private directory: string;
 
-    constructor() {
+    constructor(client: Client) {
         this.embeddings = new HuggingFaceInferenceEmbeddings({
-            model: "sentence-transformers/all-MiniLM-L6-v2",
+            model: client.config.ai.model_name.embed,
             apiKey: process.env.HUGGINGFACEHUB_API_KEY
         });
         this.directory = path.join(__dirname, "..", "..", "..", "vector-store");
@@ -118,7 +119,7 @@ class VectorStore {
 
     async checkDataExists(content: string): Promise<boolean> {
         if (!this.vectorStore) {
-            return false; 
+            return false;
         }
         const results = await this.vectorStore.similaritySearch(content, 1);
         return results.length > 0 && results[0].pageContent === content;
@@ -181,16 +182,16 @@ class VectorStore {
             if (splits.length === 0) {
                 return;
             }
-            
+
             if (!this.vectorStore) {
                 this.vectorStore = await FaissStore.fromDocuments([splits[0]], this.embeddings);
                 splits.shift();
-            } 
+            }
 
             for (const doc of splits) {
                 await this.addOrUpdateData(doc.pageContent, doc.metadata, override);
             }
-            
+
             await this.vectorStore.save(this.directory);
         } catch (error: any) {
             console.error("Error reloading data:", error.message);
@@ -206,12 +207,12 @@ class VectorStore {
         const retrievedDocs = await retriever.invoke(query);
         return retrievedDocs.map(doc => doc.pageContent).join("\n\n");
     }
-}
+};
 
-async function processNewData(content: string, metadata: Record<string, any> = {}, override: boolean = false) {
-    const vectorStore = new VectorStore();
+async function processNewData(client: Client, content: string, metadata: Record<string, any> = {}, override: boolean = false) {
+    const vectorStore = new VectorStore(client);
     await vectorStore.initialize();
     await vectorStore.addOrUpdateData(content, metadata, override);
-}
+};
 
 export { splitMessage, initializeMongoClient, createConversationChain, VectorStore, processNewData };

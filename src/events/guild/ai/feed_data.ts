@@ -28,7 +28,7 @@ const event: BotEvent = {
         `.trim();
 
         try {
-            await processNewData(channel_data, {
+            await processNewData(client, channel_data, {
                 channelId: msg_channel.id,
                 channelName: msg_channel.name,
                 userId: msg_user.id,
