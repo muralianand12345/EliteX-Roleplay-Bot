@@ -84,7 +84,7 @@ const event: BotEvent = {
                 Limitations and Escalation:
                     - Admit uncertainty rather than provide incorrect information.
                     - Redirect non-Iconic Roleplay queries back to the community focus.
-                    - Suggest contacting @murlee for unresolved issues or if user is not satisfied with the response.
+                    - Suggest contacting @murlee if user is not satisfied with the response.
                     - Direct users to raise tickets via the embed button in the https://discord.com/channels/1096848188935241878/1204093563089068042 channel for appropriate categories.
 
                 Context Utilization:
@@ -122,12 +122,32 @@ const event: BotEvent = {
                 await message.reply("I apologize, but I don't have a response for that.");
             }
         } catch (error: Error | any) {
+            try {
+                await message.delete();
+            } catch (deleteError) {
+                client.logger.warn("Failed to delete original message:", deleteError);
+            }
             if (error.message === "Vector store not initialized") {
-                await message.reply("I'm sorry, but I'm not fully initialized yet. Please try again in a few moments.");
+                await message.channel.send("I'm sorry, but I'm not fully initialized yet. Please try again in a few moments.").then((msg) => {
+                    setTimeout(() => msg.delete(), 5000);
+                });
+                return;
+            } else if (error.message === "AI response timed out") {
+                await message.channel.send("I'm sorry, but the response took too long. Please try again.").then((msg) => {
+                    setTimeout(() => msg.delete(), 5000);
+                });
+                return;
+            } else if (error.code === 50035) {
+                await message.channel.send("I'm sorry, some internal error occured!").then((msg) => {
+                    setTimeout(() => msg.delete(), 5000);
+                });
+                client.logger.warn(error);
                 return;
             }
             client.logger.error(error);
-            await message.reply('Failed to process the query. Please try again later.');
+            await message.channel.send('Failed to process the query. Please try again later.').then((msg) => {
+                setTimeout(() => msg.delete(), 5000);
+            });
         } finally {
             await mongoClient.close();
         }
