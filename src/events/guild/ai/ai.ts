@@ -1,4 +1,5 @@
 import { Events, Message, Client } from "discord.js";
+import { MongoClient } from "mongodb";
 import { config } from "dotenv";
 import { splitMessage, initializeMongoClient, createConversationChain, VectorStore } from "../../../utils/ai/ai_functions";
 import { gen_model } from "../../../utils/ai/langchain_models";
@@ -9,9 +10,8 @@ import { BotEvent } from "../../../types";
 config();
 
 const vectorStore = new VectorStore(client);
-const mongoClient = initializeMongoClient();
-
-let model: Awaited<ReturnType<typeof gen_model>>;
+let mongoClient: MongoClient | null = null;
+let model: Awaited<ReturnType<typeof gen_model>> | null = null;
 
 const event: BotEvent = {
     name: Events.MessageCreate,
@@ -22,13 +22,17 @@ const event: BotEvent = {
         if (!chatChan || !message.channel || !chatChan.includes(message.channel.id) || message.author.bot) return;
         if (message.content.startsWith(client.config.bot.prefix)) return;
 
+        await message.channel.sendTyping();
+
         if (!model) {
             model = await gen_model(0.2, client.config.ai.model_name.gen); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
         }
 
-        const chatbot_prompt = require("../../../utils/ai/ai_prompt").chatbot_prompt;
+        if (!mongoClient) {
+            mongoClient = await initializeMongoClient();
+        }
 
-        await message.channel.sendTyping();
+        const chatbot_prompt = require("../../../utils/ai/ai_prompt").chatbot_prompt;
 
         try {
             await vectorStore.initialize();
@@ -42,8 +46,6 @@ const event: BotEvent = {
                 return;
             }
         }
-
-        await mongoClient.connect();
 
         try {
             const context = await vectorStore.retrieveContext(message.content);
@@ -66,6 +68,12 @@ const event: BotEvent = {
             if (chunks.length > 0) {
                 await message.reply(chunks[0]);
                 for (let i = 1; i < chunks.length; i++) {
+                    if (chunks[i - 1].split('```').length % 2 === 0) {
+                        chunks[i] = '```\n' + chunks[i];
+                    }
+                    if (chunks[i].split('```').length % 2 === 0) {
+                        chunks[i] += '\n```';
+                    }
                     await message.channel.send(chunks[i]);
                 }
             } else {
@@ -98,8 +106,6 @@ const event: BotEvent = {
             await message.channel.send('Failed to process the query. Please try again later.').then((msg) => {
                 setTimeout(() => msg.delete(), 5000);
             });
-        } finally {
-            await mongoClient.close();
         }
     }
 };

@@ -42,18 +42,48 @@ class LimitedBufferMemory extends BufferMemory {
 };
 
 const splitMessage = (message: string, maxLength = 1900): string[] => {
-    const result = [];
-    while (message.length > 0) {
-        result.push(message.substring(0, maxLength));
-        message = message.substring(maxLength);
+    const result: string[] = [];
+    let currentChunk = '';
+    let currentLine = '';
+
+    const lines = message.split('\n');
+
+    for (const line of lines) {
+        if ((currentChunk + currentLine + line).length <= maxLength) {
+            currentLine += (currentLine ? '\n' : '') + line;
+        } else {
+            if (currentChunk) {
+                result.push(currentChunk.trim());
+                currentChunk = '';
+            }
+            if (currentLine) {
+                currentChunk = currentLine + '\n';
+                currentLine = '';
+            }
+            if (line.length > maxLength) {
+                let remainingLine = line;
+                while (remainingLine.length > 0) {
+                    const chunk = remainingLine.slice(0, maxLength);
+                    result.push(chunk.trim());
+                    remainingLine = remainingLine.slice(maxLength);
+                }
+            } else {
+                currentLine = line;
+            }
+        }
     }
+
+    if (currentChunk || currentLine) {
+        result.push((currentChunk + currentLine).trim());
+    }
+
     return result;
 };
 
-const initializeMongoClient = () => {
-    return new MongoClient(process.env.MONGO_URI || "", {
+const initializeMongoClient = async () => {
+    return await new MongoClient(process.env.MONGO_URI || "", {
         driverInfo: { name: "langchainjs" },
-    });
+    }).connect();
 };
 
 const createConversationChain = async (client: Client, model: ChatGroq, mongoClient: MongoClient, systemPrompt: string, userId: string, memory_enabled: boolean = true, maxHistory: number = 10) => {
