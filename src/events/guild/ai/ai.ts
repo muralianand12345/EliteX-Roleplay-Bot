@@ -24,13 +24,8 @@ const event: BotEvent = {
 
         await message.channel.sendTyping();
 
-        if (!model) {
-            model = await gen_model(0.2, client.config.ai.model_name.gen); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
-        }
-
-        if (!mongoClient) {
-            mongoClient = await initializeMongoClient();
-        }
+        if (!model) model = await gen_model(0.2, client.config.ai.model_name.gen); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
+        if (!mongoClient) mongoClient = await initializeMongoClient();
 
         const chatbot_prompt = require("../../../utils/ai/ai_prompt").chatbot_prompt;
 

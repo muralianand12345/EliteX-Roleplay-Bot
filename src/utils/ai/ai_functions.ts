@@ -81,7 +81,7 @@ const splitMessage = (message: string, maxLength = 1900): string[] => {
 };
 
 const initializeMongoClient = async () => {
-    return await new MongoClient(process.env.MONGO_URI || "", {
+    return await new MongoClient(process.env.LLM_MONGO_URI || "", {
         driverInfo: { name: "langchainjs" },
     }).connect();
 };
