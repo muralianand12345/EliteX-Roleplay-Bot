@@ -6,6 +6,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import ai_api from './routes/ai_api';
 import { ensureHttps } from './middlewares/auth';
+import { aiChatLimiter } from './middlewares/rate_limit';
 
 import { BotEvent } from '../../../types';
 
@@ -46,6 +47,7 @@ const event: BotEvent = {
         const ticketLogDir = path.join(__dirname, '../ticket-logs');
 
         app.use('/api', ensureHttps);
+        app.use('/api/ai', aiChatLimiter);
         app.use('/api/ai', ai_api);
         app.use(express.static(ticketLogDir));
 

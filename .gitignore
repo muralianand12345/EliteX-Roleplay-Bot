@@ -138,3 +138,4 @@ build
 
 /vector-store/docstore.json
 /vector-store/faiss.index
+yarn.lock
