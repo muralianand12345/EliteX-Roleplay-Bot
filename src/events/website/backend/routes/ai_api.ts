@@ -3,6 +3,7 @@ import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { authenticate } from '../middlewares/auth';
 import { gen_model } from '../../../../utils/ai/langchain_models';
+import { client } from '../../../../bot';
 
 const router = Router();
 let model: Awaited<ReturnType<typeof gen_model>> | null = null;
@@ -78,7 +79,7 @@ router.post('/chat', authenticate, async (req, res) => {
 
         res.json({ reply: response });
     } catch (error) {
-        console.error('Error in AI API:', error);
+        client.logger.error('Error in AI API:', error);
         res.status(500).json({ error: 'An error occurred while processing your request' });
     }
 });

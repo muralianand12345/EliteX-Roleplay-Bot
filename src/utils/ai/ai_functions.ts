@@ -14,6 +14,7 @@ import { ConversationChain } from "langchain/chains";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatGroq } from "@langchain/groq";
 import { LimitedBufferMemoryOptions } from "../../types";
+import { client } from "../../bot";
 
 config();
 
@@ -143,7 +144,7 @@ class VectorStore {
                 this.vectorStore = await FaissStore.load(this.directory, this.embeddings);
             }
         } catch (error: any) {
-            console.error("Error during initialization:", error.message);
+            client.logger.error("Error during initialization:", error.message);
         }
     }
 
@@ -185,7 +186,7 @@ class VectorStore {
                     }
                 }
             } catch (error) {
-                console.error("Error deleting existing document. Proceeding with addition.", error);
+                client.logger.error("Error deleting existing document. Proceeding with addition.", error);
             }
         }
 
@@ -224,7 +225,7 @@ class VectorStore {
 
             await this.vectorStore.save(this.directory);
         } catch (error: any) {
-            console.error("Error reloading data:", error.message);
+            client.logger.error("Error reloading data:", error.message);
             throw error;
         }
     }

@@ -20,7 +20,7 @@ const corsOptions: cors.CorsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
     credentials: true,
 };
@@ -35,7 +35,7 @@ const event: BotEvent = {
 
         const Port = process.env.PORT;
         app.use(helmet());
-        app.use(cors(corsOptions));
+        app.options('*', cors(corsOptions));
         app.use(express.json());
 
         app.use(helmet.hsts({
