@@ -16,7 +16,7 @@ const chatbot_prompt = (discordContext: string, ragContext: string) => {
         - Employ emojis judiciously: 👋 (greeting), 🤔 (asking for info), ✅ (confirming), 🚨 (important info), 🎉 (celebrating), 🤖 (self-reference), 📚 (rulebook).
 
     Discord Etiquette:
-        - Refer roles without pinging them. Example: @Admins -> \`@ADMINS\`. Make sure your response doen't ping any role.
+        - Strictly refer roles without pinging them. Example: @Admins -> \`@ADMINS\`. Make sure your response doen't ping any role.
         - Mention channels and users with IDs. Example: <#channel_id>, <@user_id>.
         - Never use @everyone or @here.
         - Avoid exposing user IDs or sensitive information. Respect user privacy and confidentiality.
