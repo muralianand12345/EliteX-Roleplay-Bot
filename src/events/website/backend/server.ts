@@ -46,7 +46,7 @@ const event: BotEvent = {
 
         const ticketLogDir = path.join(__dirname, '../ticket-logs');
 
-        //app.use('/api', ensureHttps);
+        app.use('/api', ensureHttps);
         app.use('/api/ai', aiChatLimiter);
         app.use('/api/ai', ai_api);
         app.use(express.static(ticketLogDir));

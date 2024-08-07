@@ -6,6 +6,7 @@ import { gen_model } from "../../../utils/ai/langchain_models";
 import { getMentioned } from "../../../utils/ai/get_mentioned";
 import { client } from "../../../bot";
 import { BotEvent } from "../../../types";
+import blockUserAI from "../../database/schema/blockUserAI";
 
 config();
 
@@ -23,6 +24,15 @@ const event: BotEvent = {
         if (message.content.startsWith(client.config.bot.prefix)) return;
 
         await message.channel.sendTyping();
+
+        const blockedUserData = await blockUserAI.findOne({
+            userId: message.author.id,
+            status: true
+        });
+
+        if (blockedUserData) {
+            return message.reply('You are blocked from using the AI! Contact the server staff for more information.');
+        }
 
         if (!model) model = await gen_model(0.2, client.config.ai.model_name.gen); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
         if (!mongoClient) mongoClient = await initializeMongoClient();
