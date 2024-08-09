@@ -19,8 +19,7 @@ const corsOptions: cors.CorsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key']
+    methods: ['GET', 'POST', 'OPTIONS']
 };
 
 const app = express();
@@ -40,11 +39,6 @@ const event: BotEvent = {
 
         app.use('/api', ensureHttps);
         app.use('/api/v1/ai', aiChatLimiter);
-        app.use('/api/v1/ai', (req, res, next) => {
-            console.log('Request headers:', req.headers);
-            console.log('Request body:', req.body);
-            next();
-        }, ai_api);
         app.use('/api/v1/ai', ai_api);
 
         app.use(express.static(ticketLogDir));
