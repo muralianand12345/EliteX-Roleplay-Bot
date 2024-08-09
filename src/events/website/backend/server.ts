@@ -32,7 +32,7 @@ const event: BotEvent = {
     async execute(client) {
 
         const Port = process.env.PORT;
-        
+
         app.use(cors(corsOptions));
         app.use(express.json());
 
@@ -40,8 +40,13 @@ const event: BotEvent = {
 
         app.use('/api', ensureHttps);
         app.use('/api/v1/ai', aiChatLimiter);
+        app.use('/api/v1/ai', (req, res, next) => {
+            console.log('Request headers:', req.headers);
+            console.log('Request body:', req.body);
+            next();
+        }, ai_api);
         app.use('/api/v1/ai', ai_api);
-    
+
         app.use(express.static(ticketLogDir));
 
         app.listen(Port);
