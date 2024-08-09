@@ -20,8 +20,7 @@ const corsOptions: cors.CorsOptions = {
         }
     },
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
-    credentials: true
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key']
 };
 
 const app = express();
