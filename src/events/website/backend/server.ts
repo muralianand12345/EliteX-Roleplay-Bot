@@ -20,7 +20,7 @@ const corsOptions: cors.CorsOptions = {
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
     credentials: true,
 };
@@ -34,21 +34,21 @@ const event: BotEvent = {
     async execute(client) {
 
         const Port = process.env.PORT;
-        app.use(helmet());
+        //app.use(helmet());
         app.options('*', cors(corsOptions));
         app.use(express.json());
 
-        app.use(helmet.hsts({
-            maxAge: 31536000,
-            includeSubDomains: true,
-            preload: true
-        }));
+        // app.use(helmet.hsts({
+        //     maxAge: 31536000,
+        //     includeSubDomains: true,
+        //     preload: true
+        // }));
 
-        const ticketLogDir = path.join(__dirname, '../ticket-logs');
+        const ticketLogDir = path.join(__dirname, '../../../../ticket-logs');
 
-        app.use('/api', ensureHttps);
-        app.use('/api/ai', aiChatLimiter);
-        app.use('/api/ai', ai_api);
+        // app.use('/api', ensureHttps);
+        // app.use('/api/ai', aiChatLimiter);
+        // app.use('/api/ai', ai_api);
         app.use(express.static(ticketLogDir));
 
         app.listen(Port);

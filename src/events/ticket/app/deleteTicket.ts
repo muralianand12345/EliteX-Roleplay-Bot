@@ -14,7 +14,7 @@ config();
 const event: BotEvent = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
-        const ticketLogDir = path.join(__dirname, '../../website/ticket-logs');
+        const ticketLogDir = path.join(__dirname, '../../../../ticket-logs');
         const serverAdd = `${process.env.SERVERADD}`;
 
         const getTicketUser = async () => {

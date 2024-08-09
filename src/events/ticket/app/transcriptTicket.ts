@@ -38,7 +38,7 @@ const event: BotEvent = {
                 poweredBy: false
             });
 
-            const ticketLogDir = path.join(__dirname, '../../website/ticket-logs');
+            const ticketLogDir = path.join(__dirname, '../../../../ticket-logs');
             const serverAdd = `${process.env.SERVERADD}`;
 
             fs.writeFile(`${ticketLogDir}/transcript-${chan.id}.html`, htmlCode as string, (err) => {
