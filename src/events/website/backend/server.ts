@@ -10,11 +10,18 @@ import { aiChatLimiter } from './middlewares/rate_limit';
 
 import { BotEvent } from '../../../types';
 
+const allowedOrigins = ['https://muralianand.in', 'https://www.muralianand.in', 'https://ticket.iconicrp.in'];
 
 const corsOptions: cors.CorsOptions = {
-    origin: ['https://muralianand.in', 'https://www.muralianand.in', 'https://ticket.iconicrp.in'],
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'X-API-Key']
+    credentials: true
 };
 
 const app = express();
@@ -28,7 +35,7 @@ const event: BotEvent = {
         const Port = process.env.PORT;
         app.use(helmet());
         
-        app.use('/api', cors(corsOptions));
+        app.use(cors(corsOptions));
         app.use(express.json());
 
         app.use(helmet.hsts({
