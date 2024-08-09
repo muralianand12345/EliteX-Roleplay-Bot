@@ -3,7 +3,6 @@ import { config } from 'dotenv';
 import { Events } from 'discord.js';
 import path from 'path';
 import cors from 'cors';
-import helmet from 'helmet';
 import ai_api from './routes/ai_api';
 import { ensureHttps } from './middlewares/auth';
 import { aiChatLimiter } from './middlewares/rate_limit';
@@ -21,6 +20,7 @@ const corsOptions: cors.CorsOptions = {
         }
     },
     methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
     credentials: true
 };
 
@@ -33,16 +33,9 @@ const event: BotEvent = {
     async execute(client) {
 
         const Port = process.env.PORT;
-        app.use(helmet());
         
         app.use(cors(corsOptions));
         app.use(express.json());
-
-        app.use(helmet.hsts({
-            maxAge: 31536000,
-            includeSubDomains: true,
-            preload: true
-        }));
 
         const ticketLogDir = path.join(__dirname, '../../../../ticket-logs');
 
