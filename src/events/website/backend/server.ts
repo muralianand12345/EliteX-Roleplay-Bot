@@ -14,8 +14,7 @@ import { BotEvent } from '../../../types';
 const corsOptions: cors.CorsOptions = {
     origin: ['https://muralianand.in', 'https://www.muralianand.in', 'https://ticket.iconicrp.in'],
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key'],
-    credentials: true,
+    allowedHeaders: ['Content-Type', 'X-API-Key']
 };
 
 const app = express();
@@ -27,20 +26,20 @@ const event: BotEvent = {
     async execute(client) {
 
         const Port = process.env.PORT;
-        app.use(helmet());
+        // app.use(helmet());
         
         app.use('/api', cors(corsOptions));
         app.use(express.json());
 
-        app.use(helmet.hsts({
-            maxAge: 31536000,
-            includeSubDomains: true,
-            preload: true
-        }));
+        // app.use(helmet.hsts({
+        //     maxAge: 31536000,
+        //     includeSubDomains: true,
+        //     preload: true
+        // }));
 
         const ticketLogDir = path.join(__dirname, '../../../../ticket-logs');
 
-        app.use('/api', ensureHttps);
+        // app.use('/api', ensureHttps);
         app.use('/api/v1/ai', aiChatLimiter);
         app.use('/api/v1/ai', ai_api);
     
