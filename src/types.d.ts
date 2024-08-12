@@ -61,7 +61,8 @@ export interface Activity {
 }
 
 export interface LimitedBufferMemoryOptions extends BufferMemoryInput {
-    maxHistory: number;
+    maxHistory: number,
+    userId: string
 }
 
 //db

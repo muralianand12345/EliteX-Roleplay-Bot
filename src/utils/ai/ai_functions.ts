@@ -20,15 +20,20 @@ config();
 
 class LimitedBufferMemory extends BufferMemory {
     private maxHistory: number;
+    private logFolder: string;
+    private userId: string;
 
     constructor(options: LimitedBufferMemoryOptions) {
         super(options);
         this.maxHistory = options.maxHistory;
+        this.userId = options.userId;
+        this.logFolder = path.join(__dirname, '..', '..', '..', 'logs', 'ai-chat');
     }
 
     async saveContext(inputValues: Record<string, any>, outputValues: Record<string, any>): Promise<void> {
         await super.saveContext(inputValues, outputValues);
         await this.pruneMessages();
+        await this.logChat(inputValues, outputValues);
     }
 
     private async pruneMessages(): Promise<void> {
@@ -38,6 +43,21 @@ class LimitedBufferMemory extends BufferMemory {
             for (let i = messages.length - this.maxHistory; i < messages.length; i++) {
                 await this.chatHistory.addMessage(messages[i]);
             }
+        }
+    }
+
+    private async logChat(inputValues: Record<string, any>, outputValues: Record<string, any>): Promise<void> {
+        const timestamp = new Date().toISOString();
+        const username = client.users.cache.get(this.userId)?.username || this.userId;
+        const botname = client.user?.username || 'Iconic Bot';
+        const logEntry = `[${timestamp}]\nQuery: ${username} || ${JSON.stringify(inputValues)}\nResponse: ${botname} || ${JSON.stringify(outputValues)}\n\n`;
+
+        try {
+            await fs.mkdir(this.logFolder, { recursive: true });
+            const logFile = path.join(this.logFolder, `${this.userId}.log`);
+            await fs.appendFile(logFile, logEntry);
+        } catch (error) {
+            console.error('Error logging chat:', error);
         }
     }
 };
@@ -100,7 +120,8 @@ const createConversationChain = async (client: Client, model: ChatGroq, mongoCli
             }),
             returnMessages: true,
             memoryKey: client.config.ai.database.memory_key,
-            maxHistory: maxHistory
+            maxHistory: maxHistory,
+            userId: userId
         });
 
         prompt = ChatPromptTemplate.fromMessages([
