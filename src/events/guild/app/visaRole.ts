@@ -195,18 +195,33 @@ const createActionRow = (acceptDisabled: boolean = false, onHoldDisabled: boolea
 };
 
 const createDecisionEmbed = (user: User, decision: 'accept' | 'onhold' | 'reject', client: Client) => {
-    const title = `Visa Application ${decision.charAt(0).toUpperCase() + decision.slice(1)}`;
+    let title;
     let color: ColorResolvable;
     let description: string;
 
     switch (decision) {
         case 'accept':
+            title = 'Congratulations! Visa Application Accepted';
+            break;
+        case 'onhold':
+            title = 'Visa Application Under Review';
+            break;
+        case 'reject':
+            title = 'Visa Application Rejected';
+            break;
+        default:
+            title = 'Visa Application Decision';
+            break;
+    }
+
+    switch (decision) {
+        case 'accept':
             color = 'Green';
-            description = 'Your visa application has been accepted! You have been given the visa role. Welcome to EliteX RP! Hope you have a great time here.\n\nHappy Roleplaying!';
+            description = 'Your visa application has been accepted! You have been given the visa role. Welcome to EliteX RP! Hope you have a great time here.\nKeep watching <#1273689837030867024> for the updates.\nHappy Roleplaying!';
             break;
         case 'onhold':
             color = 'Yellow';
-            description = 'Your visa application is currently on hold. Please join the waiting hall <#1273994252019437659> for voice processing. You will be called in the announcement channel <#1273993959382978580> when it\'s your turn. After the voice process, your application will be either accepted or rejected.';
+            description = 'Your visa application is currently under review. Please join the waiting hall <#1273994252019437659> for voice processing. You will be called in the announcement channel <#1273993959382978580> when it\'s your turn. After the voice process, your application will be either accepted or rejected.';
             break;
         case 'reject':
             color = 'Red';
