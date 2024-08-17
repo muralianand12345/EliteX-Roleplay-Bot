@@ -9,7 +9,7 @@ import { aiChatLimiter } from './middlewares/rate_limit';
 
 import { BotEvent } from '../../../types';
 
-const allowedOrigins = ['https://muralianand.in', 'https://www.muralianand.in'];
+const allowedOrigins = ['https://muralianand.in', 'https://www.muralianand.in', 'https://elitexticket.muralianand.in'];
 
 const corsOptions: cors.CorsOptions = {
     origin: function (origin, callback) {
