@@ -169,3 +169,20 @@ export interface IPhoneNumber extends mongoose.Document {
     status: boolean,
     timestamp: Date
 }
+
+export interface IVisaApplication extends mongoose.Document {
+    userId: string,
+    accepted: boolean,
+    data: Array<IVisaApplicationData>
+}
+
+export interface IVisaApplicationData {
+    applicationId: string,
+    timestamp: Date,
+    user_response: Array<IVisaApplicationResponse>
+}
+
+export interface IVisaApplicationResponse {
+    question: string,
+    answer: string
+}

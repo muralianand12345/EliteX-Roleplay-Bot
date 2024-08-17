@@ -50,7 +50,7 @@ const command: SlashCommand = {
         });
 
         const embed = new EmbedBuilder()
-            .setAuthor({ name: client.user?.username || "Iconic RP", iconURL: client.user?.displayAvatarURL() })
+            .setAuthor({ name: client.user?.username || "EliteX RP", iconURL: client.user?.displayAvatarURL() })
             .setDescription(`<@${target.id}> has been added to the ticket!`);
 
         await chan.send({ embeds: [embed] });

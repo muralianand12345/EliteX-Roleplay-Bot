@@ -12,15 +12,15 @@ const command: Command = {
 
         const embed = new EmbedBuilder()
             .setColor('#4B0082')
-            .setAuthor({ name: client.user?.username || "Iconic RP", iconURL: client.user?.displayAvatarURL() })
+            .setAuthor({ name: client.user?.username || "EliteX RP", iconURL: client.user?.displayAvatarURL() })
             .setTitle('🛂 Visa Application Process')
-            .setDescription("Welcome to Iconic RP! To join our community, you'll need to apply for a visa. Click the button below to start your application.")
+            .setDescription("Welcome to EliteX RP! To join our community, you'll need to apply for a visa. Click the button below to start your application.")
             .addFields(
                 { name: '📝 Application Steps', value: '1. Click the "Apply for Visa" button\n2. Fill out the application form\n3. Submit and wait for review' },
                 { name: '⏳ Processing Time', value: 'Applications are typically reviewed within 24-48 hours.' },
                 { name: '📌 Important Note', value: 'Please ensure all information provided is accurate and detailed.' }
             )
-            .setImage('https://cdn.discordapp.com/attachments/1234453206529212416/1234454204563718193/iconic_FULL.png');
+            .setImage('https://cdn.discordapp.com/attachments/1273688228469280788/1274058841721405531/2-Transparent.png');
 
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(

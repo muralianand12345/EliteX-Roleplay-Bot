@@ -5,7 +5,7 @@ const cooldown = new Collection();
 const embedSend = async (client: Client, message: Message) => {
     const embed = new EmbedBuilder()
         .setColor('Red')
-        .setAuthor({ name: "Iconic RP ModMail" })
+        .setAuthor({ name: "EliteX RP ModMail" })
         .setDescription(`Hello <@${message.author.id}>! Click the below button to contact the staff members.\nYou can use this to ask doubts and questions (For reporting players kindly use the ticket system)`)
         .setFooter({ text: 'Click the button to get started!' });
     var button = new ActionRowBuilder<ButtonBuilder>()
@@ -52,7 +52,7 @@ const embedSend = async (client: Client, message: Message) => {
             } else {
                 const modmailmodal = new ModalBuilder()
                     .setCustomId('modmail-modal')
-                    .setTitle('Iconic RP ModMail');
+                    .setTitle('EliteX RP ModMail');
 
                 const Title = new TextInputBuilder()
                     .setCustomId('modmail-modal-title')

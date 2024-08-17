@@ -13,7 +13,7 @@ const command: Command = {
 
         const embed = new EmbedBuilder()
             .setColor('Red')
-            .setAuthor({ name: client.user?.username || "Iconic RP", iconURL: client.user?.displayAvatarURL() || "" })
+            .setAuthor({ name: client.user?.username || "EliteX RP", iconURL: client.user?.displayAvatarURL() || "" })
             .setDescription("```Bug Report```")
             .setFooter({ text: "Please describe the bug you found" });
 

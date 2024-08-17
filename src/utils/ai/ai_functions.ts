@@ -49,7 +49,7 @@ class LimitedBufferMemory extends BufferMemory {
     private async logChat(inputValues: Record<string, any>, outputValues: Record<string, any>): Promise<void> {
         const timestamp = new Date().toISOString();
         const username = client.users.cache.get(this.userId)?.username || this.userId;
-        const botname = client.user?.username || 'Iconic Bot';
+        const botname = client.user?.username || 'EliteX Bot';
         const logEntry = `[${timestamp}]\nQuery: ${username} || ${JSON.stringify(inputValues)}\nResponse: ${botname} || ${JSON.stringify(outputValues)}\n\n`;
 
         try {
