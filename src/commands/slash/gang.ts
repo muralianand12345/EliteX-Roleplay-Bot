@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, User, ColorResolvable } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable } from "discord.js";
 import GangInitSchema from "../../events/database/schema/gangInit";
 import { SlashCommand } from "../../types";
 
@@ -144,44 +144,91 @@ const command: SlashCommand = {
                 return "Cannot invite a user, you are not a leader of any gang.";
             }
 
-            gangData = await GangInitSchema.findOne({ "gangMembers.userId": user.id });
-            if (gangData) {
-                return "Cannot invite a user, the user is already a member of a gang.";
-            }
-
-            gangData = await GangInitSchema.findOne({ gangLeader: user.id });
-            if (gangData) {
-                return "Cannot invite a user, the user is already a leader of a gang.";
-            }
-
-            gangData = await GangInitSchema.findOne({ "gangMembers.userId": interaction.user.id });
-            if (!gangData) {
-                return "Cannot invite a user, you are not a member of any gang.";
-            }
-
-            gangData.gangMembers.push({
-                userId: user.id,
-                gangJoinDate: new Date()
+            const targetUserGang = await GangInitSchema.findOne({
+                $or: [
+                    { "gangMembers.userId": user.id },
+                    { gangLeader: user.id }
+                ]
             });
+            if (targetUserGang) {
+                return "Cannot invite this user, they are already a member or leader of a gang.";
+            }
 
-            await gangData.save();
-            return `User ${user.username} invited successfully.`;
+            const inviteEmbed = new EmbedBuilder()
+                .setTitle("Gang Invitation")
+                .setColor(gangData.gangColor as ColorResolvable)
+                .setDescription(`You've been invited to join a gang!`)
+                .addFields(
+                    { name: "Gang Name", value: gangData.gangName, inline: true },
+                    { name: "Gang Leader", value: `<@${gangData.gangLeader}>`, inline: true },
+                    { name: "Members", value: gangData.gangMembers.length.toString(), inline: true }
+                )
+                .setThumbnail(gangData.gangLogo);
+
+            const row = new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('accept-gang-offer')
+                        .setLabel('Accept')
+                        .setStyle(ButtonStyle.Success),
+                    new ButtonBuilder()
+                        .setCustomId('reject-gang-offer')
+                        .setLabel('Reject')
+                        .setStyle(ButtonStyle.Danger)
+                );
+
+            try {
+                const sentInvite = await user.send({ embeds: [inviteEmbed], components: [row] });
+
+                const collector = sentInvite.createMessageComponentCollector({
+                    componentType: ComponentType.Button,
+                    time: 15 * 60 * 1000 // 5 minutes
+                });
+
+                collector.on('collect', async (i) => {
+                    if (i.user.id === user.id) {
+                        if (i.customId === 'accept-gang-offer') {
+                            gangData.gangMembers.push({
+                                userId: user.id,
+                                gangJoinDate: new Date()
+                            });
+                            await gangData.save();
+
+                            await i.update({ content: "You've accepted the invitation!", components: [] });
+                            await interaction.followUp(`${user.username} has accepted your gang invitation!`);
+                        } else if (i.customId === 'reject-gang-offer') {
+                            await i.update({ content: "You've rejected the invitation.", components: [] });
+                            await interaction.followUp(`${user.username} has rejected your gang invitation.`);
+                        }
+                        collector.stop();
+                    }
+                });
+
+                collector.on('end', async (collected, reason) => {
+                    if (reason === 'time') {
+                        await sentInvite.edit({ content: "This invitation has expired.", components: [] });
+                        await interaction.followUp(`The invitation to ${user.username} has expired.`);
+                    }
+                });
+
+                return `Invitation sent to ${user.username}. Waiting for their response...`;
+            } catch (error) {
+                console.error("Error sending invitation:", error);
+                return `Failed to send invitation to ${user.username}. They may have DMs disabled.`;
+            }
         };
 
         const kickUser = async (user: User) => {
+            const gangData = await GangInitSchema.findOne({
+                gangLeader: interaction.user.id,
+                "gangMembers.userId": user.id
+            });
 
-            let gangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
             if (!gangData) {
-                return "Cannot kick a user, you are not a leader of any gang.";
-            }
-
-            gangData = await GangInitSchema.findOne({ "gangMembers.userId": user.id });
-            if (!gangData) {
-                return "Cannot kick a user, the user is not a member of any gang.";
+                return "Cannot kick this user. Either you are not the gang leader or the user is not a member of your gang.";
             }
 
             gangData.gangMembers = gangData.gangMembers.filter(member => member.userId !== user.id);
-
             await gangData.save();
             return `User ${user.username} kicked successfully.`;
         };
