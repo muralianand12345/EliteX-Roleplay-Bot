@@ -14,9 +14,9 @@ const event: BotEvent = {
                 return interaction.reply({ content: "You don't have permission to approve gangs.", ephemeral: true });
             }
 
-            const gangId = interaction.message.embeds[0]?.fields?.find(f => f.name === "Gang Leader ID")?.value;
-            if (!gangId) {
-                return interaction.reply({ content: "Gang ID not found in the message.", ephemeral: true });
+            const gangLeaderId = interaction.message.embeds[0]?.fields?.find(f => f.name === "Gang Leader ID")?.value;
+            if (!gangLeaderId) {
+                return interaction.reply({ content: "Gang Leader ID not found in the message.", ephemeral: true });
             }
 
             const gangColor = interaction.message.embeds[0]?.fields?.find(f => f.name === "Gang Color")?.value;
@@ -24,7 +24,7 @@ const event: BotEvent = {
                 return interaction.reply({ content: "Gang Color not found in the message.", ephemeral: true });
             }
 
-            const gangData = await GangInitSchema.findById(gangId);
+            const gangData = await GangInitSchema.findOne({ gangLeader: gangLeaderId });
             if (!gangData) {
                 return interaction.reply({ content: "Gang not found.", ephemeral: true });
             }
@@ -66,7 +66,7 @@ const event: BotEvent = {
                     await interaction.reply({ content: "An error occurred while approving the gang.", ephemeral: true });
                 }
             } else if (interaction.customId === 'reject-gang') {
-                await GangInitSchema.findByIdAndDelete(gangId);
+                await GangInitSchema.findOneAndDelete({ gangLeader: gangLeaderId });
                 await interaction.update({ content: "Gang rejected and deleted.", components: [] });
             }
         };
