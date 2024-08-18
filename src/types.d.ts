@@ -186,3 +186,18 @@ export interface IVisaApplicationResponse {
     question: string,
     answer: string
 }
+
+export interface IGangInit extends mongoose.Document {
+    gangName: string,
+    gangColor: string,
+    gangLogo: string,
+    gangLeader: string,
+    gangMembers: Array<IGangMembers>,
+    gangCreated: Date,
+    gangStatus: boolean
+}
+
+export interface IGangMembers {
+    userId: string,
+    gangJoinDate: Date
+}
