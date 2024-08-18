@@ -60,12 +60,17 @@ const event: BotEvent = {
                         }
                     }
 
+                    const leaderUser = await client.users.fetch(gangData.gangLeader);
+                    await leaderUser.send(`Your gang **${gangData.gangName}** has been approved!`);
+
                     await interaction.update({ content: "Gang approved and roles assigned!", components: [] });
                 } catch (error) {
                     console.error("Error approving gang:", error);
                     await interaction.reply({ content: "An error occurred while approving the gang.", ephemeral: true });
                 }
             } else if (interaction.customId === 'reject-gang') {
+                const leaderUser = await client.users.fetch(gangData.gangLeader);
+                await leaderUser.send(`Your gang **${gangData.gangName}** has been rejected.`);
                 await GangInitSchema.findOneAndDelete({ gangLeader: gangLeaderId });
                 await interaction.update({ content: "Gang rejected and deleted.", components: [] });
             }
