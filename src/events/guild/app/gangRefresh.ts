@@ -11,10 +11,13 @@ const createGangEmbed = (gang: IGangInit) => new EmbedBuilder()
     .setThumbnail(gang.gangLogo)
     .addFields(
         { name: 'Leader', value: `<@${gang.gangLeader}>`, inline: true },
-        { name: 'Members', value: gang.gangMembers.length.toString(), inline: true },
-        { name: 'Created', value: gang.gangCreated.toDateString(), inline: true }
+        { name: 'Total Members', value: gang.gangMembers.length.toString(), inline: true },
+        { name: 'Created', value: gang.gangCreated.toDateString(), inline: true },
+        { name: "Status", value: gang.gangStatus ? "Active" : "Inactive", inline: true },
+        { name: 'Members', value: gang.gangMembers.map(m => `<@${m.userId}>`).join('\n') }
     )
-    .setFooter({ text: `Gang ID: ${gang._id}` });
+    .setFooter({ text: `Gang ID: ${gang._id}` })
+    .setTimestamp();
 
 const updateGangEmbeds = async (client: Client, channelId: string) => {
     try {
