@@ -14,7 +14,7 @@ const event: BotEvent = {
                 return interaction.reply({ content: "You don't have permission to approve gangs.", ephemeral: true });
             }
 
-            const gangId = interaction.message.embeds[0]?.fields?.find(f => f.name === "Gang ID")?.value;
+            const gangId = interaction.message.embeds[0]?.fields?.find(f => f.name === "Gang Leader ID")?.value;
             if (!gangId) {
                 return interaction.reply({ content: "Gang ID not found in the message.", ephemeral: true });
             }

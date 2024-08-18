@@ -94,6 +94,7 @@ const command: SlashCommand = {
                         { name: "Gang Name", value: gangData.gangName, inline: true },
                         { name: "Leader", value: `<@${gangData.gangLeader}>`, inline: true },
                         { name: "Gang Color", value: gangData.gangColor, inline: true },
+                        { name: "Gang Leader ID", value: gangData.gangLeader, inline: true }
                     )
                     .setThumbnail(gangData.gangLogo);
         
