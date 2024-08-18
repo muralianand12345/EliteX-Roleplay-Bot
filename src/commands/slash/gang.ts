@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError } from "discord.js";
 import GangInitSchema from "../../events/database/schema/gangInit";
 import { IGangInit, SlashCommand } from "../../types";
 
@@ -97,7 +97,7 @@ const command: SlashCommand = {
                         { name: "Gang Leader ID", value: gangData.gangLeader, inline: true }
                     )
                     .setThumbnail(gangData.gangLogo);
-        
+
                 const row = new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()
@@ -109,7 +109,7 @@ const command: SlashCommand = {
                             .setLabel('Reject')
                             .setStyle(ButtonStyle.Danger)
                     );
-        
+
                 await adminChannel.send({ embeds: [embed], components: [row] });
             }
         };
@@ -178,7 +178,7 @@ const command: SlashCommand = {
                 if (!gangData.gangStatus) {
                     return "Cannot invite users, your gang is not yet approved by admins.";
                 }
-        
+
                 const targetUserGang = await GangInitSchema.findOne({
                     $or: [
                         { "gangMembers.userId": user.id },
@@ -196,7 +196,7 @@ const command: SlashCommand = {
                 if (gangData.gangMembers.length >= 25) {
                     return "Cannot invite more members, gang is full.";
                 }
-        
+
                 const inviteEmbed = new EmbedBuilder()
                     .setTitle("Gang Invitation")
                     .setColor(gangData.gangColor as ColorResolvable)
@@ -207,7 +207,7 @@ const command: SlashCommand = {
                         { name: "Members", value: gangData.gangMembers.length.toString(), inline: true }
                     )
                     .setThumbnail(gangData.gangLogo);
-        
+
                 const row = new ActionRowBuilder<ButtonBuilder>()
                     .addComponents(
                         new ButtonBuilder()
@@ -219,34 +219,60 @@ const command: SlashCommand = {
                             .setLabel('Reject')
                             .setStyle(ButtonStyle.Danger)
                     );
-        
-                const sentInvite = await user.send({ embeds: [inviteEmbed], components: [row] });
-        
+
+                let sentInvite;
+                try {
+                    sentInvite = await user.send({ embeds: [inviteEmbed], components: [row] });
+                } catch (error) {
+                    if (error instanceof DiscordAPIError && error.code === 50007) {
+                        return `Unable to send invitation to ${user.username}. They may have DMs disabled or have blocked the bot.`;
+                    } else {
+                        throw error;
+                    }
+                }
+
                 const collector = sentInvite.createMessageComponentCollector({
                     componentType: ComponentType.Button,
                     time: 15 * 60 * 1000 // 15 minutes
                 });
-        
+
                 collector.on('collect', async (i) => {
                     if (i.user.id === user.id) {
                         try {
                             if (i.customId === 'accept-gang-offer') {
+
+                                const updatedGangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
+                                if (!updatedGangData || updatedGangData.gangMembers.length >= 25) {
+                                    await i.update({ content: "Sorry, the gang is no longer available or is full.", components: [] });
+                                    return;
+                                }
+
+                                const existingMember = updatedGangData.gangMembers.find(member => member.userId === user.id);
+                                if (existingMember) {
+                                    await i.update({ content: "You've already joined the gang.", components: [] });
+                                    return;
+                                }
+
                                 gangData.gangMembers.push({
                                     userId: user.id,
                                     gangJoinDate: new Date()
                                 });
                                 await gangData.save();
 
-                                const role = interaction.guild?.roles.cache.get(gangData.gangRole);
+                                const role = interaction.guild?.roles.cache.get(updatedGangData.gangRole);
                                 if (role) {
-                                    await interaction.guild?.members.cache.get(user.id)?.roles.add(role);
+                                    try {
+                                        await interaction.guild?.members.cache.get(user.id)?.roles.add(role);
+                                    } catch (roleError) {
+                                        client.logger.error("Error adding role to user:", roleError);
+                                    }
                                 }
-        
+
                                 await i.update({ content: "You've accepted the invitation!", components: [] });
-                                await interaction.followUp({ content: `${user.username} has accepted your gang invitation!`, ephemeral: true }).catch(() => {});
+                                await interaction.followUp({ content: `${user.username} has accepted your gang invitation!`, ephemeral: true }).catch(() => { });
                             } else if (i.customId === 'reject-gang-offer') {
                                 await i.update({ content: "You've rejected the invitation.", components: [] });
-                                await interaction.followUp({ content: `${user.username} has rejected your gang invitation.`, ephemeral: true }).catch(() => {});
+                                await interaction.followUp({ content: `${user.username} has rejected your gang invitation.`, ephemeral: true }).catch(() => { });
                             }
                         } catch (error) {
                             client.logger.error("Error processing gang invitation response:", error);
@@ -255,7 +281,7 @@ const command: SlashCommand = {
                         collector.stop();
                     }
                 });
-        
+
                 collector.on('end', async (collected, reason) => {
                     if (reason === 'time') {
                         await sentInvite.edit({ content: "This invitation has expired.", components: [] });
@@ -266,7 +292,7 @@ const command: SlashCommand = {
                         }
                     }
                 });
-        
+
                 return `Invitation sent to ${user.username}. Waiting for their response...`;
             } catch (error) {
                 client.logger.error("Error in inviteUser function:", error);
@@ -313,6 +339,7 @@ const command: SlashCommand = {
                 .setThumbnail(gangData.gangLogo)
                 .addFields(
                     { name: "Leader", value: `<@${gangData.gangLeader}>`, inline: true },
+                    { name: 'Total Members', value: gangData.gangMembers.length.toString(), inline: true },
                     { name: "Created", value: gangData.gangCreated.toDateString(), inline: true },
                     { name: "Status", value: gangData.gangStatus ? "Active" : "Inactive", inline: true },
                     { name: "Members", value: gangData.gangMembers.map(member => `<@${member.userId}>`).join(", ") }

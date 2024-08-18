@@ -53,8 +53,7 @@ const updateGangEmbeds = async (client: Client, channelId: string) => {
 
 const setupGangEmbedUpdates = (client: Client, channelId: string) => {
     updateGangEmbeds(client, channelId);
-    // scheduleJob('0 * * * *', () => updateGangEmbeds(client, channelId));
-    scheduleJob('*/1 * * * *', () => updateGangEmbeds(client, channelId));
+    scheduleJob('*/5 * * * *', () => updateGangEmbeds(client, channelId));
 };
 
 const event: BotEvent = {
