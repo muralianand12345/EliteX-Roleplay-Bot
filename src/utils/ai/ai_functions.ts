@@ -57,7 +57,7 @@ class LimitedBufferMemory extends BufferMemory {
             const logFile = path.join(this.logFolder, `${this.userId}.log`);
             await fs.appendFile(logFile, logEntry);
         } catch (error) {
-            console.error('Error logging chat:', error);
+            client.logger.error('Error logging chat:', error);
         }
     }
 };

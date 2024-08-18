@@ -249,7 +249,7 @@ const command: SlashCommand = {
                                 await interaction.followUp({ content: `${user.username} has rejected your gang invitation.`, ephemeral: true }).catch(() => {});
                             }
                         } catch (error) {
-                            console.error("Error processing gang invitation response:", error);
+                            client.logger.error("Error processing gang invitation response:", error);
                             await i.update({ content: "An error occurred while processing your response.", components: [] });
                         }
                         collector.stop();
@@ -262,14 +262,14 @@ const command: SlashCommand = {
                         try {
                             await interaction.followUp({ content: `The invitation to ${user.username} has expired.`, ephemeral: true });
                         } catch (error) {
-                            console.error("Error sending expiration notification:", error);
+                            client.logger.error("Error sending expiration notification:", error);
                         }
                     }
                 });
         
                 return `Invitation sent to ${user.username}. Waiting for their response...`;
             } catch (error) {
-                console.error("Error in inviteUser function:", error);
+                client.logger.error("Error in inviteUser function:", error);
                 return `An error occurred while inviting ${user.username}. Please try again later.`;
             }
         };
@@ -365,6 +365,10 @@ const command: SlashCommand = {
 
         await interaction.deferReply();
 
+        if (!client.config.gang.enabled) return await interaction.editReply("Gang feature is disabled.");
+        if (!interaction.guild) return await interaction.editReply("This command can only be used in a server.");
+        if (interaction.channel?.id !== client.config.gang.channel.create) return await interaction.editReply(`This command can only be used in <#${client.config.gang.channel.create}>.`);
+
         try {
             switch (interaction.options.getSubcommand()) {
                 case "create": {
@@ -409,7 +413,7 @@ const command: SlashCommand = {
                 }
             }
         } catch (error) {
-            console.error("Error in gang command:", error);
+            client.logger.error("Error in gang command:", error);
             await interaction.editReply("An error occurred while processing your request.");
         }
     }

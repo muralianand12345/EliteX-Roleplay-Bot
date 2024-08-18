@@ -65,7 +65,7 @@ const event: BotEvent = {
 
                     await interaction.update({ content: "Gang approved and roles assigned!", components: [] });
                 } catch (error) {
-                    console.error("Error approving gang:", error);
+                    client.logger.error("Error approving gang:", error);
                     await interaction.reply({ content: "An error occurred while approving the gang.", ephemeral: true });
                 }
             } else if (interaction.customId === 'reject-gang') {
