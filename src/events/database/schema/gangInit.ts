@@ -6,6 +6,7 @@ const ganginitSchema = new Schema<IGangInit>({
     gangColor: { type: String, required: true },
     gangLogo: { type: String, required: true },
     gangLeader: { type: String, required: true },
+    gangRole: { type: String, required: true },
     gangMembers: [{
         userId: { type: String, required: true },
         gangJoinDate: { type: Date, required: true }

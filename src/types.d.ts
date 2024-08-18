@@ -192,6 +192,7 @@ export interface IGangInit extends mongoose.Document {
     gangColor: string,
     gangLogo: string,
     gangLeader: string,
+    gangRole: string,
     gangMembers: Array<IGangMembers>,
     gangCreated: Date,
     gangStatus: boolean
