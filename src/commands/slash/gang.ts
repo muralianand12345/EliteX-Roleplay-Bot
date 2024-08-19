@@ -3,7 +3,7 @@ import GangInitSchema from "../../events/database/schema/gangInit";
 import { IGangInit, SlashCommand } from "../../types";
 
 const command: SlashCommand = {
-    cooldown: 1000,
+    cooldown: 5000,
     owner: false,
     data: new SlashCommandBuilder()
         .setName("gang")
