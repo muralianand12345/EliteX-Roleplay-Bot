@@ -43,6 +43,6 @@ const event: BotEvent = {
 
         client.user.setStatus(PresenceUpdateStatus.DoNotDisturb);
     }
-}
+};
 
 export default event;
