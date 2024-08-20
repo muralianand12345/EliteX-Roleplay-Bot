@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../middlewares/auth';
 import { client } from '../../../../bot';
-import { Guild, GuildMember, Role } from 'discord.js';
+import { EmbedBuilder, Guild, GuildMember, Role, WebhookClient } from 'discord.js';
 
 const router = Router();
 
@@ -34,6 +34,20 @@ router.post('/job/roles', authenticate, async (req, res) => {
         }
 
         const role = await guild.roles.fetch(jobRoles.role) as Role;
+
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: client.user?.username || "", iconURL: client.user?.displayAvatarURL() })
+            .setColor(action === 'add' ? 'Green' : 'Red')
+            .setDescription(`User: ${user.user.tag}\nTarget: ${target.user.tag}\nRole: ${role.name}\nAction: ${action}`);
+
+        if (client.config.fivem.log.enabled) {
+            const webhook = new WebhookClient({ url: client.config.fivem.log.webhook });
+            await webhook.send({
+                username: client.user?.username,
+                avatarURL: client.user?.displayAvatarURL(),
+                embeds: [embed]
+            });
+        }
 
         if (action === 'add') {
             await target.roles.add(role);
