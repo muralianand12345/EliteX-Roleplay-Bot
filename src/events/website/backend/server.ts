@@ -38,8 +38,7 @@ const event: BotEvent = {
 
         const ticketLogDir = path.join(__dirname, '../../../../ticket-logs');
 
-        app.use('/api', ensureHttps);
-        app.use('/api/v1/ai', aiChatLimiter);
+        app.use('/api/v1/ai', ensureHttps, aiChatLimiter);
         app.use('/api/v1/ai', ai_api);
         app.use('/api/v1/fivem', fivem_api);
 
