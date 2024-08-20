@@ -15,7 +15,7 @@ router.post('/job/roles', authenticate, async (req, res) => {
 
     try {
 
-        if (!client.config.fivem.enalbed) return res.status(400).json({ error: 'FiveM integration is disabled' });
+        if (!client.config.fivem.enabled) return res.status(400).json({ error: 'FiveM integration is disabled' });
 
         const guild = client.guilds.cache.get(client.config.fivem.discord.guildId) as Guild;
         if (!guild) {
