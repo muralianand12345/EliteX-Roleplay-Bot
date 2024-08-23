@@ -1,10 +1,10 @@
-# Iconic Roleplay: The Ultimate Tamil Roleplay Experience
+# EliteX Roleplay: The Ultimate Tamil Roleplay Experience
 
 ## Overview
-Iconic Roleplay is a premier Tamil roleplay server, created by the visionary team of Kalilaasa, ThalaiNagaram, Ullasa Ullagam, and EliteX RP. Our server offers an immersive and authentic roleplaying environment for the Tamil community.
+EliteX RP is a premier Tamil roleplay server, created by an person OwnerPlayz. Our server offers an immersive and authentic roleplaying environment for the Tamil community.
 
 ### Key Features:
-- Available on FiveM and RedM platforms (previously on RageMP)
+- Available on FiveM
 - Free-to-play, high-quality roleplaying experience
 - Rich, immersive world with detailed environments
 - Diverse character options and storylines
@@ -12,7 +12,6 @@ Iconic Roleplay is a premier Tamil roleplay server, created by the visionary tea
 
 ## Platforms
 1. FiveM: A modification framework for GTA V, allowing multiplayer on customized dedicated servers.
-2. RedM: Similar to FiveM, but for Red Dead Redemption 2, offering a wild west roleplaying experience.
 
 ## Community Highlights
 - Engaging storylines and character development
@@ -21,10 +20,10 @@ Iconic Roleplay is a premier Tamil roleplay server, created by the visionary tea
 - Continuous updates and improvements to enhance gameplay
 
 ## Getting Started
-1. Join our Discord server: http://discord.gg/bezKPsgVdx (Permanent link) or discord.gg/iconicrp (Temporary link)
+1. Join our Discord server: https://discord.gg/CKEQEEy8Pv (Permanent link) or discord.gg/elitexrp (Temporary link)
 2. Apply for a visa through the application process
 3. Review the server rules and guidelines
-4. Connect to the server using FiveM or RedM client
+4. Connect to the server using FiveM client
 
 ## Server Rules
 
@@ -181,34 +180,15 @@ g) Disregarding RP Consequences:
 - Allows for fair police response and roleplay development
 
 ### Visa Application Process
-1. Access the application: Go to https://discord.com/channels/1096848188935241878/1097141376279388291
+1. Access the application: Go to https://discord.com/channels/784794493580476436/1274078968621961246
 2. Click "Apply for Visa" button
 3. Complete the detailed application form
-4. Submit and await review (typically 24-48 hours)
+4. Submit and await review (typically 1-24 hours)
 5. Ensure all provided information is accurate and comprehensive
 
-### Support Systems
-
-#### Modmail
-- Purpose: For less severe issues or general queries
-- How to Use:
-  1. DM the Iconic Roleplay Discord bot
-  2. Follow the guided process for issue resolution
-  3. Can be used for quick questions and minor problems
-
-#### Support Ticket
-- Purpose: For more severe issues, OOC problems, report bugs, supporter-related queries, In game issue and reports and more Roleplay related issues.
-- How to Use:
-  1. Go to https://discord.com/channels/1096848188935241878/1204093563089068042
-  2. Click the embed button to request a ticket
-  3. Select the appropriate category for your issue
-  4. Submit the form and await admin response
-  5. Engage with the admin to resolve your issue
-
 ### Additional Information
-- Developer: Iconic Bot developed by Murali Anand
-- Server Maintenance: Regular updates and improvements
-- Community Events: Check Discord announcements for special events and activities
-- Roleplay Resources: Extensive guidebook available at https://discord.com/channels/1096848188935241878/1208098391406415913
+- Developer: EliteX Bot developed by Murali Anand (@murlee)
+- Community Events: Check Discord announcements (https://discord.com/channels/784794493580476436/1273689837030867024) for special events and activities 
+- Roleplay Resources: Extensive guidebook available at https://discord.com/channels/784794493580476436/1273691719786954793
 
-Remember, Iconic Roleplay is committed to providing an immersive, enjoyable, and fair roleplaying experience for all participants. Adherence to these rules and guidelines ensures a positive environment for everyone in our community.
+Remember, EliteX Roleplay is committed to providing an immersive, enjoyable, and fair roleplaying experience for all participants. Adherence to these rules and guidelines ensures a positive environment for everyone in our community.
