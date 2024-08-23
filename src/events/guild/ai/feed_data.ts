@@ -35,8 +35,6 @@ const event: BotEvent = {
                 username: msg_user.username,
                 timestamp: new Date().toISOString()
             });
-
-            console.log(`Data processed for AI: ${channel_data}`);
         } catch (error) {
             client.logger.error(`Error processing message for AI: ${error}`);
         }
