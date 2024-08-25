@@ -83,7 +83,6 @@ const handleModalSubmit = async (interaction: any, client: Client) => {
 
 const handleButtonInteraction = async (interaction: any, client: Client) => {
     try {
-
         const [action, userId] = interaction.customId.split('-');
         const jobName = interaction.channel.name;
         const selectedJob = client.config.job.application.jobtype.find((job: any) => job.name === jobName);
@@ -99,21 +98,43 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
         const user = await client.users.fetch(userId);
         const acceptRejectChannel = await client.channels.fetch(client.config.job.channel.acceptreject) as any;
 
-        if (action === 'acceptjobapplication') {
-            await user.send(`Congratulations! Your application for ${jobName} has been accepted.`);
-            await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been accepted.`);
-        } else if (action === 'rejectjobapplication') {
-            await user.send(`We're sorry, but your application for ${jobName} has been rejected.`);
-            await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been rejected.`);
+        const isAccepted = action === 'acceptjobapplication';
+        const status = isAccepted ? 'accepted' : 'rejected';
+
+        const dmEmbed = new EmbedBuilder()
+            .setTitle(`Job Application ${status.charAt(0).toUpperCase() + status.slice(1)}`)
+            .setDescription(`Your application for ${jobName} has been ${status}.`)
+            .setColor(isAccepted ? 'Green' : 'Red')
+            .setTimestamp();
+
+        if (isAccepted) {
+            dmEmbed.addFields({ name: 'Next Steps', value: 'Please await further instructions from the hiring team.' });
+        } else {
+            dmEmbed.addFields({ name: 'Future Opportunities', value: 'We encourage you to apply for future positions that match your skills and interests.' });
         }
 
-        await interaction.reply({ content: `Application ${action === 'acceptjobapplication' ? 'accepted' : 'rejected'}.`, ephemeral: true });
+        await user.send({ embeds: [dmEmbed] });
+
+        const channelEmbed = new EmbedBuilder()
+            .setTitle(`Job Application ${status.charAt(0).toUpperCase() + status.slice(1)}`)
+            .setDescription(`${user.tag}'s application for ${jobName} has been ${status}.`)
+            .setColor(isAccepted ? 'Green' : 'Red')
+            .addFields(
+                { name: 'Applicant', value: user.tag },
+                { name: 'Position', value: jobName },
+                { name: 'Status', value: status.charAt(0).toUpperCase() + status.slice(1) }
+            )
+            .setTimestamp();
+
+        await acceptRejectChannel.send({ embeds: [channelEmbed] });
+
+        await interaction.reply({ content: `Application ${status}.`, ephemeral: true });
         await interaction.message.edit({ components: [] });
     } catch (error) {
-        client.logger.error('Error in handleModalSubmit:', error);
-        await interaction.reply({ content: 'An error occurred while submitting your application. Please try again later.', ephemeral: true }).catch((err: Error | any) => client.logger.error('Error in handleModalSubmit:', err));
+        client.logger.error('Error in handleButtonInteraction:', error);
+        await interaction.reply({ content: 'An error occurred while processing the application. Please try again later.', ephemeral: true }).catch((err: Error | any) => client.logger.error('Error in handleButtonInteraction:', err));
     }
-}
+};
 
 const event: BotEvent = {
     name: Events.InteractionCreate,
