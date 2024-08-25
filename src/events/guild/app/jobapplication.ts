@@ -86,31 +86,40 @@ const handleModalSubmit = async (interaction: any, client: Client) => {
 };
 
 const handleButtonInteraction = async (interaction: any, client: Client) => {
-    const [action, userId] = interaction.customId.split('-');
-    const jobName = interaction.channel.name;
-    const selectedJob = client.config.job.application.jobtype.find((job: any) => job.name === jobName);
+    try {
+        console.log('Modal submitted:', interaction.customId);
+        console.log('User:', interaction.user.tag);
+        const [action, userId] = interaction.customId.split('-');
+        const jobName = interaction.channel.name;
+        const selectedJob = client.config.job.application.jobtype.find((job: any) => job.name === jobName);
 
-    if (!selectedJob) {
-        return await interaction.reply({ content: 'Error: Job type not found.', ephemeral: true });
+        if (!selectedJob) {
+            return await interaction.reply({ content: 'Error: Job type not found.', ephemeral: true });
+        }
+
+        if (!interaction.member.roles.cache.has(selectedJob.head)) {
+            return await interaction.reply({ content: 'You do not have permission to perform this action.', ephemeral: true });
+        }
+
+        const user = await client.users.fetch(userId);
+        const acceptRejectChannel = await client.channels.fetch(client.config.job.channel.acceptreject) as any;
+
+        console.log('Attempting to send reply to user');
+
+        if (action === 'acceptjobapplication') {
+            await user.send(`Congratulations! Your application for ${jobName} has been accepted.`);
+            await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been accepted.`);
+        } else if (action === 'rejectjobapplication') {
+            await user.send(`We're sorry, but your application for ${jobName} has been rejected.`);
+            await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been rejected.`);
+        }
+
+        await interaction.reply({ content: `Application ${action === 'acceptjobapplication' ? 'accepted' : 'rejected'}.`, ephemeral: true });
+        await interaction.message.edit({ components: [] });
+    } catch (error) {
+        console.error('Error in handleModalSubmit:', error);
+        await interaction.reply({ content: 'An error occurred while submitting your application. Please try again later.', ephemeral: true }).catch(console.error);
     }
-
-    if (!interaction.member.roles.cache.has(selectedJob.head)) {
-        return await interaction.reply({ content: 'You do not have permission to perform this action.', ephemeral: true });
-    }
-
-    const user = await client.users.fetch(userId);
-    const acceptRejectChannel = await client.channels.fetch(client.config.job.channel.acceptreject) as any;
-
-    if (action === 'acceptjobapplication') {
-        await user.send(`Congratulations! Your application for ${jobName} has been accepted.`);
-        await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been accepted.`);
-    } else if (action === 'rejectjobapplication') {
-        await user.send(`We're sorry, but your application for ${jobName} has been rejected.`);
-        await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been rejected.`);
-    }
-
-    await interaction.reply({ content: `Application ${action === 'acceptjobapplication' ? 'accepted' : 'rejected'}.`, ephemeral: true });
-    await interaction.message.edit({ components: [] });
 };
 
 const event: BotEvent = {

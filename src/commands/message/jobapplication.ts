@@ -18,9 +18,9 @@ const command: Command = {
 
         const embed = new EmbedBuilder()
             .setColor('DarkGold')
-            .setAuthor({ name: '📝 Job Application Process', iconURL: client.user?.displayAvatarURL() })
-            .setFooter({ text: client.user?.username || "EliteX RP", iconURL: client.user?.avatarURL() || "" })
-            .setTimestamp();
+            .setAuthor({ name: '📝 Job Application Process' })
+            .setDescription('```Please select the job category you want to apply for.```')
+            .setFooter({ text: client.user?.username || "EliteX RP", iconURL: client.user?.avatarURL() || "" });
 
         const jobOptions = client.config.job.application.jobtype.map((job: any) => ({
             label: job.name,
