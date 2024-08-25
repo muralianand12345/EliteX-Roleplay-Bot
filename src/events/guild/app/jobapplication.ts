@@ -34,56 +34,84 @@ const handleJobApplicationSelection = async (interaction: StringSelectMenuIntera
 };
 
 const handleModalSubmit = async (interaction: any, client: Client) => {
-    const jobValue = interaction.customId.replace('job-application-', '');
-    const selectedJob = client.config.job.application.jobtype.find((job: any) => job.value === jobValue);
+    try {
+        console.log('Modal submission started');
+        
+        const jobValue = interaction.customId.replace('job-application-', '');
+        const selectedJob = client.config.job.application.jobtype.find((job: any) => job.value === jobValue);
 
-    if (!selectedJob) {
-        return await interaction.reply({ content: 'Invalid job application.', ephemeral: true });
+        if (!selectedJob) {
+            console.log('Invalid job application');
+            return await interaction.reply({ content: 'Invalid job application.', ephemeral: true });
+        }
+
+        console.log('Selected job:', selectedJob.name);
+
+        const responseChannel = await client.channels.fetch(client.config.job.channel.response) as any;
+        if (!responseChannel) {
+            console.log('Response channel not found');
+            return await interaction.reply({ content: 'Error: Response channel not found.', ephemeral: true });
+        }
+
+        console.log('Response channel found');
+
+        let thread;
+        try {
+            thread = responseChannel.threads.cache.find((t: ThreadChannel) => t.name === selectedJob.name);
+            if (!thread) {
+                console.log('Creating new thread');
+                thread = await responseChannel.threads.create({
+                    name: selectedJob.name,
+                    autoArchiveDuration: 10080,
+                    reason: `Thread for ${selectedJob.name} applications`
+                }) as ThreadChannel;
+            }
+        } catch (error) {
+            console.error('Error creating/finding thread:', error);
+            return await interaction.reply({ content: 'Error: Unable to create or find the application thread.', ephemeral: true });
+        }
+
+        console.log('Thread ready');
+
+        const embed = new EmbedBuilder()
+            .setTitle(`${selectedJob.name} Application`)
+            .setDescription(`Applicant: ${interaction.user.tag}`)
+            .setColor('Blue')
+            .addFields(selectedJob.form.map((question: any) => ({
+                name: question.question,
+                value: interaction.fields.getTextInputValue(question.id) || 'No response provided'
+            })))
+            .setTimestamp();
+
+        const acceptButton = new ButtonBuilder()
+            .setCustomId(`acceptjobapplication-${interaction.user.id}`)
+            .setLabel('Accept')
+            .setStyle(ButtonStyle.Success);
+
+        const rejectButton = new ButtonBuilder()
+            .setCustomId(`rejectjobapplication-${interaction.user.id}`)
+            .setLabel('Reject')
+            .setStyle(ButtonStyle.Danger);
+
+        const row = new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(acceptButton, rejectButton);
+
+        console.log('Sending application to thread');
+        await thread.send({ embeds: [embed], components: [row] });
+
+        console.log('Replying to user');
+        await interaction.reply({ content: 'Your application has been submitted!', ephemeral: true });
+        
+        console.log('Modal submission completed successfully');
+    } catch (error) {
+        console.error('Error in handleModalSubmit:', error);
+        await interaction.reply({ content: 'An error occurred while submitting your application. Please try again later.', ephemeral: true })
+            .catch((replyError: Error | any) => console.error('Error sending error reply:', replyError));
     }
-
-    const responseChannel = await client.channels.fetch(client.config.job.channel.response) as any;
-    if (!responseChannel) return await interaction.reply({ content: 'Error: Response channel not found.', ephemeral: true });
-
-    let thread = responseChannel.threads.cache.find((t: ThreadChannel) => t.name === selectedJob.name);
-    if (!thread) {
-        thread = await responseChannel.threads.create({
-            name: selectedJob.name,
-            autoArchiveDuration: 10080, // 7 days
-            reason: `Thread for ${selectedJob.name} applications`
-        }) as ThreadChannel;
-    }
-
-    const embed = new EmbedBuilder()
-        .setTitle(`${selectedJob.name} Application`)
-        .setDescription(`Applicant: ${interaction.user.tag}`)
-        .setColor('Blue')
-        .addFields(selectedJob.form.map((question: any) => ({
-            name: question.question,
-            value: interaction.fields.getTextInputValue(question.id) || 'No response provided'
-        })))
-        .setTimestamp();
-
-    const acceptButton = new ButtonBuilder()
-        .setCustomId(`acceptjobapplication-${interaction.user.id}`)
-        .setLabel('Accept')
-        .setStyle(ButtonStyle.Success);
-
-    const rejectButton = new ButtonBuilder()
-        .setCustomId(`rejectjobapplication-${interaction.user.id}`)
-        .setLabel('Reject')
-        .setStyle(ButtonStyle.Danger);
-
-    const row = new ActionRowBuilder<ButtonBuilder>()
-        .addComponents(acceptButton, rejectButton);
-
-    await thread.send({ embeds: [embed], components: [row] });
-
-    await interaction.reply({ content: 'Your application has been submitted!', ephemeral: true });
 };
 
 const handleButtonInteraction = async (interaction: any, client: Client) => {
     try {
-
         const [action, userId] = interaction.customId.split('-');
         const jobName = interaction.channel.name;
         const selectedJob = client.config.job.application.jobtype.find((job: any) => job.name === jobName);
@@ -99,19 +127,41 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
         const user = await client.users.fetch(userId);
         const acceptRejectChannel = await client.channels.fetch(client.config.job.channel.acceptreject) as any;
 
-        if (action === 'acceptjobapplication') {
-            await user.send(`Congratulations! Your application for ${jobName} has been accepted.`);
-            await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been accepted.`);
-        } else if (action === 'rejectjobapplication') {
-            await user.send(`We're sorry, but your application for ${jobName} has been rejected.`);
-            await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been rejected.`);
+        const isAccepted = action === 'acceptjobapplication';
+        const status = isAccepted ? 'accepted' : 'rejected';
+
+        const dmEmbed = new EmbedBuilder()
+            .setTitle(`Job Application ${status.charAt(0).toUpperCase() + status.slice(1)}`)
+            .setDescription(`Your application for ${jobName} has been ${status}.`)
+            .setColor(isAccepted ? 'Green' : 'Red')
+            .setTimestamp();
+
+        if (isAccepted) {
+            dmEmbed.addFields({ name: 'Next Steps', value: 'Please await further instructions from the hiring team.' });
+        } else {
+            dmEmbed.addFields({ name: 'Future Opportunities', value: 'We encourage you to apply for future positions that match your skills and interests.' });
         }
 
-        await interaction.reply({ content: `Application ${action === 'acceptjobapplication' ? 'accepted' : 'rejected'}.`, ephemeral: true });
+        await user.send({ embeds: [dmEmbed] });
+
+        const channelEmbed = new EmbedBuilder()
+            .setTitle(`Job Application ${status.charAt(0).toUpperCase() + status.slice(1)}`)
+            .setDescription(`${user.tag}'s application for ${jobName} has been ${status}.`)
+            .setColor(isAccepted ? 'Green' : 'Red')
+            .addFields(
+                { name: 'Applicant', value: user.tag },
+                { name: 'Position', value: jobName },
+                { name: 'Status', value: status.charAt(0).toUpperCase() + status.slice(1) }
+            )
+            .setTimestamp();
+
+        await acceptRejectChannel.send({ embeds: [channelEmbed] });
+
+        await interaction.reply({ content: `Application ${status}.`, ephemeral: true });
         await interaction.message.edit({ components: [] });
     } catch (error) {
-        client.logger.error('Error in handleModalSubmit:', error);
-        await interaction.reply({ content: 'An error occurred while submitting your application. Please try again later.', ephemeral: true }).catch((err: Error | any) => client.logger.error('Error in handleModalSubmit:', err));
+        client.logger.error('Error in handleButtonInteraction:', error);
+        await interaction.reply({ content: 'An error occurred while processing the application. Please try again later.', ephemeral: true }).catch((err: Error | any) => client.logger.error('Error in handleButtonInteraction:', err));
     }
 };
 
