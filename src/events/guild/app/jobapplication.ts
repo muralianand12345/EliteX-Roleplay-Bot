@@ -110,7 +110,7 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
         if (isAccepted) {
             dmEmbed.addFields({ name: 'Next Steps', value: 'Please await further instructions from the hiring team.' });
         } else {
-            dmEmbed.addFields({ name: 'Future Opportunities', value: 'We encourage you to apply for future positions that match your skills and interests.' });
+            dmEmbed.addFields({ name: 'Rejected', value: 'Your application has been rejected. Try again after few hours.' });
         }
 
         await user.send({ embeds: [dmEmbed] });
@@ -121,7 +121,7 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
             .setColor(isAccepted ? 'Green' : 'Red')
             .addFields(
                 { name: 'Applicant', value: user.tag },
-                { name: 'Position', value: jobName },
+                { name: 'Job', value: jobName },
                 { name: 'Status', value: status.charAt(0).toUpperCase() + status.slice(1) }
             )
             .setTimestamp();
@@ -130,7 +130,16 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
 
         await interaction.reply({ content: `Application ${status}.`, ephemeral: true });
         await interaction.message.edit({ components: [] });
-    } catch (error) {
+    } catch (error: Error | any) {
+        if (error.code === 50007) {
+            return await interaction.reply({ content: 'Error: User has disabled DMs.', ephemeral: true });
+        } else if (error.code === 50013) {
+            return await interaction.reply({ content: 'Error: Missing permissions to send DMs.', ephemeral: true });
+        } else if (error.code === 10003) {
+            return await interaction.reply({ content: 'Error: User not found.', ephemeral: true });
+        } else if (error.code === 10008) {
+            return await interaction.reply({ content: 'Error: Message not found.', ephemeral: true });
+        }
         client.logger.error('Error in handleButtonInteraction:', error);
         await interaction.reply({ content: 'An error occurred while processing the application. Please try again later.', ephemeral: true }).catch((err: Error | any) => client.logger.error('Error in handleButtonInteraction:', err));
     }
