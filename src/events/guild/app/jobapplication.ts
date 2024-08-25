@@ -36,13 +36,17 @@ const handleJobApplicationSelection = async (interaction: StringSelectMenuIntera
 const handleModalSubmit = async (interaction: any, client: Client) => {
     const jobValue = interaction.customId.replace('job-application-', '');
     const selectedJob = client.config.job.application.jobtype.find((job: any) => job.value === jobValue);
-    
+
     if (!selectedJob) {
         return await interaction.reply({ content: 'Invalid job application.', ephemeral: true });
     }
 
     const responseChannel = await client.channels.fetch(client.config.job.channel.response) as any;
     if (!responseChannel) return await interaction.reply({ content: 'Error: Response channel not found.', ephemeral: true });
+
+    console.log('Job Value:', jobValue);
+    console.log('Selected Job:', selectedJob);
+    console.log('Response Channel:', responseChannel);
 
     let thread = responseChannel.threads.cache.find((t: ThreadChannel) => t.name === selectedJob.name);
     if (!thread) {
@@ -59,7 +63,7 @@ const handleModalSubmit = async (interaction: any, client: Client) => {
         .setColor('Blue')
         .addFields(selectedJob.form.map((question: any) => ({
             name: question.question,
-            value: interaction.fields.getTextInputValue(question.id)
+            value: interaction.fields.getTextInputValue(question.id) || 'No response provided'
         })))
         .setTimestamp();
 
@@ -86,6 +90,10 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
     const jobName = interaction.channel.name;
     const selectedJob = client.config.job.application.jobtype.find((job: any) => job.name === jobName);
 
+    if (!selectedJob) {
+        return await interaction.reply({ content: 'Error: Job type not found.', ephemeral: true });
+    }
+
     if (!interaction.member.roles.cache.has(selectedJob.head)) {
         return await interaction.reply({ content: 'You do not have permission to perform this action.', ephemeral: true });
     }
@@ -93,15 +101,15 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
     const user = await client.users.fetch(userId);
     const acceptRejectChannel = await client.channels.fetch(client.config.job.channel.acceptreject) as any;
 
-    if (action === 'accept') {
+    if (action === 'acceptjobapplication') {
         await user.send(`Congratulations! Your application for ${jobName} has been accepted.`);
         await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been accepted.`);
-    } else if (action === 'reject') {
+    } else if (action === 'rejectjobapplication') {
         await user.send(`We're sorry, but your application for ${jobName} has been rejected.`);
         await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been rejected.`);
     }
 
-    await interaction.reply({ content: `Application ${action}ed.`, ephemeral: true });
+    await interaction.reply({ content: `Application ${action === 'acceptjobapplication' ? 'accepted' : 'rejected'}.`, ephemeral: true });
     await interaction.message.edit({ components: [] });
 };
 
