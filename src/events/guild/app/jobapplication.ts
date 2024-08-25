@@ -1,5 +1,6 @@
 import { Events, StringSelectMenuInteraction, Client, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ThreadChannel, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
-import { BotEvent } from '../../../types';
+import jobApplicationSchema from '../../database/schema/jobApplication';
+import { BotEvent, IJobApplication } from '../../../types';
 
 const handleJobApplicationSelection = async (interaction: StringSelectMenuInteraction, client: Client) => {
     if (!client.config.job.application.enabled) return await interaction.reply({ content: 'Job application is currently disabled.', ephemeral: true });
@@ -9,6 +10,16 @@ const handleJobApplicationSelection = async (interaction: StringSelectMenuIntera
 
     if (!selectedJob) {
         return await interaction.reply({ content: 'Invalid job selection.', ephemeral: true });
+    }
+
+    const existingApplication = await jobApplicationSchema.findOne({
+        userId: interaction.user.id,
+        'data.jobValue': selectedJobValue,
+        accepted: true
+    });
+
+    if (existingApplication) {
+        return await interaction.reply({ content: 'You have already been accepted for this job.', ephemeral: true });
     }
 
     const modal = new ModalBuilder()
@@ -53,13 +64,18 @@ const handleModalSubmit = async (interaction: any, client: Client) => {
         }) as ThreadChannel;
     }
 
+    const userResponses = selectedJob.form.map((question: any) => ({
+        question: question.question,
+        answer: interaction.fields.getTextInputValue(question.id) || 'No response provided'
+    }));
+
     const embed = new EmbedBuilder()
         .setTitle(`${selectedJob.name} Application`)
         .setDescription(`Applicant: ${interaction.user.tag}`)
         .setColor('Blue')
-        .addFields(selectedJob.form.map((question: any) => ({
-            name: question.question,
-            value: interaction.fields.getTextInputValue(question.id) || 'No response provided'
+        .addFields(userResponses.map((response: any) => ({
+            name: response.question,
+            value: response.answer
         })))
         .setTimestamp();
 
@@ -77,6 +93,21 @@ const handleModalSubmit = async (interaction: any, client: Client) => {
         .addComponents(acceptButton, rejectButton);
 
     await thread.send({ embeds: [embed], components: [row] });
+
+    await jobApplicationSchema.findOneAndUpdate(
+        { userId: interaction.user.id },
+        {
+            $push: {
+                data: {
+                    jobValue: jobValue,
+                    jobName: selectedJob.name,
+                    timestamp: new Date(),
+                    user_response: userResponses
+                }
+            }
+        },
+        { upsert: true, new: true }
+    );
 
     await interaction.reply({ content: 'Your application has been submitted!', ephemeral: true });
 };
@@ -100,6 +131,16 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
 
         const isAccepted = action === 'acceptjobapplication';
         const status = isAccepted ? 'accepted' : 'rejected';
+
+        await jobApplicationSchema.findOneAndUpdate(
+            { userId: userId, 'data.jobName': jobName },
+            {
+                $set: {
+                    accepted: isAccepted,
+                    'data.$.status': status
+                }
+            }
+        );
 
         const dmEmbed = new EmbedBuilder()
             .setTitle(`Job Application ${status.charAt(0).toUpperCase() + status.slice(1)}`)
