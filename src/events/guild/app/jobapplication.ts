@@ -44,10 +44,6 @@ const handleModalSubmit = async (interaction: any, client: Client) => {
     const responseChannel = await client.channels.fetch(client.config.job.channel.response) as any;
     if (!responseChannel) return await interaction.reply({ content: 'Error: Response channel not found.', ephemeral: true });
 
-    console.log('Job Value:', jobValue);
-    console.log('Selected Job:', selectedJob);
-    console.log('Response Channel:', responseChannel);
-
     let thread = responseChannel.threads.cache.find((t: ThreadChannel) => t.name === selectedJob.name);
     if (!thread) {
         thread = await responseChannel.threads.create({
@@ -87,8 +83,7 @@ const handleModalSubmit = async (interaction: any, client: Client) => {
 
 const handleButtonInteraction = async (interaction: any, client: Client) => {
     try {
-        console.log('Modal submitted:', interaction.customId);
-        console.log('User:', interaction.user.tag);
+
         const [action, userId] = interaction.customId.split('-');
         const jobName = interaction.channel.name;
         const selectedJob = client.config.job.application.jobtype.find((job: any) => job.name === jobName);
@@ -104,8 +99,6 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
         const user = await client.users.fetch(userId);
         const acceptRejectChannel = await client.channels.fetch(client.config.job.channel.acceptreject) as any;
 
-        console.log('Attempting to send reply to user');
-
         if (action === 'acceptjobapplication') {
             await user.send(`Congratulations! Your application for ${jobName} has been accepted.`);
             await acceptRejectChannel.send(`${user.tag}'s application for ${jobName} has been accepted.`);
@@ -117,8 +110,8 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
         await interaction.reply({ content: `Application ${action === 'acceptjobapplication' ? 'accepted' : 'rejected'}.`, ephemeral: true });
         await interaction.message.edit({ components: [] });
     } catch (error) {
-        console.error('Error in handleModalSubmit:', error);
-        await interaction.reply({ content: 'An error occurred while submitting your application. Please try again later.', ephemeral: true }).catch(console.error);
+        client.logger.error('Error in handleModalSubmit:', error);
+        await interaction.reply({ content: 'An error occurred while submitting your application. Please try again later.', ephemeral: true }).catch((err: Error | any) => client.logger.error('Error in handleModalSubmit:', err));
     }
 };
 
