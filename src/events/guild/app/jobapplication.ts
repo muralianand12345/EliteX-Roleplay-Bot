@@ -1,6 +1,24 @@
-import { Events, StringSelectMenuInteraction, Client, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ThreadChannel, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { Events, StringSelectMenuInteraction, StringSelectMenuBuilder, Client, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ThreadChannel, ButtonBuilder, ButtonStyle, EmbedBuilder, ButtonInteraction } from 'discord.js';
 import jobApplicationSchema from '../../database/schema/jobApplication';
 import { BotEvent, IJobApplication } from '../../../types';
+
+const handleJobMenu = async (interaction: ButtonInteraction, client: Client) => {
+    const jobOptions = client.config.job.application.jobtype.map((job: any) => ({
+        label: job.name,
+        value: job.value,
+        emoji: job.emoji
+    }));
+
+    const row = new ActionRowBuilder<StringSelectMenuBuilder>()
+        .addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('job-applicationform-category')
+                .setPlaceholder('Select the job category')
+                .addOptions(jobOptions),
+        );
+
+    await interaction.reply({ content: 'Select the job category you want to apply for.', components: [row] });
+};
 
 const handleJobApplicationSelection = async (interaction: StringSelectMenuInteraction, client: Client) => {
     if (!client.config.job.application.enabled) return await interaction.reply({ content: 'Job application is currently disabled.', ephemeral: true });
@@ -195,6 +213,8 @@ const event: BotEvent = {
             await handleModalSubmit(interaction, client);
         } else if (interaction.isButton() && (interaction.customId.startsWith('acceptjobapplication-') || interaction.customId.startsWith('rejectjobapplication-'))) {
             await handleButtonInteraction(interaction, client);
+        } else if (interaction.isButton() && interaction.customId === 'job-application') {
+            await handleJobMenu(interaction, client);
         }
     }
 };

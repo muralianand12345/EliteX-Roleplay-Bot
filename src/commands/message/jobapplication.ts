@@ -1,4 +1,4 @@
-import { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, Message } from 'discord.js';
+import { EmbedBuilder, ActionRowBuilder, Message, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { Command } from '../../types';
 
 const command: Command = {
@@ -19,23 +19,17 @@ const command: Command = {
         const embed = new EmbedBuilder()
             .setColor('DarkGold')
             .setAuthor({ name: '📝 Job Application Process' })
-            .setDescription('```Please select the job category you want to apply for.```')
+            .setDescription('```Click the "Apply Job" button to start your application.```')
             .setFooter({ text: client.user?.username || "EliteX RP", iconURL: client.user?.avatarURL() || "" });
 
-        const jobOptions = client.config.job.application.jobtype.map((job: any) => ({
-            label: job.name,
-            value: job.value,
-            emoji: job.emoji
-        }));
-
-        const row = new ActionRowBuilder<StringSelectMenuBuilder>()
-            .addComponents(
-                new StringSelectMenuBuilder()
-                    .setCustomId('job-applicationform-category')
-                    .setPlaceholder('Select the job category')
-                    .addOptions(jobOptions),
-            );
-
+            const row = new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    new ButtonBuilder()
+                    .setCustomId('job-applicationform')
+                    .setLabel('Apply Job')
+                    .setStyle(ButtonStyle.Primary)
+                );  
+        
         await message.channel.send({
             embeds: [embed],
             components: [row]
