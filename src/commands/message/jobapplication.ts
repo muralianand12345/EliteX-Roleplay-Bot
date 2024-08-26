@@ -22,13 +22,13 @@ const command: Command = {
             .setDescription('```Click the "Apply Job" button to start your application.```')
             .setFooter({ text: client.user?.username || "EliteX RP", iconURL: client.user?.avatarURL() || "" });
 
-            const row = new ActionRowBuilder<ButtonBuilder>()
-                .addComponents(
-                    new ButtonBuilder()
-                    .setCustomId('job-applicationform')
+        const row = new ActionRowBuilder<ButtonBuilder>()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('job-application') 
                     .setLabel('Apply Job')
                     .setStyle(ButtonStyle.Primary)
-                );  
+            );  
         
         await message.channel.send({
             embeds: [embed],
