@@ -403,10 +403,8 @@ const command: SlashCommand = {
                     const color = interaction.options.getString("color", true);
                     const logo = interaction.options.getString("logo", true);
 
-                    await interaction.editReply({ content: "Edit gang has been disabled for time being!" });
-
-                    // const response = await createGang(name, color, logo);
-                    // await interaction.editReply(response);
+                    const response = await createGang(name, color, logo);
+                    await interaction.editReply(response);
                     break;
                 }
                 case "invite": {
@@ -431,6 +429,8 @@ const command: SlashCommand = {
                 case "edit": {
                     const option = interaction.options.getString("option", true);
                     const value = interaction.options.getString("value", true);
+
+                    await interaction.editReply({ content: "Edit gang has been disabled for time being!" });
 
                     const response = await editGang(option, value);
                     await interaction.editReply(response);
