@@ -1,4 +1,4 @@
-import { GuildMember, SlashCommandBuilder, EmbedBuilder, User } from 'discord.js';
+import { GuildMember, SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import visaApplicationSchema from '../../events/database/schema/visaApplication';
 import { SlashCommand } from '../../types';
 
@@ -16,7 +16,6 @@ const command: SlashCommand = {
             .setRequired(true)
         ),
     async execute(interaction, client) {
-        if (!interaction.guild) return;
 
         await interaction.deferReply({ ephemeral: true });
 
