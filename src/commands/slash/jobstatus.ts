@@ -45,26 +45,31 @@ const command: SlashCommand = {
             return interaction.editReply({ content: `User has not submitted any ${userJobRole.name} job applications.` });
         }
 
-        const applicationDetails = relevantApplications.map((data, index) => {
-            const responseDetails = data.user_response.map(response => 
-                `   ${response.question}: ${response.answer}`
-            ).join('\n');
-
-            return `${index + 1}. **Application**\n` +
-                   `   Status: ${data.status || 'Pending'}\n` +
-                   `   Applied: ${data.timestamp.toLocaleString()}\n` +
-                   `   Responses:\n${responseDetails}\n`;
-        });
-
         const embed = new EmbedBuilder()
-            .setTitle(`${userJobRole.name} Job Application Status for ${member.user.tag}`)
+            .setTitle(`${userJobRole.name} Job Application Status`)
             .setColor('Blue')
+            .setDescription(`Status for <@${member.id}> (${member.user.tag})`)
             .addFields(
-                { name: 'User ID', value: member.id, inline: true },
                 { name: 'Total Applications', value: relevantApplications.length.toString(), inline: true },
-                { name: 'Application Details', value: applicationDetails.join('\n') }
+                { name: 'Latest Status', value: relevantApplications[relevantApplications.length - 1].status || 'Pending', inline: true }
             )
             .setTimestamp();
+
+        const recentApplications = relevantApplications.slice(-5).reverse();
+        const applicationHistory = recentApplications.map((app, index) => {
+            const date = new Date(app.timestamp).toLocaleDateString();
+            return `${recentApplications.length - index}. ${date} - ${app.status || 'Pending'}`;
+        }).join('\n');
+
+        embed.addFields({ 
+            name: 'Recent Application History', 
+            value: applicationHistory || 'No recent applications',
+            inline: false
+        });
+
+        if (relevantApplications.length > 5) {
+            embed.setFooter({ text: `Showing ${recentApplications.length} most recent out of ${relevantApplications.length} total applications` });
+        }
 
         await interaction.editReply({ embeds: [embed] });
     }
