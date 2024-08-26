@@ -17,7 +17,7 @@ const handleJobMenu = async (interaction: ButtonInteraction, client: Client) => 
                 .addOptions(jobOptions),
         );
 
-    await interaction.reply({ content: 'Select the job category you want to apply for.', components: [row] });
+    await interaction.reply({ content: 'Select the job category you want to apply for.', components: [row], ephemeral: true });
 };
 
 const handleJobApplicationSelection = async (interaction: StringSelectMenuInteraction, client: Client) => {
