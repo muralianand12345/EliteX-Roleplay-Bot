@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError } from "discord.js";
+import isValidDomain from 'is-valid-domain';
 import GangInitSchema from "../../events/database/schema/gangInit";
 import { IGangInit, SlashCommand } from "../../types";
 
@@ -126,27 +127,39 @@ const command: SlashCommand = {
                 return "Cannot create a gang, you are already a member of a gang.";
             }
 
-            const nameRegex = /^[a-zA-Z]+$/;
+            const nameRegex = /^[a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]{3,20}$/;
             if (!name.match(nameRegex)) {
-                return "Name should only contain alphabets.";
+                return "Name should be 3-20 characters long and can contain letters, numbers, spaces, and common special characters.";
             }
             gangData = await GangInitSchema.findOne({ gangName: name });
             if (gangData) {
                 return "Name already exists.";
             }
 
-            const colorRegex = /^#[0-9A-F]{6}$/i;
-            if (!color.match(colorRegex)) {
-                return "Hex color should be in the format #000000.";
+            const hexColorRegex = /^#[0-9A-F]{6}$/i;
+            const rgbColorRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/;
+            if (!color.match(hexColorRegex) && !color.match(rgbColorRegex)) {
+                return "Color should be in valid hex (#RRGGBB) or RGB (rgb(R,G,B)) format.";
             }
             gangData = await GangInitSchema.findOne({ gangColor: color });
             if (gangData) {
                 return "Color already exists.";
             }
 
-            const logoRegex = /^https?:\/\/.*\.(?:png|jpg|jpeg)$/;
-            if (!logo.match(logoRegex)) {
-                return "Logo should be a valid image link.";
+            try {
+                const url = new URL(logo);
+                if (!['http:', 'https:'].includes(url.protocol)) {
+                    return "Logo URL must use http or https protocol.";
+                }
+                if (!isValidDomain(url.hostname)) {
+                    return "Logo URL must have a valid domain name.";
+                }
+                const pathname = url.pathname.toLowerCase();
+                if (!['.png', '.jpg', '.jpeg'].some(ext => pathname.endsWith(ext))) {
+                    return "Logo must be a PNG, JPG, or JPEG file.";
+                }
+            } catch {
+                return "Logo must be a valid URL.";
             }
 
             gangData = new GangInitSchema({
@@ -225,6 +238,7 @@ const command: SlashCommand = {
                     sentInvite = await user.send({ embeds: [inviteEmbed], components: [row] });
                 } catch (error) {
                     if (error instanceof DiscordAPIError && error.code === 50007) {
+                        client.logger.warn(`Unable to send invitation to ${user.username}. They may have DMs disabled or have blocked the bot.`);
                         return `Unable to send invitation to ${user.username}. They may have DMs disabled or have blocked the bot.`;
                     } else {
                         throw error;
@@ -286,7 +300,11 @@ const command: SlashCommand = {
                     if (reason === 'time') {
                         await sentInvite.edit({ content: "This invitation has expired.", components: [] });
                         try {
-                            await interaction.followUp({ content: `The invitation to ${user.username} has expired.`, ephemeral: true });
+                            if (interaction.isRepliable()) {
+                                await interaction.followUp({ content: `The invitation to ${user.username} has expired.`, ephemeral: true });
+                            } else {
+                                client.logger.warn("Interaction no longer repliable when sending expiration notification");
+                            }
                         } catch (error) {
                             client.logger.error("Error sending expiration notification:", error);
                         }
