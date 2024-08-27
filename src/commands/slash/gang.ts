@@ -1,4 +1,3 @@
-import axios from 'axios';
 import isValidDomain from 'is-valid-domain';
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError } from "discord.js";
 import GangInitSchema from "../../events/database/schema/gangInit";
@@ -140,7 +139,7 @@ const command: SlashCommand = {
             const hexColorRegex = /^#[0-9A-F]{6}$/i;
             const rgbColorRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/;
             if (!color.match(hexColorRegex) && !color.match(rgbColorRegex)) {
-                return "Color should be in valid hex (#RRGGBB) format.";
+                return "Color should be in valid hex (#RRGGBB) or RGB (rgb(R,G,B)) format.";
             }
             gangData = await GangInitSchema.findOne({ gangColor: color });
             if (gangData) {
@@ -158,20 +157,6 @@ const command: SlashCommand = {
                 const pathname = url.pathname.toLowerCase();
                 if (!['.png', '.jpg', '.jpeg'].some(ext => pathname.endsWith(ext))) {
                     return "Logo must be a PNG, JPG, or JPEG file.";
-                }
-
-                try {
-                    const response = await axios.get(logo, {
-                        responseType: 'arraybuffer',
-                        timeout: 5000, // 5 seconds timeout
-                        maxContentLength: 1024 * 1024 * 5, // 5MB max size
-                    });
-                    const contentType = response.headers['content-type'];
-                    if (!contentType.startsWith('image/')) {
-                        return "The provided URL does not contain a valid image.";
-                    }
-                } catch (error) {
-                    return "Unable to verify the image. Please ensure it's a valid and accessible image URL.";
                 }
             } catch {
                 return "Logo must be a valid URL.";
