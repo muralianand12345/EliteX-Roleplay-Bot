@@ -21,8 +21,10 @@ records.forEach(record => {
 const getNearestColor = (color: string): { name: string; hex: string } | null => {
     const lowerColor = color.toLowerCase();
     if (colorMap.has(lowerColor)) {
+        console.log('Color found:', color);
         return { name: lowerColor, hex: colorMap.get(lowerColor)! };
     }
+    console.log('Color not found:', color);
     return null;
 }
 
