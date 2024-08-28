@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError, Attachment } from "discord.js";
+import ValidateColor from "../../utils/validate/colors";
 import GangInitSchema from "../../events/database/schema/gangInit";
 import { IGangInit, SlashCommand } from "../../types";
 
@@ -135,11 +136,11 @@ const command: SlashCommand = {
                 return "Name already exists.";
             }
 
-            const hexColorRegex = /^#[0-9A-F]{6}$/i;
-            if (!color.match(hexColorRegex)) {
-                return "Invalid color. Please provide a valid hex code.";
+            const convertedColor = ValidateColor(color);
+            if (!convertedColor) {
+                return "Invalid color. Please provide a valid color name, hex code, RGB, or HSL value.";
             }
-            gangData = await GangInitSchema.findOne({ gangColor: color });
+            gangData = await GangInitSchema.findOne({ gangColor: convertedColor });
             if (gangData) {
                 return "Color already exists.";
             }
@@ -159,7 +160,7 @@ const command: SlashCommand = {
 
             gangData = new GangInitSchema({
                 gangName: name,
-                gangColor: color,
+                gangColor: convertedColor,
                 gangLogo: logoUrl,
                 gangLeader: interaction.user.id,
                 gangRole: "None",
@@ -379,17 +380,17 @@ const command: SlashCommand = {
                 }
                 case "color": {
 
-                    const hexColorRegex = /^#[0-9A-F]{6}$/i;
-                    if (!value.match(hexColorRegex)) {
-                        return "Invalid color. Please provide a valid hex code.";
+                    const convertedColor = ValidateColor(value);
+                    if (!convertedColor) {
+                        return "Invalid color. Please provide a valid color name, hex code, RGB, or HSL value.";
                     }
 
-                    const checkData = await GangInitSchema.findOne({ gangColor: value });
+                    const checkData = await GangInitSchema.findOne({ gangColor: convertedColor });
                     if (checkData) {
                         return "Color already exists.";
                     }
 
-                    gangData.gangColor = value;
+                    gangData.gangColor = convertedColor as string;
                     break;
                 }
                 case "logo": {
