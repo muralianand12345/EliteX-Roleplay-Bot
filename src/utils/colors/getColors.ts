@@ -3,7 +3,7 @@ import path from 'path';
 import { parse } from 'csv-parse/sync';
 import { ColorData } from '../../types';
 
-const csvFilePath = path.resolve(__dirname, '../../../assets/colorsnames.csv');
+const csvFilePath = path.resolve(__dirname, '../../../assets/colornames.csv');
 const csvData = fs.readFileSync(csvFilePath, 'utf8');
 const records: ColorData[] = parse(csvData, {
     columns: true,
@@ -18,7 +18,7 @@ records.forEach(record => {
     }
 });
 
-function getNearestColor(color: string): { name: string; hex: string } | null {
+const getNearestColor = (color: string): { name: string; hex: string } | null => {
     const lowerColor = color.toLowerCase();
     if (colorMap.has(lowerColor)) {
         return { name: lowerColor, hex: colorMap.get(lowerColor)! };
