@@ -60,6 +60,12 @@ export interface Activity {
     type: ActivityType
 }
 
+export interface ColorData {
+    name: string;
+    hex: string;
+    goodName: string;
+}
+
 export interface LimitedBufferMemoryOptions extends BufferMemoryInput {
     maxHistory: number,
     userId: string
@@ -221,3 +227,4 @@ export interface IJobApplicationResponse {
     question: string,
     answer: string
 }
+

@@ -1,7 +1,8 @@
-import isValidDomain from 'is-valid-domain';
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError } from "discord.js";
+import { rgb } from 'color-convert';
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError, Attachment } from "discord.js";
 import GangInitSchema from "../../events/database/schema/gangInit";
 import { IGangInit, SlashCommand } from "../../types";
+import { getNearestColor } from "../../utils/colors/getColors";
 
 const command: SlashCommand = {
     cooldown: 5000,
@@ -25,10 +26,10 @@ const command: SlashCommand = {
                         .setDescription("Color of the gang.")
                         .setRequired(true)
                 )
-                .addStringOption(option =>
+                .addAttachmentOption(option =>
                     option
                         .setName("logo")
-                        .setDescription("Logo of the gang.")
+                        .setDescription("Logo of the gang (PNG, JPG, or JPEG).")
                         .setRequired(true)
                 )
         )
@@ -115,7 +116,7 @@ const command: SlashCommand = {
             }
         };
 
-        const createGang = async (name: string, color: string, logo: string) => {
+        const createGang = async (name: string, color: string, logo: Attachment) => {
 
             let gangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
             if (gangData) {
@@ -136,36 +137,44 @@ const command: SlashCommand = {
                 return "Name already exists.";
             }
 
+            let hexColor: string;
             const hexColorRegex = /^#[0-9A-F]{6}$/i;
             const rgbColorRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/;
-            if (!color.match(hexColorRegex) && !color.match(rgbColorRegex)) {
-                return "Color should be in valid hex (#RRGGBB) or RGB (rgb(R,G,B)) format.";
+            if (color.match(hexColorRegex)) {
+                hexColor = color;
+            } else if (color.match(rgbColorRegex)) {
+                const [, r, g, b] = color.match(rgbColorRegex) || [];
+                hexColor = `#${rgb.hex(parseInt(r), parseInt(g), parseInt(b))}`;
+            } else {
+                const nearestColor = getNearestColor(color);
+                if (nearestColor) {
+                    hexColor = nearestColor.hex;
+                } else {
+                    return "Invalid color. Please provide a valid color name, hex code, or RGB value.";
+                }
             }
             gangData = await GangInitSchema.findOne({ gangColor: color });
             if (gangData) {
                 return "Color already exists.";
             }
 
-            try {
-                const url = new URL(logo);
-                if (!['http:', 'https:'].includes(url.protocol)) {
-                    return "Logo URL must use http or https protocol.";
-                }
-                if (!isValidDomain(url.hostname)) {
-                    return "Logo URL must have a valid domain name.";
-                }
-                const pathname = url.pathname.toLowerCase();
-                if (!['.png', '.jpg', '.jpeg'].some(ext => pathname.endsWith(ext))) {
-                    return "Logo must be a PNG, JPG, or JPEG file.";
-                }
-            } catch {
-                return "Logo must be a valid URL.";
+            const maxSize = 8 * 1024 * 1024;
+            if (logo.size > maxSize) {
+                return "Logo file size must be less than 8MB.";
             }
+
+            const allowedExtensions = ['.png', '.jpg', '.jpeg'];
+            const fileExtension = logo.name?.toLowerCase().slice(logo.name.lastIndexOf('.'));
+            if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+                return "Logo must be a PNG, JPG, or JPEG file.";
+            }
+
+            const logoUrl = logo.url;
 
             gangData = new GangInitSchema({
                 gangName: name,
                 gangColor: color,
-                gangLogo: logo,
+                gangLogo: logoUrl,
                 gangLeader: interaction.user.id,
                 gangRole: "None",
                 gangMembers: [{
@@ -383,11 +392,25 @@ const command: SlashCommand = {
                     break;
                 }
                 case "color": {
-                    const colorRegex = /^#[0-9A-F]{6}$/i;
-                    if (!value.match(colorRegex)) {
-                        return "Hex color should be in the format #000000.";
+                    let hexColor: string;
+                    const hexColorRegex = /^#[0-9A-F]{6}$/i;
+                    const rgbColorRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/;
+
+                    if (value.match(hexColorRegex)) {
+                        hexColor = value;
+                    } else if (value.match(rgbColorRegex)) {
+                        const [, r, g, b] = value.match(rgbColorRegex) || [];
+                        hexColor = `#${rgb.hex(parseInt(r), parseInt(g), parseInt(b))}`;
+                    } else {
+                        const nearestColor = getNearestColor(value);
+                        if (nearestColor) {
+                            hexColor = nearestColor.hex;
+                        } else {
+                            return "Invalid color. Please provide a valid color name, hex code, or RGB value.";
+                        }
                     }
-                    gangData.gangColor = value;
+
+                    gangData.gangColor = hexColor;
                     break;
                 }
                 case "logo": {
@@ -419,7 +442,12 @@ const command: SlashCommand = {
                 case "create": {
                     const name = interaction.options.getString("name", true);
                     const color = interaction.options.getString("color", true);
-                    const logo = interaction.options.getString("logo", true);
+                    const logo = interaction.options.getAttachment("logo");
+
+                    if (!logo) {
+                        await interaction.editReply("Please provide a logo for your gang.");
+                        return;
+                    }
 
                     const response = await createGang(name, color, logo);
                     await interaction.editReply(response);
