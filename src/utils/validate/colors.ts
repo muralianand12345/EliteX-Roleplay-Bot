@@ -1,11 +1,10 @@
 import Color from "color";
-import { ColorResolvable } from "discord.js";
 
-const ValidateColor = (inputColor: string): ColorResolvable | null => {
+const ValidateColor = (inputColor: string): string | null => {
     try {
-        let color = Color(inputColor);
-        return color.hex() as ColorResolvable;
-    } catch (error: Error | any) {
+        const color = Color(inputColor);
+        return color.hex();
+    } catch (error) {
         return null;
     }
 };
