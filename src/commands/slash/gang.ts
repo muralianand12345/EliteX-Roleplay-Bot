@@ -1,8 +1,6 @@
-import { rgb } from 'color-convert';
 import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError, Attachment } from "discord.js";
 import GangInitSchema from "../../events/database/schema/gangInit";
 import { IGangInit, SlashCommand } from "../../types";
-import { getNearestColor } from "../../utils/colors/getColors";
 
 const command: SlashCommand = {
     cooldown: 5000,
@@ -137,21 +135,9 @@ const command: SlashCommand = {
                 return "Name already exists.";
             }
 
-            let hexColor: string;
             const hexColorRegex = /^#[0-9A-F]{6}$/i;
-            const rgbColorRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/;
-            if (color.match(hexColorRegex)) {
-                hexColor = color;
-            } else if (color.match(rgbColorRegex)) {
-                const [, r, g, b] = color.match(rgbColorRegex) || [];
-                hexColor = `#${rgb.hex(parseInt(r), parseInt(g), parseInt(b))}`;
-            } else {
-                const nearestColor = getNearestColor(color);
-                if (nearestColor) {
-                    hexColor = nearestColor.hex;
-                } else {
-                    return "Invalid color. Please provide a valid color name, hex code, or RGB value.";
-                }
+            if (!color.match(hexColorRegex)) {
+                return "Invalid color. Please provide a valid hex code.";
             }
             gangData = await GangInitSchema.findOne({ gangColor: color });
             if (gangData) {
@@ -392,25 +378,18 @@ const command: SlashCommand = {
                     break;
                 }
                 case "color": {
-                    let hexColor: string;
-                    const hexColorRegex = /^#[0-9A-F]{6}$/i;
-                    const rgbColorRegex = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/;
 
-                    if (value.match(hexColorRegex)) {
-                        hexColor = value;
-                    } else if (value.match(rgbColorRegex)) {
-                        const [, r, g, b] = value.match(rgbColorRegex) || [];
-                        hexColor = `#${rgb.hex(parseInt(r), parseInt(g), parseInt(b))}`;
-                    } else {
-                        const nearestColor = getNearestColor(value);
-                        if (nearestColor) {
-                            hexColor = nearestColor.hex;
-                        } else {
-                            return "Invalid color. Please provide a valid color name, hex code, or RGB value.";
-                        }
+                    const hexColorRegex = /^#[0-9A-F]{6}$/i;
+                    if (!value.match(hexColorRegex)) {
+                        return "Invalid color. Please provide a valid hex code.";
                     }
 
-                    gangData.gangColor = hexColor;
+                    const checkData = await GangInitSchema.findOne({ gangColor: value });
+                    if (checkData) {
+                        return "Color already exists.";
+                    }
+
+                    gangData.gangColor = value;
                     break;
                 }
                 case "logo": {
@@ -488,8 +467,7 @@ const command: SlashCommand = {
                 }
             }
         } catch (error) {
-            client.logger.error("Error in gang command:");
-            client.logger.error(error);
+            client.logger.error("Error in gang command:", error);
             await interaction.editReply("An error occurred while processing your request.");
         }
     }
