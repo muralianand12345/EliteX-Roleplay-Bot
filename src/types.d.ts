@@ -228,3 +228,24 @@ export interface IJobApplicationResponse {
     answer: string
 }
 
+export interface IGangWar extends mongoose.Document {
+    warLocation: string,
+    warStatus: 'pending' | 'active' | 'ended',
+    combatants: Array<IGangWarCombatants>,
+    warEnd: Date | null,
+    timestamp: Date
+}
+
+export interface IGangWarCombatants {
+    gangName: string,
+    gangLeader: string,
+    gangLogo: string,
+    gangRole: string,
+    gangMembers: Array<IGangMembers>
+}
+
+export interface GangWarLocation {
+    name: string;
+    value: string;
+    emoji: string;
+}
