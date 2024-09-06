@@ -114,14 +114,14 @@ const event: BotEvent = {
                 client.logger.error("Error disbanding gang:", error);
                 await interaction.editReply({ content: "An error occurred while disbanning the gang." });
             }
+        }
 
-            if (!interaction.isButton()) return;
+        if (!interaction.isButton()) return;
 
-            if (interaction.customId === 'approve-gang' || interaction.customId === 'reject-gang') {
-                await handleAdminApproval(interaction);
-            } else if (interaction.customId === 'approve-gang-disband' || interaction.customId === 'reject-gang-disband') {
-                await handleGangDisband(interaction);
-            }
+        if (interaction.customId === 'approve-gang' || interaction.customId === 'reject-gang') {
+            await handleAdminApproval(interaction);
+        } else if (interaction.customId === 'approve-gang-disband' || interaction.customId === 'reject-gang-disband') {
+            await handleGangDisband(interaction);
         }
     }
 };
