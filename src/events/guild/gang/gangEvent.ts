@@ -106,8 +106,10 @@ const event: BotEvent = {
                     await leaderUser.send(`Your gang disband request has been rejected.`);
 
                     await interaction.editReply({ content: "Gang disband request rejected." });
+                    await interaction.message.edit({ components: [] });
                 } else {
-                    return interaction.editReply({ content: "Invalid interaction." });
+                    await interaction.editReply({ content: "Invalid interaction." });
+                    await interaction.message.edit({ components: [] });
                 }
 
             } catch (error) {
