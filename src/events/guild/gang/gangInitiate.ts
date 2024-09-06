@@ -8,7 +8,6 @@ const event: BotEvent = {
     async execute(interaction, client) {
 
         const handleGangInitiate = async (interaction: ButtonInteraction) => {
-
             if (!client.config.gang.war.enabled) {
                 return interaction.reply({ content: "Gang war is disabled.", ephemeral: true });
             }
@@ -24,7 +23,17 @@ const event: BotEvent = {
                     return interaction.editReply({ content: "Gang is not initialized!" });
                 }
 
-                const gangLocationOptions = client.config.gang.war.location.map((location: GangWarLocation) => ({
+                const activeGangWars = await GangWarSchema.find({ warStatus: 'active' });
+                const availableLocations = client.config.gang.war.location.filter((location: GangWarLocation) => {
+                    const warAtLocation = activeGangWars.find(war => war.warLocation === location.value);
+                    return !warAtLocation || warAtLocation.combatants.length < client.config.gang.war.maxcombatants;
+                });
+
+                if (availableLocations.length === 0) {
+                    return interaction.editReply({ content: "No locations available for gang war at the moment. Try again later." });
+                }
+
+                const gangLocationOptions = availableLocations.map((location: GangWarLocation) => ({
                     label: location.name,
                     value: location.value,
                     emoji: location.emoji
@@ -60,41 +69,52 @@ const event: BotEvent = {
                     return interaction.editReply({ content: "Gang is not initialized!" });
                 }
                 if (gangData.gangMembers.length < client.config.gang.war.mingangmembers) {
-                    return interaction.editReply({ content: `You need atleast ${client.config.gang.war.mingangmembers} members to start a gang war.` });
+                    return interaction.editReply({ content: `You need at least ${client.config.gang.war.mingangmembers} members to start a gang war.` });
                 }
 
-                const gangWar = await GangWarSchema.findOne({ 'combatants.gangName': gangData.gangName });
-                if (gangWar) {
-                    if (gangWar.warStatus === 'active' || gangWar.warStatus === 'pending') {
-                        return interaction.editReply({ content: "Your gang is already in war or has chosen the location." });
-                    }
+                const existingGangWar = await GangWarSchema.findOne({ 'combatants.gangName': gangData.gangName, warStatus: 'active' });
+                if (existingGangWar) {
+                    return interaction.editReply({ content: "Your gang is already in an active war." });
                 }
 
                 if (!client.config.gang.war.location.some((location: any) => location.value === interaction.values[0])) {
                     return interaction.editReply({ content: "Invalid location." });
                 }
 
-                const gangWarLocationTaken = await GangWarSchema.findOne({ warLocation: interaction.values[0] });
-                if (gangWarLocationTaken && gangWarLocationTaken.combatants.length >= client.config.gang.war.maxcombatants) {
-                    return interaction.editReply({ content: "Location is already taken." });
+                const selectedLocation = interaction.values[0];
+                const gangWarLocation = client.config.gang.war.location.find((location: any) => location.value === selectedLocation);
+
+                let gangWar = await GangWarSchema.findOne({ warLocation: selectedLocation, warStatus: 'active' });
+
+                if (gangWar) {
+                    if (gangWar.combatants.length >= client.config.gang.war.maxcombatants) {
+                        return interaction.editReply({ content: "This location has reached the maximum number of combatants." });
+                    }
+
+                    gangWar.combatants.push({
+                        gangName: gangData.gangName,
+                        gangLeader: gangData.gangLeader,
+                        gangLogo: gangData.gangLogo,
+                        gangRole: gangData.gangRole,
+                        gangMembers: gangData.gangMembers
+                    });
+
+                    await gangWar.save();
+                } else {
+                    gangWar = new GangWarSchema({
+                        warLocation: selectedLocation,
+                        combatants: [{
+                            gangName: gangData.gangName,
+                            gangLeader: gangData.gangLeader,
+                            gangLogo: gangData.gangLogo,
+                            gangRole: gangData.gangRole,
+                            gangMembers: gangData.gangMembers
+                        }],
+                        warStatus: 'active'
+                    });
+
+                    await gangWar.save();
                 }
-
-                const gangWarLocation = client.config.gang.war.location.find((location: any) => location.value === interaction.values[0]);
-
-                const combatants: Array<IGangWarCombatants> = [{
-                    gangName: gangData.gangName,
-                    gangLeader: gangData.gangLeader,
-                    gangLogo: gangData.gangLogo,
-                    gangRole: gangData.gangRole,
-                    gangMembers: gangData.gangMembers
-                }];
-
-                const newGangWar = new GangWarSchema({
-                    warLocation: gangWarLocation.value,
-                    combatants: combatants
-                });
-
-                await newGangWar.save();
 
                 const adminChan = await interaction.guild?.channels.fetch(client.config.bot.adminChannel) as TextChannel;
                 if (adminChan) {
@@ -102,15 +122,18 @@ const event: BotEvent = {
                         .setColor('Grey')
                         .setAuthor({ name: client.user?.username || "EliteX RP", iconURL: client.user?.displayAvatarURL() })
                         .setTitle('🔫 Gang War')
-                        .setDescription(`Gang war initiated at ${gangWarLocation.name} by **${gangData.gangName}**.`);
+                        .setDescription(`Gang war ${gangWar.combatants.length === 1 ? 'initiated' : 'joined'} at ${gangWarLocation.name} by **${gangData.gangName}**.`);
 
                     await adminChan.send({ embeds: [embed] });
                 }
 
-                await interaction.editReply({ content: `Gang war initiated at ${gangWarLocation.name}.`, components: [] });
+                await interaction.editReply({
+                    content: `Your gang has ${gangWar.combatants.length === 1 ? 'initiated' : 'joined'} the gang war at ${gangWarLocation.name}.`,
+                    components: []
+                });
             } catch (error) {
-                client.logger.error('Error fetching gang data:', error);
-                return interaction.editReply({ content: "An error occurred while fetching data. Try again later." });
+                client.logger.error('Error handling gang war location selection:', error);
+                return interaction.editReply({ content: "An error occurred while processing your request. Try again later." });
             }
         }
 

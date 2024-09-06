@@ -3,7 +3,7 @@ import { IGangWar } from "../../../types";
 
 const gangWarSchema = new Schema<IGangWar>({
     warLocation: { type: String, required: true },
-    warStatus: { type: String, required: true, default: 'active' },
+    warStatus: { type: String, required: true, enum: ['active', 'ended'], default: 'active' },
     combatants: [{
         gangName: { type: String, required: true },
         gangLeader: { type: String, required: true },

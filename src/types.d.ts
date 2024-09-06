@@ -230,7 +230,7 @@ export interface IJobApplicationResponse {
 
 export interface IGangWar extends mongoose.Document {
     warLocation: string,
-    warStatus: 'pending' | 'active' | 'ended',
+    warStatus: 'active' | 'ended',
     combatants: Array<IGangWarCombatants>,
     warEnd: Date | null,
     timestamp: Date
