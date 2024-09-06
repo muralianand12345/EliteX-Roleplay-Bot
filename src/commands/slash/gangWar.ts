@@ -55,8 +55,8 @@ const command: SlashCommand = {
                 gangWars.forEach((war, index) => {
                     const location = client.config.gang.war.location.find((loc: GangWarLocation) => loc.value === war.warLocation);
                     embed.addFields({
-                        name: `War ${index + 1}`,
-                        value: `Location: ${location?.name || 'Unknown'} ${location?.emoji || ''}\nStatus: ${war.warStatus}\nCombatants: ${war.combatants.map(c => c.gangName).join(' vs ')}\nStarted: ${war.timestamp.toLocaleString()}`
+                        name: `__War ${index + 1}__`,
+                        value: `__**Location:**__ ${location?.name || 'Unknown'} ${location?.emoji || ''}\n__**Status:**__ \`${war.warStatus}\`\n__**Combatants:**__ ${war.combatants.map(c => c.gangName).join(' **vs** ')}\n__**Started:**__ ${war.timestamp.toLocaleString()}`
                     });
                 });
 
@@ -79,15 +79,15 @@ const command: SlashCommand = {
 
                     gangWars.forEach((war, index) => {
                         const location = client.config.gang.war.location.find((loc: GangWarLocation) => loc.value === war.warLocation);
-                        let fieldValue = `Location: ${location?.name || 'Unknown'} ${location?.emoji || ''}\n`;
-                        fieldValue += `Status: ${war.warStatus}\n`;
-                        fieldValue += `Started: ${war.timestamp.toLocaleString()}\n`;
-                        fieldValue += `Combatants:\n`;
+                        let fieldValue = `__**Location:**__ ${location?.name || 'Unknown'} ${location?.emoji || ''}\n`;
+                        fieldValue += `__**Status:**__ ${war.warStatus}\n`;
+                        fieldValue += `__**Started:**__ ${war.timestamp.toLocaleString()}\n`;
+                        fieldValue += `__**Combatants:**__\n`;
                         war.combatants.forEach(gang => {
-                            fieldValue += `- ${gang.gangName} (Leader: ${gang.gangLeader})\n`;
-                            fieldValue += `  Members: ${gang.gangMembers.length}\n`;
+                            fieldValue += `- ${gang.gangName} (__**Leader:**__ <@${gang.gangLeader}>)\n`;
+                            fieldValue += `  __**Members:**__ \`${gang.gangMembers.length}\`\n`;
                         });
-                        detailedEmbed.addFields({ name: `War ${index + 1}`, value: fieldValue });
+                        detailedEmbed.addFields({ name: `__War ${index + 1}__`, value: fieldValue });
                     });
 
                     await i.update({ embeds: [detailedEmbed], components: [] });
