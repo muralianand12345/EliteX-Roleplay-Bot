@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError, Attachment } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError, Attachment, TextChannel } from "discord.js";
 import ValidateColor from "../../utils/validate/colors";
 import GangInitSchema from "../../events/database/schema/gangInit";
 import { IGangInit, SlashCommand } from "../../types";
@@ -80,6 +80,11 @@ const command: SlashCommand = {
                         .setDescription("Value to set.")
                         .setRequired(true)
                 )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("disband")
+                .setDescription("Disband your gang (Need admin approval!).")
         ),
     async execute(interaction, client) {
 
@@ -410,6 +415,49 @@ const command: SlashCommand = {
             return `Gang ${option} updated successfully.`;
         };
 
+        const deleteGang = async () => {
+            const gangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
+            if (!gangData) {
+                return "Cannot delete the gang, you are not a leader of any gang.";
+            }
+
+            const adminChannel = await client.channels.fetch(client.config.bot.adminChannel) as TextChannel;
+            if (!adminChannel) {
+                return "Cannot disband the gang. Error \"404\" (Chan-012 not found)";
+            }
+
+            const gangId = gangData._id as string | number | null;
+            if (!gangId) {
+                return "Cannot disband the gang. Error \"404\" (Gang ID not found)";
+            }
+
+            const embed = new EmbedBuilder()
+                .setTitle("Gang Disband Request")
+                .setColor("Red")
+                .setDescription(`Gang ${gangData.gangName} has requested to disband.`)
+                .addFields(
+                    { name: "Leader", value: `<@${gangData.gangLeader}>`, inline: true },
+                    { name: "Members", value: gangData.gangMembers.length.toString(), inline: true },
+                    { name: "Created", value: gangData.gangCreated.toDateString(), inline: true }
+                )
+                .setFooter({ text: gangId.toString() })
+                .setThumbnail(gangData.gangLogo);
+
+            const row = new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('approve-gang-disband')
+                        .setLabel('Approve')
+                        .setStyle(ButtonStyle.Success),
+                    new ButtonBuilder()
+                        .setCustomId('reject-gang-disband')
+                        .setLabel('Reject')
+                        .setStyle(ButtonStyle.Danger)
+                );
+
+            await adminChannel.send({ embeds: [embed], components: [row] });
+            return "Disband request sent to admins. Please wait for approval.";
+        }
 
         await interaction.deferReply();
 
@@ -459,6 +507,11 @@ const command: SlashCommand = {
                     await interaction.editReply({ content: "Edit gang has been disabled for time being!" });
 
                     const response = await editGang(option, value);
+                    await interaction.editReply(response);
+                    break;
+                }
+                case "disband": {
+                    const response = await deleteGang();
                     await interaction.editReply(response);
                     break;
                 }

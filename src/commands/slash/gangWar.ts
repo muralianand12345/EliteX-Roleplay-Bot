@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, ComponentType, ChatInputCommandInteraction, Client, TextChannel } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, ComponentType, ChatInputCommandInteraction, Client, TextChannel, Role } from "discord.js";
 import { SlashCommand, GangWarLocation, IGangWar } from "../../types";
 import GangWarSchema from "../../events/database/schema/gangWarInitialize";
 
@@ -56,7 +56,7 @@ const command: SlashCommand = {
                     const location = client.config.gang.war.location.find((loc: GangWarLocation) => loc.value === war.warLocation);
                     embed.addFields({
                         name: `__War ${index + 1}__`,
-                        value: `__**Location:**__ ${location?.name || 'Unknown'} ${location?.emoji || ''}\n__**Status:**__ \`${war.warStatus}\`\n__**Combatants:**__ ${war.combatants.map(c => c.gangName).join(' **vs** ')}\n__**Started:**__ ${war.timestamp.toLocaleString()}`
+                        value: `**Location:** ${location?.name || 'Unknown'} ${location?.emoji || ''}\**Status:** \`${war.warStatus}\`\**Combatants:** ${war.combatants.map(c => c.gangName).join(' **vs** ')}\**Started:** ${war.timestamp.toLocaleString()}`
                     });
                 });
 
@@ -79,13 +79,13 @@ const command: SlashCommand = {
 
                     gangWars.forEach((war, index) => {
                         const location = client.config.gang.war.location.find((loc: GangWarLocation) => loc.value === war.warLocation);
-                        let fieldValue = `__**Location:**__ ${location?.name || 'Unknown'} ${location?.emoji || ''}\n`;
-                        fieldValue += `__**Status:**__ ${war.warStatus}\n`;
-                        fieldValue += `__**Started:**__ ${war.timestamp.toLocaleString()}\n`;
-                        fieldValue += `__**Combatants:**__\n`;
+                        let fieldValue = `**Location:** ${location?.name || 'Unknown'} ${location?.emoji || ''}\n`;
+                        fieldValue += `**Status:** \`${war.warStatus}\`\n`;
+                        fieldValue += `**Started:** ${war.timestamp.toLocaleString()}\n`;
+                        fieldValue += `**Combatants:**\n`;
                         war.combatants.forEach(gang => {
-                            fieldValue += `- ${gang.gangName} (__**Leader:**__ <@${gang.gangLeader}>)\n`;
-                            fieldValue += `  __**Members:**__ \`${gang.gangMembers.length}\`\n`;
+                            fieldValue += `- ${gang.gangName} (**Leader:** <@${gang.gangLeader}>)\n`;
+                            fieldValue += `  **Members:** \`${gang.gangMembers.length}\`\n`;
                         });
                         detailedEmbed.addFields({ name: `__War ${index + 1}__`, value: fieldValue });
                     });
@@ -106,7 +106,13 @@ const command: SlashCommand = {
                 if (!channel) {
                     return interaction.reply({ content: 'Gang war channel not found.', ephemeral: true });
                 }
-                await channel.permissionOverwrites.edit(interaction.guild!.roles.everyone, {
+
+                const role = await interaction.guild?.roles.fetch(client.config.visaform.role.visa) as Role;
+                if (!role) {
+                    return interaction.reply({ content: 'Error occured, Visa role not found.', ephemeral: true });
+                }
+
+                await channel.permissionOverwrites.edit(role, {
                     ViewChannel: enable
                 });
 
