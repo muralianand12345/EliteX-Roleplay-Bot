@@ -42,6 +42,10 @@ const event: BotEvent = {
         app.use('/api/v1/ai', ai_api);
         app.use('/api/v1/fivem', fivem_api);
 
+        app.get('/', (req, res) => {
+            res.send('EliteX Roleplay Bot');
+        });
+
         app.use(express.static(ticketLogDir));
 
         app.listen(Port);
