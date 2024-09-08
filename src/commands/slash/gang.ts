@@ -65,26 +65,27 @@ const command: SlashCommand = {
                 .setDescription("Edit your gang.")
                 .addStringOption(option =>
                     option
-                        .setName("option")
-                        .setDescription("Option to edit.")
-                        .setRequired(true)
-                        .addChoices(
-                            { name: "name", value: "name" },
-                            { name: "color", value: "color" },
-                            { name: "logo", value: "logo" }
-                        )
+                        .setName("name")
+                        .setDescription("Name of the gang.")
+                        .setRequired(false)
                 )
-                .addStringOption(option =>
+                .addAttachmentOption(option =>
                     option
-                        .setName("value")
-                        .setDescription("Value to set.")
-                        .setRequired(true)
+                        .setName("logo")
+                        .setDescription("Logo of the gang (PNG, JPG, or JPEG).")
+                        .setRequired(false)
                 )
+
         )
         .addSubcommand(subcommand =>
             subcommand
                 .setName("disband")
                 .setDescription("Disband your gang (Need admin approval!).")
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("leave")
+                .setDescription("Leave/Retire from your gang.")
         ),
     async execute(interaction, client) {
 
@@ -367,52 +368,43 @@ const command: SlashCommand = {
             return { embeds: [embed] };
         };
 
-        const editGang = async (option: string, value: string) => {
+        const editGang = async (name: string | null, logo: Attachment | null) => {
 
             let gangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
             if (!gangData) {
                 return "Cannot edit the gang, you are not a leader of any gang.";
             }
 
-            switch (option) {
-                case "name": {
-                    const nameRegex = /^[a-zA-Z]+$/;
-                    if (!value.match(nameRegex)) {
-                        return "Name should only contain alphabets.";
-                    }
-                    gangData.gangName = value;
-                    break;
-                }
-                case "color": {
+            if (!gangData.gangStatus) {
+                return "Cannot edit the gang, your gang is not yet approved by admins.";
+            }
 
-                    const convertedColor = ValidateColor(value);
-                    if (!convertedColor) {
-                        return "Invalid color. Please provide a valid color name, hex code, RGB, or HSL value.";
-                    }
+            if (name) {
+                const nameRegex = /^[a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]{3,20}$/;
+                if (!name.match(nameRegex)) {
+                    return "Name should be 3-20 characters long and can contain letters, numbers, spaces, and common special characters.";
+                }
 
-                    const checkData = await GangInitSchema.findOne({ gangColor: convertedColor });
-                    if (checkData) {
-                        return "Color already exists.";
-                    }
+                gangData.gangName = name;
+            }
 
-                    gangData.gangColor = convertedColor as string;
-                    break;
+            if (logo) {
+                const maxSize = 8 * 1024 * 1024;
+                if (logo.size > maxSize) {
+                    return "Logo file size must be less than 8MB.";
                 }
-                case "logo": {
-                    const logoRegex = /^https?:\/\/.*\.(?:png|jpg|jpeg)$/;
-                    if (!value.match(logoRegex)) {
-                        return "Logo should be a valid image link.";
-                    }
-                    gangData.gangLogo = value;
-                    break;
+
+                const allowedExtensions = ['.png', '.jpg', '.jpeg'];
+                const fileExtension = logo.name?.toLowerCase().slice(logo.name.lastIndexOf('.'));
+                if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+                    return "Logo must be a PNG, JPG, or JPEG file.";
                 }
-                default: {
-                    return "Invalid option.";
-                }
+
+                gangData.gangLogo = logo.url;
             }
 
             await gangData.save();
-            return `Gang ${option} updated successfully.`;
+            return "Gang updated successfully.";
         };
 
         const deleteGang = async () => {
@@ -459,6 +451,30 @@ const command: SlashCommand = {
             return "Disband request sent to admins. Please wait for approval.";
         }
 
+        const leaveGang = async () => {
+            const gangData = await GangInitSchema.findOne({ "gangMembers.userId": interaction.user.id });
+            if (!gangData) {
+                return "Cannot leave the gang, you are not a member of any gang.";
+            }
+
+            if (gangData.gangLeader === interaction.user.id) {
+                return "Cannot leave the gang, you are the leader of the gang. Disband the gang instead.";
+            }
+
+            const gangLeader = await client.users.fetch(gangData.gangLeader);
+            const role = interaction.guild?.roles.cache.get(gangData.gangRole);
+            if (role) {
+                await interaction.guild?.members.cache.get(interaction.user.id)?.roles.remove(role);
+            }
+
+            gangData.gangMembers = gangData.gangMembers.filter(member => member.userId !== interaction.user.id);
+            await gangData.save();
+
+            await gangLeader.send(`User <@${interaction.user.id}> has left your gang ${gangData.gangName}.`);
+
+            return `You've left the gang ${gangData.gangName}.`;
+        }
+
         await interaction.deferReply();
 
         if (!client.config.gang.enabled) return await interaction.editReply("Gang feature is disabled.");
@@ -501,17 +517,22 @@ const command: SlashCommand = {
                     break;
                 }
                 case "edit": {
-                    const option = interaction.options.getString("option", true);
-                    const value = interaction.options.getString("value", true);
+                    const name = interaction.options.getString("name");
+                    const logo = interaction.options.getAttachment("logo");
 
                     await interaction.editReply({ content: "Edit gang has been disabled for time being!" });
 
-                    const response = await editGang(option, value);
+                    const response = await editGang(name, logo);
                     await interaction.editReply(response);
                     break;
                 }
                 case "disband": {
                     const response = await deleteGang();
+                    await interaction.editReply(response);
+                    break;
+                }
+                case "leave": {
+                    const response = await leaveGang();
                     await interaction.editReply(response);
                     break;
                 }
