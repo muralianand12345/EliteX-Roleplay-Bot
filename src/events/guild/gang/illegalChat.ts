@@ -37,8 +37,8 @@ const event: BotEvent = {
                 .setColor('Grey')
                 .setTitle('DarkChat Message')
                 .addFields(
-                    { name: 'User', value: message.author.username, inline: true },
-                    { name: 'Content', value: `\`\`\`${content}\`\`\``, inline: true }
+                    { name: 'User', value: message.author.username },
+                    { name: 'Content', value: `\`\`\`${content}\`\`\`` }
                 )
                 .setFooter({ text: message.author.id })
                 .setTimestamp();
