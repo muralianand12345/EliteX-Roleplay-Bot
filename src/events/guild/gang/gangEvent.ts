@@ -118,12 +118,81 @@ const event: BotEvent = {
             }
         }
 
+        const handleGangEdit = async (interaction: ButtonInteraction) => {
+            await interaction.deferReply({ ephemeral: true });
+        
+            try {
+                const gangId = interaction.message.embeds[0].footer?.text;
+                if (!gangId) {
+                    return interaction.editReply({ content: "Gang ID not found in the message." });
+                }
+        
+                const gangData = await GangInitSchema.findById(gangId);
+                if (!gangData) {
+                    return interaction.editReply({ content: "Gang not found." });
+                }
+        
+                const newName = interaction.message.embeds[0].fields.find(f => f.name === "New Name")?.value;
+                const newColor = interaction.message.embeds[0].fields.find(f => f.name === "New Color")?.value;
+                const newLogo = interaction.message.embeds[0].fields.find(f => f.name === "New Logo")?.value;
+        
+                if (interaction.customId === 'approve-gang-edit') {
+                    let updated = false;
+        
+                    if (newName && newName !== "No change") {
+                        gangData.gangName = newName;
+                        updated = true;
+                    }
+                    if (newColor && newColor !== "No change") {
+                        gangData.gangColor = newColor;
+                        updated = true;
+                    }
+                    if (newLogo && newLogo !== "No change") {
+                        gangData.gangLogo = newLogo;
+                        updated = true;
+                    }
+        
+                    if (updated) {
+                        await gangData.save();
+        
+                        const role = interaction.guild?.roles.cache.get(gangData.gangRole);
+                        if (role) {
+                            await role.edit({
+                                name: gangData.gangName,
+                                color: gangData.gangColor as ColorResolvable,
+                            });
+                        }
+        
+                        const leaderUser = await client.users.fetch(gangData.gangLeader);
+                        await leaderUser.send(`Your gang edit request for **${gangData.gangName}** has been approved.`);
+        
+                        await interaction.editReply({ content: "Gang edit approved and changes applied." });
+                    } else {
+                        await interaction.editReply({ content: "No changes were made to the gang." });
+                    }
+                } else if (interaction.customId === 'reject-gang-edit') {
+                    const leaderUser = await client.users.fetch(gangData.gangLeader);
+                    await leaderUser.send(`Your gang edit request for **${gangData.gangName}** has been rejected.`);
+        
+                    await interaction.editReply({ content: "Gang edit request rejected." });
+                }
+        
+                await interaction.message.edit({ components: [] });
+        
+            } catch (error) {
+                client.logger.error("Error handling gang edit:", error);
+                await interaction.editReply({ content: "An error occurred while processing the gang edit." });
+            }
+        };
+
         if (!interaction.isButton()) return;
 
         if (interaction.customId === 'approve-gang' || interaction.customId === 'reject-gang') {
             await handleAdminApproval(interaction);
         } else if (interaction.customId === 'approve-gang-disband' || interaction.customId === 'reject-gang-disband') {
             await handleGangDisband(interaction);
+        } else if (interaction.customId === 'approve-gang-edit' || interaction.customId === 'reject-gang-edit') {
+            await handleGangEdit(interaction);
         }
     }
 };

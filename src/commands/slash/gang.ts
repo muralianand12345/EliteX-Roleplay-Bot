@@ -69,6 +69,12 @@ const command: SlashCommand = {
                         .setDescription("Name of the gang.")
                         .setRequired(false)
                 )
+                .addStringOption(option =>
+                    option
+                        .setName("color")
+                        .setDescription("Color of the gang.")
+                        .setRequired(false)
+                )
                 .addAttachmentOption(option =>
                     option
                         .setName("logo")
@@ -88,6 +94,47 @@ const command: SlashCommand = {
                 .setDescription("Leave/Retire from your gang.")
         ),
     async execute(interaction, client) {
+
+        const sendEditApprovalRequest = async (gangData: IGangInit, newName: string | null, newColor: string | null, newLogo: string | null) => {
+            const adminChannel = await client.channels.fetch(client.config.bot.adminChannel) as TextChannel;
+            if (!adminChannel) {
+                throw new Error("Admin channel not found");
+            }
+
+            const gangId = gangData._id as string | number;
+        
+            const embed = new EmbedBuilder()
+                .setTitle("Gang Edit Request")
+                .setColor(gangData.gangColor as ColorResolvable)
+                .setDescription(`Gang ${gangData.gangName} has requested to edit their information.`)
+                .addFields(
+                    { name: "Leader", value: `<@${gangData.gangLeader}>`, inline: true },
+                    { name: "Current Name", value: gangData.gangName, inline: true },
+                    { name: "Current Color", value: gangData.gangColor, inline: true },
+                    { name: "New Name", value: newName || "No change", inline: true },
+                    { name: "New Color", value: newColor || "No change", inline: true },
+                    { name: "New Logo", value: newLogo || "No change", inline: true }
+                )
+                .setFooter({ text: gangId.toString() });
+        
+            if (gangData.gangLogo) {
+                embed.setThumbnail(gangData.gangLogo);
+            }
+        
+            const row = new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('approve-gang-edit')
+                        .setLabel('Approve')
+                        .setStyle(ButtonStyle.Success),
+                    new ButtonBuilder()
+                        .setCustomId('reject-gang-edit')
+                        .setLabel('Reject')
+                        .setStyle(ButtonStyle.Danger)
+                );
+        
+            await adminChannel.send({ embeds: [embed], components: [row] });
+        };
 
         const notifyAdminChannel = async (gangData: IGangInit) => {
             const adminChannel = await client.channels.fetch(client.config.bot.adminChannel);
@@ -368,45 +415,63 @@ const command: SlashCommand = {
             return { embeds: [embed] };
         };
 
-        const editGang = async (name: string | null, logo: Attachment | null) => {
-
+        const editGang = async (name: string | null, color: string | null, logo: Attachment | null) => {
             let gangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
             if (!gangData) {
                 return "Cannot edit the gang, you are not a leader of any gang.";
             }
-
+        
             if (!gangData.gangStatus) {
                 return "Cannot edit the gang, your gang is not yet approved by admins.";
             }
-
+        
+            let newName = null;
+            let newColor = null;
+            let newLogo = null;
+        
             if (name) {
                 const nameRegex = /^[a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]{3,20}$/;
                 if (!name.match(nameRegex)) {
                     return "Name should be 3-20 characters long and can contain letters, numbers, spaces, and common special characters.";
                 }
-
-                gangData.gangName = name;
+                newName = name;
             }
-
+        
+            if (color) {
+                const convertedColor = ValidateColor(color);
+                if (!convertedColor) {
+                    return "Invalid color. Please provide a valid color name, hex code, RGB, or HSL value.";
+                }
+                newColor = convertedColor;
+            }
+        
             if (logo) {
                 const maxSize = 8 * 1024 * 1024;
                 if (logo.size > maxSize) {
                     return "Logo file size must be less than 8MB.";
                 }
-
+        
                 const allowedExtensions = ['.png', '.jpg', '.jpeg'];
                 const fileExtension = logo.name?.toLowerCase().slice(logo.name.lastIndexOf('.'));
                 if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
                     return "Logo must be a PNG, JPG, or JPEG file.";
                 }
-
-                gangData.gangLogo = logo.url;
+                newLogo = logo.url;
             }
-
-            await gangData.save();
-            return "Gang updated successfully.";
+        
+            if (!newName && !newColor && !newLogo) {
+                return "No changes requested.";
+            }
+        
+            try {
+                await sendEditApprovalRequest(gangData, newName, newColor, newLogo);
+                return "Edit request sent to admins. Please wait for approval.";
+            } catch (error) {
+                client.logger.error("Error sending edit approval request:", error);
+                return "An error occurred while sending the edit request. Please try again later.";
+            }
         };
-
+        
         const deleteGang = async () => {
             const gangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
             if (!gangData) {
@@ -518,11 +583,12 @@ const command: SlashCommand = {
                 }
                 case "edit": {
                     const name = interaction.options.getString("name");
+                    const color = interaction.options.getString("color");
                     const logo = interaction.options.getAttachment("logo");
 
                     await interaction.editReply({ content: "Edit gang has been disabled for time being!" });
 
-                    const response = await editGang(name, logo);
+                    const response = await editGang(name, color, logo);
                     await interaction.editReply(response);
                     break;
                 }
