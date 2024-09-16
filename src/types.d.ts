@@ -1,6 +1,7 @@
-import { Client, SlashCommandBuilder, CommandInteraction, Collection, ActivityType, PermissionResolvable, Message, AutocompleteInteraction, ChatInputCommandInteraction, ActivityType, Channel } from "discord.js"
-import mongoose from "mongoose"
-import discord from "discord.js"
+import { Client, SlashCommandBuilder, CommandInteraction, Collection, ActivityType, PermissionResolvable, Message, AutocompleteInteraction, ChatInputCommandInteraction, ActivityType, Channel } from "discord.js";
+import mongoose from "mongoose";
+import discord from "discord.js";
+import { Request } from 'express';
 import { BufferMemoryInput } from "langchain/memory"
 
 declare module "discord.js" {
@@ -69,6 +70,10 @@ export interface ColorData {
 export interface LimitedBufferMemoryOptions extends BufferMemoryInput {
     maxHistory: number,
     userId: string
+}
+
+export interface AuthRequest extends Request {
+    userId?: string;
 }
 
 //db
@@ -248,4 +253,17 @@ export interface GangWarLocation {
     name: string;
     value: string;
     emoji: string;
+}
+
+export interface ILoginUser extends mongoose.Document {
+    discordId: string;
+    username: string;
+    email: string;
+    avatar?: string;
+    discriminator: string;
+    accessToken?: string;
+    refreshToken?: string;
+    tokenExpires?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }

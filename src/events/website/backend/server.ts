@@ -5,6 +5,7 @@ import path from 'path';
 import cors from 'cors';
 import ai_api from './routes/ai_api';
 import fivem_api from './routes/fivem_api';
+import auth_api from './routes/auth_api';
 import { ensureHttps } from './middlewares/auth';
 import { aiChatLimiter } from './middlewares/rate_limit';
 
@@ -41,6 +42,7 @@ const event: BotEvent = {
         app.use('/api/v1/ai', ensureHttps, aiChatLimiter);
         app.use('/api/v1/ai', ai_api);
         app.use('/api/v1/fivem', fivem_api);
+        app.use('/api/v1/auth', auth_api);
 
         app.get('/', (req, res) => {
             res.send('EliteX Roleplay Bot');
