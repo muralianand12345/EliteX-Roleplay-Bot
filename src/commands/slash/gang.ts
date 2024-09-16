@@ -120,7 +120,7 @@ const command: SlashCommand = {
             if (gangData.gangLogo) {
                 embed.setThumbnail(gangData.gangLogo);
             }
-            
+
             if (newLogo && newLogo !== "No change") {
                 embed.setImage(newLogo);
             }
@@ -589,8 +589,6 @@ const command: SlashCommand = {
                     const name = interaction.options.getString("name");
                     const color = interaction.options.getString("color");
                     const logo = interaction.options.getAttachment("logo");
-
-                    await interaction.editReply({ content: "Edit gang has been disabled for time being!" });
 
                     const response = await editGang(name, color, logo);
                     await interaction.editReply(response);
