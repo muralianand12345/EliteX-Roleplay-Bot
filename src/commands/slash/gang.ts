@@ -105,7 +105,7 @@ const command: SlashCommand = {
         
             const embed = new EmbedBuilder()
                 .setTitle("Gang Edit Request")
-                .setColor(gangData.gangColor as ColorResolvable)
+                .setColor((newColor || gangData.gangColor) as ColorResolvable)
                 .setDescription(`Gang ${gangData.gangName} has requested to edit their information.`)
                 .addFields(
                     { name: "Leader", value: `<@${gangData.gangLeader}>`, inline: true },
@@ -119,6 +119,10 @@ const command: SlashCommand = {
         
             if (gangData.gangLogo) {
                 embed.setThumbnail(gangData.gangLogo);
+            }
+            
+            if (newLogo && newLogo !== "No change") {
+                embed.setImage(newLogo);
             }
         
             const row = new ActionRowBuilder<ButtonBuilder>()
