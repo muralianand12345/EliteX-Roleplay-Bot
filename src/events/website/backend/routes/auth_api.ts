@@ -33,6 +33,7 @@ router.post('/discord/login', async (req, res) => {
                 grant_type: 'authorization_code',
                 code: code,
                 redirect_uri: REDIRECT_URI!,
+                scope: 'identify',
             }), {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -63,6 +64,8 @@ router.post('/discord/login', async (req, res) => {
             });
             await user.save();
         } else {
+            user.avatar = discordUser.avatar;
+            user.username = discordUser.username;
             user.accessToken = access_token;
             user.refreshToken = refresh_token;
             await user.save();

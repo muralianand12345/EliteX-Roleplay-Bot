@@ -85,6 +85,17 @@ const command: SlashCommand = {
         )
         .addSubcommand(subcommand =>
             subcommand
+                .setName("leader")
+                .setDescription("Transfer gang leadership.")
+                .addUserOption(option =>
+                    option
+                        .setName("user")
+                        .setDescription("User to transfer leadership.")
+                        .setRequired(true)
+                )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
                 .setName("disband")
                 .setDescription("Disband your gang (Need admin approval!).")
         )
@@ -102,7 +113,7 @@ const command: SlashCommand = {
             }
 
             const gangId = gangData._id as string | number;
-        
+
             const embed = new EmbedBuilder()
                 .setTitle("Gang Edit Request")
                 .setColor((newColor || gangData.gangColor) as ColorResolvable)
@@ -116,7 +127,7 @@ const command: SlashCommand = {
                     { name: "New Logo", value: newLogo || "No change", inline: true }
                 )
                 .setFooter({ text: gangId.toString() });
-        
+
             if (gangData.gangLogo) {
                 embed.setThumbnail(gangData.gangLogo);
             }
@@ -124,7 +135,7 @@ const command: SlashCommand = {
             if (newLogo && newLogo !== "No change") {
                 embed.setImage(newLogo);
             }
-        
+
             const row = new ActionRowBuilder<ButtonBuilder>()
                 .addComponents(
                     new ButtonBuilder()
@@ -136,7 +147,7 @@ const command: SlashCommand = {
                         .setLabel('Reject')
                         .setStyle(ButtonStyle.Danger)
                 );
-        
+
             await adminChannel.send({ embeds: [embed], components: [row] });
         };
 
@@ -353,11 +364,8 @@ const command: SlashCommand = {
                     if (reason === 'time') {
                         await sentInvite.edit({ content: "This invitation has expired.", components: [] });
                         try {
-                            if (interaction.isRepliable()) {
-                                await interaction.followUp({ content: `The invitation to ${user.username} has expired.`, ephemeral: true });
-                            } else {
-                                client.logger.warn("Interaction no longer repliable when sending expiration notification");
-                            }
+                            const gangLeader = await client.users.fetch(interaction.user.id);
+                            await gangLeader.send(`The invitation to ${user.username} has expired.`);
                         } catch (error) {
                             client.logger.error("Error sending expiration notification:", error);
                         }
@@ -424,15 +432,15 @@ const command: SlashCommand = {
             if (!gangData) {
                 return "Cannot edit the gang, you are not a leader of any gang.";
             }
-        
+
             if (!gangData.gangStatus) {
                 return "Cannot edit the gang, your gang is not yet approved by admins.";
             }
-        
+
             let newName = null;
             let newColor = null;
             let newLogo = null;
-        
+
             if (name) {
                 const nameRegex = /^[a-zA-Z0-9\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]{3,20}$/;
                 if (!name.match(nameRegex)) {
@@ -440,7 +448,7 @@ const command: SlashCommand = {
                 }
                 newName = name;
             }
-        
+
             if (color) {
                 const convertedColor = ValidateColor(color);
                 if (!convertedColor) {
@@ -448,13 +456,13 @@ const command: SlashCommand = {
                 }
                 newColor = convertedColor;
             }
-        
+
             if (logo) {
                 const maxSize = 8 * 1024 * 1024;
                 if (logo.size > maxSize) {
                     return "Logo file size must be less than 8MB.";
                 }
-        
+
                 const allowedExtensions = ['.png', '.jpg', '.jpeg'];
                 const fileExtension = logo.name?.toLowerCase().slice(logo.name.lastIndexOf('.'));
                 if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
@@ -462,11 +470,11 @@ const command: SlashCommand = {
                 }
                 newLogo = logo.url;
             }
-        
+
             if (!newName && !newColor && !newLogo) {
                 return "No changes requested.";
             }
-        
+
             try {
                 await sendEditApprovalRequest(gangData, newName, newColor, newLogo);
                 return "Edit request sent to admins. Please wait for approval.";
@@ -475,7 +483,107 @@ const command: SlashCommand = {
                 return "An error occurred while sending the edit request. Please try again later.";
             }
         };
-        
+
+        const transferLeader = async (user: User) => {
+
+            if (user.bot) {
+                return "Cannot transfer leadership to a bot.";
+            }
+
+            if (user.id === interaction.user.id) {
+                return "Cannot transfer leadership to yourself.";
+            }
+
+            const gangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
+            if (!gangData) {
+                return "Cannot transfer leadership, you are not a leader of any gang.";
+            }
+            if (!gangData.gangStatus) {
+                return "Cannot transfer leadership, your gang is not yet approved by admins.";
+            }
+
+            const targetUserGang = await GangInitSchema.findOne({
+                "gangMembers.userId": user.id,
+                _id: gangData._id
+            });
+            if (!targetUserGang) {
+                return "Cannot transfer leadership, the target user is not a member of your gang.";
+            }
+
+            const transferEmbed = new EmbedBuilder()
+                .setTitle("Gang Leadership Transfer")
+                .setColor(gangData.gangColor as ColorResolvable)
+                .setDescription(`You've been offered the leadership of the gang!`)
+                .addFields(
+                    { name: "Gang Name", value: gangData.gangName, inline: true },
+                    { name: "Current Leader", value: `<@${gangData.gangLeader}>`, inline: true },
+                    { name: "Members", value: gangData.gangMembers.length.toString(), inline: true }
+                )
+                .setThumbnail(gangData.gangLogo);
+
+            const row = new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(
+                    new ButtonBuilder()
+                        .setCustomId('accept-gang-leader')
+                        .setLabel('Accept')
+                        .setStyle(ButtonStyle.Success),
+                    new ButtonBuilder()
+                        .setCustomId('reject-gang-leader')
+                        .setLabel('Reject')
+                        .setStyle(ButtonStyle.Danger)
+                );
+
+            let sentInvite;
+
+            try {
+                sentInvite = await user.send({ embeds: [transferEmbed], components: [row] });
+            } catch (error) {
+                if (error instanceof DiscordAPIError && error.code === 50007) {
+                    client.logger.warn(`Unable to send leadership transfer to ${user.username}. They may have DMs disabled or have blocked the bot.`);
+                    return `Unable to send leadership transfer to ${user.username}. They may have DMs disabled or have blocked the bot.`;
+                } else {
+                    throw error;
+                }
+            }
+
+            const collector = sentInvite.createMessageComponentCollector({
+                componentType: ComponentType.Button,
+                time: 15 * 60 * 1000 // 15 minutes
+            });
+
+            return new Promise((resolve) => {
+                collector.on('collect', async (i) => {
+                    if (i.user.id === user.id) {
+                        try {
+                            if (i.customId === 'accept-gang-leader') {
+
+                                gangData.gangLeader = user.id;
+                                await gangData.save();
+
+                                await i.update({ content: "You've accepted the leadership transfer!", components: [] });
+                                resolve(`Leadership of ${gangData.gangName} has been transferred to ${user.username}.`);
+                            } else if (i.customId === 'reject-gang-leader') {
+                                await i.update({ content: "You've rejected the leadership transfer.", components: [] });
+                                resolve(`${user.username} has rejected the leadership transfer.`);
+                            }
+                        } catch (error) {
+                            client.logger.error("Error processing gang leadership transfer response:", error);
+                            await i.update({ content: "An error occurred while processing your response.", components: [] });
+                            resolve("An error occurred during the leadership transfer process.");
+                        }
+                        collector.stop();
+                    }
+                });
+
+                collector.on('end', async (collected, reason) => {
+                    if (reason === 'time') {
+                        await sentInvite.edit({ content: "This leadership transfer offer has expired.", components: [] });
+                        resolve("The leadership transfer offer has expired.");
+                    }
+                });
+            });
+        };
+
         const deleteGang = async () => {
             const gangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
             if (!gangData) {
@@ -591,6 +699,13 @@ const command: SlashCommand = {
                     const logo = interaction.options.getAttachment("logo");
 
                     const response = await editGang(name, color, logo);
+                    await interaction.editReply(response);
+                    break;
+                }
+                case "leader": {
+                    const user = interaction.options.getUser("user", true);
+                    const response = await transferLeader(user);
+                    if (!response) return await interaction.editReply("An error occurred while processing your request.");
                     await interaction.editReply(response);
                     break;
                 }

@@ -6,4 +6,10 @@ const aiChatLimiter = rateLimit({
     message: 'Too many AI chat requests, please try again later.'
 });
 
-export { aiChatLimiter };
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: 'Too many login attempts, please try again later.'
+});
+
+export { aiChatLimiter, loginLimiter };
