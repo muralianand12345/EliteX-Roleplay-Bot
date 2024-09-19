@@ -537,6 +537,7 @@ const command: SlashCommand = {
 
             try {
                 sentInvite = await user.send({ embeds: [transferEmbed], components: [row] });
+                
             } catch (error) {
                 if (error instanceof DiscordAPIError && error.code === 50007) {
                     client.logger.warn(`Unable to send leadership transfer to ${user.username}. They may have DMs disabled or have blocked the bot.`);

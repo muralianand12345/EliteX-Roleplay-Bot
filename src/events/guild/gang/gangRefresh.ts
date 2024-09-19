@@ -1,4 +1,4 @@
-import { Events, Client, TextChannel, EmbedBuilder, ColorResolvable } from 'discord.js';
+import { Events, Client, TextChannel, EmbedBuilder, ColorResolvable, GuildMember } from 'discord.js';
 import GangInitSchema from '../../database/schema/gangInit';
 import { scheduleJob } from 'node-schedule';
 import { BotEvent, IGangInit } from '../../../types';
@@ -29,10 +29,17 @@ const updateGangEmbeds = async (client: Client, channelId: string) => {
 
         const updatedMessages: string[] = [];
 
-        for (const [index, gang] of gangs.entries()) {
+        for (const gang of gangs) {
+            const guildMembers = await channel.guild.members.fetch();
+            gang.gangMembers = gang.gangMembers.filter(member => 
+                guildMembers.has(member.userId)
+            );
+
+            await GangInitSchema.findByIdAndUpdate(gang._id, { gangMembers: gang.gangMembers });
+
             const embed = createGangEmbed(gang);
 
-            const existingMessage = messages.at(index);
+            const existingMessage = messages.find(m => m.embeds[0]?.footer?.text === `Gang ID: ${gang._id}`);
             if (existingMessage) {
                 await existingMessage.edit({ embeds: [embed] });
                 updatedMessages.push(existingMessage.id);
