@@ -70,7 +70,8 @@ const command: SlashCommand = {
 
                 await interaction.editReply({ embeds: [embed], components: [row] });
                 const filter = (i: any) => i.customId === 'gang-zonal-war-view-details' && i.user.id === interaction.user.id;
-                const collector = interaction.channel?.createMessageComponentCollector({ filter, time: 15000 });
+                const chan = interaction.channel as TextChannel;
+                const collector = chan?.createMessageComponentCollector({ filter, time: 15000 });
 
                 collector?.on('collect', async (i) => {
                     const detailedEmbed = new EmbedBuilder()
@@ -154,7 +155,8 @@ const command: SlashCommand = {
                 await interaction.editReply({ content: 'Select a war to set the result:', components: [row] });
 
                 const filter = (i: any) => i.customId === 'select-zonal-war' && i.user.id === interaction.user.id;
-                const collector = interaction.channel?.createMessageComponentCollector({ filter, time: 30000 });
+                const chan = interaction.channel as TextChannel;
+                const collector = chan?.createMessageComponentCollector({ filter, time: 30000 });
 
                 collector?.on('collect', async (i: any) => {
                     const selectedWar = await GangZonalWarSchema.findById(i.values[0]);
@@ -178,7 +180,8 @@ const command: SlashCommand = {
                     await i.update({ content: 'Select the winning gang:', components: [winnerRow] });
 
                     const winnerFilter = (i: any) => i.customId === 'select-winner' && i.user.id === interaction.user.id;
-                    const winnerCollector = interaction.channel?.createMessageComponentCollector({ filter: winnerFilter, time: 30000 });
+                    const chan2 = interaction.channel as TextChannel;
+                    const winnerCollector = chan2?.createMessageComponentCollector({ filter: winnerFilter, time: 30000 });
 
                     winnerCollector?.on('collect', async (i: any) => {
                         const winnerName = i.values[0];
@@ -234,7 +237,8 @@ const command: SlashCommand = {
 
                 await interaction.editReply({ content: 'Select a war to end:', components: [row] });
                 const filter = (i: any) => i.customId === 'select-zonal-war-to-end' && i.user.id === interaction.user.id;
-                const collector = interaction.channel?.createMessageComponentCollector({ filter, time: 30000 });
+                const chan = interaction.channel as TextChannel;
+                const collector = chan?.createMessageComponentCollector({ filter, time: 30000 });
 
                 collector?.on('collect', async (i: any) => {
                     const selectedWar = await GangZonalWarSchema.findById(i.values[0]);

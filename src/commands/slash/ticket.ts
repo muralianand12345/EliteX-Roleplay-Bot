@@ -90,7 +90,7 @@ const command: SlashCommand = {
                         await interaction.editReply({ content: 'Processing...' });
                         ticketConfig = collected.first().content || "";
                     })
-                    .catch(async (collected) => {
+                    .catch(async (collected: any) => {
                         if (collected.size === 0) {
                             await interaction.editReply({ content: 'Successfully added!' });
                         }

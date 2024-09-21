@@ -229,7 +229,7 @@ const command: SlashCommand = {
         };
 
         const notifyAdminChannel = async (gangData: IGangInit) => {
-            const adminChannel = await client.channels.fetch(client.config.bot.adminChannel);
+            const adminChannel = await client.channels.fetch(client.config.bot.adminChannel) as TextChannel;
             if (adminChannel && adminChannel.isTextBased()) {
 
                 const embed = new EmbedBuilder()

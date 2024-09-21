@@ -226,7 +226,8 @@ const closeTicketEmbed = async (client: Client, interaction: Interaction) => {
         embed.setDescription(`\`\`\`Delete After Verifying\`\`\``)
     }
 
-    await interaction.channel?.send({
+    const chan = interaction.channel as TextChannel;
+    await chan?.send({
         embeds: [embed],
         components: [rowTicketClose]
     });

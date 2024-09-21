@@ -1,4 +1,4 @@
-import { EmbedBuilder, ActionRowBuilder, Message, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { EmbedBuilder, ActionRowBuilder, Message, ButtonBuilder, ButtonStyle, TextChannel } from 'discord.js';
 import { Command } from '../../types';
 
 const command: Command = {
@@ -10,8 +10,10 @@ const command: Command = {
     botPerms: ['Administrator'],
     async execute(client, message, args) {
 
+        const chan = message.channel as TextChannel;
+
         if (!client.config.job.enabled) {
-            return await message.channel.send(`${message.guild?.name}'s Job system is currently disabled!`).then((m: Message) => {
+            return await chan.send(`${message.guild?.name}'s Job system is currently disabled!`).then((m: Message) => {
                 setTimeout(() => m.delete(), 1000 * 5);
             });
         }
@@ -30,7 +32,7 @@ const command: Command = {
                     .setStyle(ButtonStyle.Primary)
             );  
         
-        await message.channel.send({
+        await chan.send({
             embeds: [embed],
             components: [row]
         });

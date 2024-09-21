@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import { VectorStore } from '../../utils/ai/ai_functions';
 
 import { Command } from '../../types';
+import { TextChannel } from 'discord.js';
 
 config();
 
@@ -15,7 +16,8 @@ const command: Command = {
     botPerms: ['Administrator'],
     async execute(client, message, args) {
 
-        await message.channel.sendTyping();
+        const chan = message.channel as TextChannel;
+        await chan.sendTyping();
 
         const markdownPath = path.join(__dirname, '..', '..', '..', 'vector-store', 'data', 'server_info.md');
 

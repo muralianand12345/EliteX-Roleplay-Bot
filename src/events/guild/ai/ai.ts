@@ -1,4 +1,4 @@
-import { Events, Message, Client } from "discord.js";
+import { Events, Message, Client, TextChannel } from "discord.js";
 import { MongoClient } from "mongodb";
 import { config } from "dotenv";
 import { splitMessage, initializeMongoClient, createConversationChain, VectorStore } from "../../../utils/ai/ai_functions";
@@ -19,11 +19,12 @@ const event: BotEvent = {
     async execute(message: Message, client: Client) {
 
         if (!client.config.ai.enabled) return;
+        const chan = message.channel as TextChannel;
         const chatChan = client.config.ai.channel;
-        if (!chatChan || !message.channel || !chatChan.includes(message.channel.id) || message.author.bot) return;
+        if (!chatChan || !chan || !chatChan.includes(chan.id) || message.author.bot) return;
         if (message.content.startsWith(client.config.bot.prefix)) return;
 
-        await message.channel.sendTyping();
+        await chan.sendTyping();
 
         const blockedUserData = await blockUserAI.findOne({
             userId: message.author.id,
@@ -79,7 +80,7 @@ const event: BotEvent = {
                     if (chunks[i].split('```').length % 2 === 0) {
                         chunks[i] += '\n```';
                     }
-                    await message.channel.send(chunks[i]);
+                    await chan.send(chunks[i]);
                 }
             } else {
                 await message.reply("I apologize, but I don't have a response for that.");
@@ -91,24 +92,24 @@ const event: BotEvent = {
                 client.logger.warn("Failed to delete original message:", deleteError);
             }
             if (error.message === "Vector store not initialized") {
-                await message.channel.send("I'm sorry, but I'm not fully initialized yet. Please try again in a few moments.").then((msg) => {
+                await chan.send("I'm sorry, but I'm not fully initialized yet. Please try again in a few moments.").then((msg) => {
                     setTimeout(() => msg.delete(), 5000);
                 });
                 return;
             } else if (error.message === "AI response timed out") {
-                await message.channel.send("I'm sorry, but the response took too long. Please try again.").then((msg) => {
+                await chan.send("I'm sorry, but the response took too long. Please try again.").then((msg) => {
                     setTimeout(() => msg.delete(), 5000);
                 });
                 return;
             } else if (error.code === 50035) {
-                await message.channel.send("I'm sorry, some internal error occured!").then((msg) => {
+                await chan.send("I'm sorry, some internal error occured!").then((msg) => {
                     setTimeout(() => msg.delete(), 5000);
                 });
                 client.logger.warn(error);
                 return;
             }
             client.logger.error(error);
-            await message.channel.send('Failed to process the query. Please try again later.').then((msg) => {
+            await chan.send('Failed to process the query. Please try again later.').then((msg) => {
                 setTimeout(() => msg.delete(), 5000);
             });
         }
