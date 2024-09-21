@@ -12,7 +12,9 @@ const ganginitSchema = new Schema<IGangInit>({
         gangJoinDate: { type: Date, required: true }
     }],
     gangCreated: { type: Date, required: true, default: Date.now },
-    gangStatus: { type: Boolean, required: true, default: true }
+    gangStatus: { type: Boolean, required: true, default: true },
+    warWon: { type: Number, required: false, default: 0 },
+    gangLocation: [{ type: String, required: false }]
 });
 
 export default model('gang-data', ganginitSchema);

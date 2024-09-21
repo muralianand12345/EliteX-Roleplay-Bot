@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
-import { IGangWar } from "../../../types";
+import { IGangZonalWar } from "../../../types";
 
-const gangWarSchema = new Schema<IGangWar>({
+const gangZonalWarSchema = new Schema<IGangZonalWar>({
     warLocation: { type: String, required: true },
     warStatus: { type: String, required: true, enum: ['active', 'ended'], default: 'active' },
     combatants: [{
@@ -15,4 +15,4 @@ const gangWarSchema = new Schema<IGangWar>({
     timestamp: { type: Date, required: true, default: Date.now }
 });
 
-export default model('gang-war', gangWarSchema);
+export default model('gang-zonal-war', gangZonalWarSchema);

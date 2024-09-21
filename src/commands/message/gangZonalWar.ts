@@ -2,8 +2,8 @@ import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, TextChannel
 import { Command } from '../../types';
 
 const command: Command = {
-    name: 'initgangwar',
-    description: "Starts a gang war.",
+    name: 'initgangzonalwar',
+    description: "Starts a zonal gang war.",
     cooldown: 1000,
     owner: true,
     userPerms: [],
@@ -14,18 +14,18 @@ const command: Command = {
             .setColor('Grey')
             .setAuthor({ name: client.user?.username || "EliteX RP", iconURL: client.user?.displayAvatarURL() })
             .setTitle('🔫 Gang War')
-            .setDescription(`Initiate Gang War by clicking the button below.`);
+            .setDescription(`Initiate Gang Zonal War by clicking the button below.`);
 
         const row = new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('gang-war-initiate')
-                    .setLabel('Gang War')
+                    .setCustomId('gang-zonal-war-initiate')
+                    .setLabel('Gang Zonal War')
                     .setStyle(ButtonStyle.Danger)
                     .setEmoji('🔫')
             );
 
-        const chan = client.channels.cache.get(client.config.gang.war.channel.war) as TextChannel;
+        const chan = client.channels.cache.get(client.config.gang.zonalwar.channel.war) as TextChannel;
         await chan.send({
             embeds: [embed],
             components: [row]

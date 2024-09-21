@@ -5,19 +5,30 @@ import { BotEvent, IGangInit } from '../../../types';
 
 const fetchAllGangs = async () => await GangInitSchema.find({ gangStatus: true });
 
-const createGangEmbed = (gang: IGangInit) => new EmbedBuilder()
-    .setTitle(gang.gangName)
-    .setColor(gang.gangColor as ColorResolvable)
-    .setThumbnail(gang.gangLogo)
-    .addFields(
-        { name: 'Leader', value: `<@${gang.gangLeader}>`, inline: true },
-        { name: 'Total Members', value: gang.gangMembers.length.toString(), inline: true },
-        { name: 'Created', value: gang.gangCreated.toDateString(), inline: true },
-        { name: "Status", value: gang.gangStatus ? "Active" : "Inactive", inline: true },
-        { name: 'Members', value: gang.gangMembers.map(m => `<@${m.userId}>`).join('\n') }
-    )
-    .setFooter({ text: `Gang ID: ${gang._id}` })
-    .setTimestamp();
+const createGangEmbed = (gang: IGangInit, config: any) => {
+    const getLocationNames = (locationValues: string[]) => {
+        if (!locationValues || locationValues.length === 0) return 'No Gang Locations';
+        return locationValues.map(locationValue => {
+            const location = config.gang.war.location.find((loc: any) => loc.value === locationValue);
+            return location ? `${location.name} ${location.emoji}` : 'Unknown Location';
+        }).join(', ');
+    };
+
+    return new EmbedBuilder()
+        .setTitle(gang.gangName)
+        .setColor(gang.gangColor as ColorResolvable)
+        .setThumbnail(gang.gangLogo)
+        .addFields(
+            { name: 'Leader', value: `<@${gang.gangLeader}>`, inline: true },
+            { name: 'Total Members', value: gang.gangMembers.length.toString(), inline: true },
+            { name: 'Created', value: gang.gangCreated.toDateString(), inline: true },
+            { name: "Status", value: gang.gangStatus ? "Active" : "Inactive", inline: true },
+            { name: 'Gang Locations', value: getLocationNames(gang.gangLocation), inline: false },
+            { name: 'Members', value: gang.gangMembers.map(m => `<@${m.userId}>`).join('\n') }
+        )
+        .setFooter({ text: `Gang ID: ${gang._id}` })
+        .setTimestamp();
+};
 
 const updateGangEmbeds = async (client: Client, channelId: string) => {
     try {
@@ -37,7 +48,7 @@ const updateGangEmbeds = async (client: Client, channelId: string) => {
 
             await GangInitSchema.findByIdAndUpdate(gang._id, { gangMembers: gang.gangMembers });
 
-            const embed = createGangEmbed(gang);
+            const embed = createGangEmbed(gang, client.config);
 
             const existingMessage = messages.find(m => m.embeds[0]?.footer?.text === `Gang ID: ${gang._id}`);
             if (existingMessage) {

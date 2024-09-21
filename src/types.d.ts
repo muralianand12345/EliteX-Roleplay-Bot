@@ -206,7 +206,9 @@ export interface IGangInit extends mongoose.Document {
     gangRole: string,
     gangMembers: Array<IGangMembers>,
     gangCreated: Date,
-    gangStatus: boolean
+    gangStatus: boolean,
+    warWon: number,
+    gangLocation: string[]
 }
 
 export interface IGangMembers {
@@ -233,15 +235,15 @@ export interface IJobApplicationResponse {
     answer: string
 }
 
-export interface IGangWar extends mongoose.Document {
+export interface IGangZonalWar extends mongoose.Document {
     warLocation: string,
     warStatus: 'active' | 'ended',
-    combatants: Array<IGangWarCombatants>,
+    combatants: Array<IGangZonalWarCombatants>,
     warEnd: Date | null,
     timestamp: Date
 }
 
-export interface IGangWarCombatants {
+export interface IGangZonalWarCombatants {
     gangName: string,
     gangLeader: string,
     gangLogo: string,
@@ -249,10 +251,27 @@ export interface IGangWarCombatants {
     gangMembers: Array<IGangMembers>
 }
 
-export interface GangWarLocation {
+export interface GangZonalWarLocation {
     name: string;
     value: string;
     emoji: string;
+}
+
+export interface IGangWar extends mongoose.Document {
+    location: string,
+    combatants: Array<IGangWarCombatants>,
+    warStatus: 'pending' | 'active' | 'ended',
+    warStart: Date | null,
+    warEnd: Date | null
+}
+
+export interface IGangWarCombatants {
+    gangName: string,
+    gangLeader: string,
+    gangLogo: string,
+    gangRole: string,
+    type: 'attacker' | 'defender',
+    gangMembers: Array<IGangMembers>
 }
 
 export interface ILoginUser extends mongoose.Document {
@@ -266,4 +285,10 @@ export interface ILoginUser extends mongoose.Document {
     tokenExpires?: Date;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface GangWarLocation {
+    name: string;
+    value: string;
+    emoji: string;
 }

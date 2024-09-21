@@ -1,7 +1,8 @@
-import { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError, Attachment, TextChannel } from "discord.js";
+import { AutocompleteInteraction, SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, User, ColorResolvable, DiscordAPIError, Attachment, TextChannel } from "discord.js";
 import ValidateColor from "../../utils/validate/colors";
 import GangInitSchema from "../../events/database/schema/gangInit";
-import { IGangInit, SlashCommand } from "../../types";
+import { client } from "../../bot";
+import { IGangInit, SlashCommand, GangWarLocation } from "../../types";
 
 const command: SlashCommand = {
     cooldown: 5000,
@@ -103,7 +104,83 @@ const command: SlashCommand = {
             subcommand
                 .setName("leave")
                 .setDescription("Leave/Retire from your gang.")
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("location")
+                .setDescription("Select gang location (Admin only).")
+                .addStringOption(option =>
+                    option
+                        .setName("gang")
+                        .setDescription("The gang to set the location for.")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+                .addStringOption(option =>
+                    option
+                        .setName("location")
+                        .setDescription("The location to set for the gang.")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName("remove_location")
+                .setDescription("Remove a gang location (Admin only).")
+                .addStringOption(option =>
+                    option
+                        .setName("gang")
+                        .setDescription("The gang to remove the location from.")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
+                .addStringOption(option =>
+                    option
+                        .setName("location")
+                        .setDescription("The location to remove from the gang.")
+                        .setRequired(true)
+                        .setAutocomplete(true)
+                )
         ),
+
+    async autocomplete(interaction: AutocompleteInteraction) {
+        try {
+            const focusedOption = interaction.options.getFocused(true);
+            let choices: { name: string; value: string }[] = [];
+
+            if (focusedOption.name === "gang") {
+                const gangs = await GangInitSchema.find({});
+                choices = gangs.map(gang => ({ name: gang.gangName, value: gang.gangName }));
+            }
+            else if (focusedOption.name === "location") {
+                const gangName = interaction.options.getString("gang");
+
+                if (gangName) {
+                    const gangData = await GangInitSchema.findOne({ gangName: gangName });
+                    if (gangData) {
+                        const allGangs = await GangInitSchema.find({});
+                        const takenLocations = allGangs.flatMap(gang => gang.gangLocation || []);
+                        const availableLocations = client.config.gang.war.location.filter((loc: GangWarLocation) =>
+                            !takenLocations.includes(loc.value)
+                        );
+                        choices = availableLocations.map((location: GangWarLocation) => ({
+                            name: `${location.name} ${location.emoji}`,
+                            value: location.value
+                        }));
+                    }
+                }
+            }
+
+            const filtered = choices.filter(choice =>
+                choice.name.toLowerCase().includes(focusedOption.value.toLowerCase())
+            );
+            await interaction.respond(filtered.slice(0, 25));
+        } catch (error) {
+            console.error("Error in autocomplete function:", error);
+            await interaction.respond([{ name: "Error occurred", value: "error" }]);
+        }
+    },
     async execute(interaction, client) {
 
         const sendEditApprovalRequest = async (gangData: IGangInit, newName: string | null, newColor: string | null, newLogo: string | null) => {
@@ -537,7 +614,7 @@ const command: SlashCommand = {
 
             try {
                 sentInvite = await user.send({ embeds: [transferEmbed], components: [row] });
-                
+
             } catch (error) {
                 if (error instanceof DiscordAPIError && error.code === 50007) {
                     client.logger.warn(`Unable to send leadership transfer to ${user.username}. They may have DMs disabled or have blocked the bot.`);
@@ -651,7 +728,59 @@ const command: SlashCommand = {
             await gangLeader.send(`User <@${interaction.user.id}> has left your gang ${gangData.gangName}.`);
 
             return `You've left the gang ${gangData.gangName}.`;
-        }
+        };
+
+        const setGangLocation = async (gangName: string, locationValue: string) => {
+            if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+                return "You don't have permission to set gang locations.";
+            }
+
+            const gangData = await GangInitSchema.findOne({ gangName: gangName });
+            if (!gangData) {
+                return "Gang not found.";
+            }
+
+            const allGangs = await GangInitSchema.find({});
+            const takenLocations = allGangs.flatMap(gang => gang.gangLocation || []);
+
+            if (takenLocations.includes(locationValue)) {
+                return `Location "${locationValue}" is already taken by another gang.`;
+            }
+
+            const selectedLocation = client.config.gang.war.location.find((loc: GangWarLocation) => loc.value === locationValue);
+            if (!selectedLocation) {
+                return "Invalid location selected.";
+            }
+
+            if (!gangData.gangLocation) {
+                gangData.gangLocation = [];
+            }
+            gangData.gangLocation.push(selectedLocation.value);
+            await gangData.save();
+
+            return `Location added for ${gangName}: ${selectedLocation.name} ${selectedLocation.emoji}`;
+        };
+
+        const removeGangLocation = async (gangName: string, locationValue: string) => {
+            if (!interaction.memberPermissions?.has(PermissionFlagsBits.Administrator)) {
+                return "You don't have permission to remove gang locations.";
+            }
+
+            const gangData = await GangInitSchema.findOne({ gangName: gangName });
+            if (!gangData) {
+                return "Gang not found.";
+            }
+
+            if (!gangData.gangLocation || !gangData.gangLocation.includes(locationValue)) {
+                return "This gang doesn't have the specified location.";
+            }
+
+            gangData.gangLocation = gangData.gangLocation.filter(loc => loc !== locationValue);
+            await gangData.save();
+
+            const locationInfo = client.config.gang.war.location.find((loc: GangWarLocation) => loc.value === locationValue);
+            return `Location removed from ${gangName}: ${locationInfo ? `${locationInfo.name} ${locationInfo.emoji}` : locationValue}`;
+        };
 
         await interaction.deferReply();
 
@@ -717,6 +846,20 @@ const command: SlashCommand = {
                 }
                 case "leave": {
                     const response = await leaveGang();
+                    await interaction.editReply(response);
+                    break;
+                }
+                case "location": {
+                    const gangName = interaction.options.getString("gang", true);
+                    const locationValue = interaction.options.getString("location", true);
+                    const response = await setGangLocation(gangName, locationValue);
+                    await interaction.editReply(response);
+                    break;
+                }
+                case "remove_location": {
+                    const gangName = interaction.options.getString("gang", true);
+                    const locationValue = interaction.options.getString("location", true);
+                    const response = await removeGangLocation(gangName, locationValue);
                     await interaction.editReply(response);
                     break;
                 }
