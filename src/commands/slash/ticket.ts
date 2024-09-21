@@ -85,7 +85,8 @@ const command: SlashCommand = {
 
             const collectorFilter = (message: Message) => message.author.id === interaction.user.id;
             await interaction.editReply({ content: `Enter your Ticket Category | Labal Name, Channel CategoryID, Emoji.\nExample\n\`\`\`Support, 123456789, ❤️\nPurchase, 987654321, ✅\`\`\`` }).then(async () => {
-                await interaction.channel?.awaitMessages({ filter: collectorFilter, max: 1, time: 300000, errors: ['time'] })
+                let chan = interaction.channel as TextChannel;
+                await chan?.awaitMessages({ filter: collectorFilter, max: 1, time: 300000, errors: ['time'] })
                     .then(async (collected: any) => {
                         await interaction.editReply({ content: 'Processing...' });
                         ticketConfig = collected.first().content || "";
