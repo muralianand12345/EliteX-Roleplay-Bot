@@ -7,7 +7,7 @@ const event: BotEvent = {
     name: Events.MessageReactionAdd,
     async execute(reaction, user, client) {
 
-        if (!client.config.moderation.reactionmod.enabled) return;
+        if (!client.config?.moderation?.reactionmod?.enabled) return;
         if (user.bot) return;
 
         const emojisToRemove = client.config.moderation.reactionmod.emojitoremove;
