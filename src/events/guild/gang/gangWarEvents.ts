@@ -231,6 +231,12 @@ const event: BotEvent = {
 
                 await newGangWar.save();
 
+                const attackerLeader = await client.users.fetch(gangData.gangLeader);
+                const defenderLeader = await client.users.fetch(defendingGangData.gangLeader);
+                const locationName = getLocationName(selectedLocation);
+                await sendDM(attackerLeader, `Your gang has initiated a war against **${defendingGangData.gangName}** for the location: **${locationName}**. Prepare for battle!`);
+                await sendDM(defenderLeader, `Your gang is under attack! **${gangData.gangName}** has initiated a war for your location: **${locationName}**. Defend your territory!`);
+
                 await announceGangWar(client, newGangWar);
 
                 const gangWarId = newGangWar._id as string | number;
