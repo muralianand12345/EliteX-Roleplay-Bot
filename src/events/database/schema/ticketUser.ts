@@ -10,16 +10,7 @@ const ticketUserSchema = new Schema<ITicketUser>({
         ticketNumber: { type: Number, required: true },
         ticketId: { type: String, required: true },
         transcriptLink: { type: String, required: false },
-        ticketPannelId: { type: String, required: true },
-        tticketData: {
-            messages: [{
-                userId: { type: String, required: true },
-                username: { type: String, required: true },
-                content: { type: String, required: true },
-                timestamp: { type: Date, default: Date.now, required: true },
-            }],
-        },
-        timestamp: { type: Date, default: Date.now, required: false },
+        ticketPannelId: { type: String, required: true }
     }]
 });
 

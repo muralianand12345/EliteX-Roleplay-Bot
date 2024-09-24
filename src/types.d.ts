@@ -118,18 +118,7 @@ export interface ITicketLog {
     ticketNumber: number,
     ticketId: string,
     transcriptLink: string,
-    ticketPanelId: string,
-    ticketData: { 
-        messages: Array<ITicketDataLog>
-    }
-    timestamp: Date
-}
-
-export interface ITicketDataLog {
-    userId: string,
-    username: string,
-    content: string,
-    timestamp: Date
+    ticketPanelId: string
 }
 
 export interface ITicketGuild extends mongoose.Document {

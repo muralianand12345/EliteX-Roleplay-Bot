@@ -103,14 +103,6 @@ const event: BotEvent = {
                     if (matchingEntry) {
                         matchingEntry.transcriptLink = `${serverAdd}/transcript-${interaction.channel.id}.html`;
                         matchingEntry.activeStatus = false;
-                        const messages = await chan.messages.fetch({ limit: 100 });
-                        matchingEntry.ticketData.messages = messages.map((msg: Message) => ({
-                            userId: msg.author.id,
-                            username: msg.author.username,
-                            content: msg.content,
-                            timestamp: msg.createdAt
-                        })).reverse();
-
                         await ticketUser.save();
 
                         await deleteTicketEmbedandClient(client, interaction, ticketUser, ticketGuild, serverAdd, chan, null);
@@ -168,14 +160,6 @@ const event: BotEvent = {
                     if (matchingEntry) {
                         matchingEntry.transcriptLink = `${serverAdd}/transcript-${interaction.channel.id}.html`;
                         matchingEntry.activeStatus = false;
-                        const messages = await chan.messages.fetch({ limit: 100 });
-                        matchingEntry.ticketData.messages = messages.map((msg: Message) => ({
-                            userId: msg.author.id,
-                            username: msg.author.username,
-                            content: msg.content,
-                            timestamp: msg.createdAt
-                        })).reverse();
-                        
                         await ticketUser.save();
 
                         await deleteTicketEmbedandClient(client, interaction, ticketUser, ticketGuild, serverAdd, chan, TicketReason);
