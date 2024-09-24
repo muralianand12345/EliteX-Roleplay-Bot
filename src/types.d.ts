@@ -119,6 +119,17 @@ export interface ITicketLog {
     ticketId: string,
     transcriptLink: string,
     ticketPanelId: string,
+    ticketData: { 
+        messages: Array<ITicketDataLog>
+    }
+    timestamp: Date
+}
+
+export interface ITicketDataLog {
+    userId: string,
+    username: string,
+    content: string,
+    timestamp: Date
 }
 
 export interface ITicketGuild extends mongoose.Document {
