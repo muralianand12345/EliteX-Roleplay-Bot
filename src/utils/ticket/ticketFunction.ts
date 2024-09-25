@@ -1,7 +1,8 @@
 import { CategoryChannel, ChannelType, Client, Interaction, PermissionFlagsBits, TextChannel, Collection, Message } from "discord.js";
 import { writeTicketLog } from "./ticketDataLogger";
-import discordTranscripts from "discord-html-transcripts";
+import { ExportReturnType, createTranscript } from "discord-html-transcripts";
 import fs from "fs";
+import path from "path";
 const fsPromises = fs.promises;
 
 import { ITicketUser, ITicketGuild } from "../../types";
@@ -74,56 +75,46 @@ const closeTicketChan = async (client: Client, interaction: Interaction, parentC
 };
 
 const deleteTicketLog = async (client: Client, interaction: Interaction, ticketLogDir: string, chan: TextChannel, type: string) => {
+    let messages = new Collection<string, Message>();
+    let lastId: string | undefined;
 
-    let messages: Collection<string, Message>;
-    try {
-        messages = await chan.messages.fetch({ limit: 100 });
-    } catch (error) {
-        client.logger.error('Error fetching messages:', error);
-        messages = new Collection<string, Message>();
+    while (true) {
+        const options: { limit: number; before?: string } = { limit: 100 };
+        if (lastId) options.before = lastId;
+
+        const fetchedMessages = await chan.messages.fetch(options);
+        if (fetchedMessages.size === 0) break;
+
+        messages = messages.concat(fetchedMessages);
+        lastId = fetchedMessages.last()?.id;
+        if (fetchedMessages.size < 100) break;
+    }
+
+    if (messages.size === 0) {
+        client.logger.info('Ticket | No messages found in channel.');
+        return;
     }
 
     await writeTicketLog(
         interaction.guild?.id ?? '',
-        (interaction.member?.user as any)?.id ?? '', 
+        (interaction.member?.user as any)?.id ?? '',
         interaction.channel?.id ?? '',
         Array.from(messages.values())
     );
-    
-    let htmlCode;
 
-    switch (type) {
-        case 'image-save':
-            htmlCode = await discordTranscripts.createTranscript(chan, {
-                limit: -1,
-                returnType: 'string' as any,
-                filename: `transcript-${interaction.channel?.id}.html`,
-                saveImages: true,
-                poweredBy: false
-            });
-            break;
-        case 'no-image-save':
-            htmlCode = await discordTranscripts.createTranscript(chan, {
-                limit: -1,
-                returnType: 'string' as any,
-                filename: `transcript-${interaction.channel?.id}.html`,
-                saveImages: false,
-                poweredBy: false
-            });
-            break;
-        default:
-            htmlCode = await discordTranscripts.createTranscript(chan, {
-                limit: -1,
-                returnType: 'string' as any,
-                filename: `transcript-${interaction.channel?.id}.html`,
-                saveImages: false,
-                poweredBy: false
-            });
-            break;
-    }
+    const transcriptOptions = {
+        limit: -1,
+        returnType: 'string' as ExportReturnType,
+        filename: `transcript-${interaction.channel?.id}.html`,
+        saveImages: type === 'image-save',
+        poweredBy: false
+    };
 
-    await fsPromises.mkdir(ticketLogDir.toString(), { recursive: true });
-    await fsPromises.writeFile(`${ticketLogDir}/transcript-${interaction.channel?.id}.html`, htmlCode as string);
+    const htmlCode = await createTranscript(chan, transcriptOptions);
+    await fsPromises.mkdir(ticketLogDir, { recursive: true });
+    const htmlFilePath = path.join(ticketLogDir, `transcript-${interaction.channel?.id}.html`);
+    const htmlContent = typeof htmlCode === 'string' ? htmlCode : htmlCode.toString();
+    await fsPromises.writeFile(htmlFilePath, htmlContent);
 }
 
 const reopenTicketChan = async (client: Client, interaction: Interaction, ticketUser: ITicketUser, ticketGuild: ITicketGuild) => {
