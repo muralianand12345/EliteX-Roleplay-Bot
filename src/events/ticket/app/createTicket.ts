@@ -36,24 +36,11 @@ const event: BotEvent = {
             }
 
             if (ticketUser) {
-
-                const updatePromises = ticketUser.ticketlog.map(async (ticket: ITicketLog) => {
-                    if (!interaction.guild.channels.cache.get(ticket.ticketId)) {
-                        client.logger.info(`Ticket Channel Missing | UserId: ${ticketUser.userId} | TicketId: ${ticket.ticketId}`);
-                        return null;
-                    }
-                    return ticket;
-                });
-
-                const updatedTicketlog = await Promise.all(updatePromises);
-                ticketUser.ticketlog = updatedTicketlog.filter((ticket): ticket is ITicketLog => ticket !== null);
-                await ticketUser.save();
-
                 const activeTickets = ticketUser.ticketlog.filter((ticket: ITicketLog) => ticket.activeStatus);
                 if (activeTickets.length >= ticketGuild.ticketMaxCount) {
-                    return await interaction.editReply({ 
-                        content: `You are limited to opening \`${ticketGuild.ticketMaxCount}\` tickets. Please close any existing tickets before creating a new one.`, 
-                        ephemeral: true 
+                    return await interaction.editReply({
+                        content: `You are limited to opening \`${ticketGuild.ticketMaxCount}\` tickets. Please close any existing tickets before creating a new one.`,
+                        ephemeral: true
                     });
                 }
             } else {
@@ -99,8 +86,6 @@ const event: BotEvent = {
                 if (i.user.id === interaction.user.id) {
 
                     if (i.values[0]) {
-
-                        //check if the category exists in the guild
                         const category = i.values[0];
                         if (!interaction.guild.channels.cache.find((c: Channel) => c.id === category && c.type === ChannelType.GuildCategory)) {
                             return await i.reply({
@@ -130,6 +115,10 @@ const event: BotEvent = {
                                     components: []
                                 });
                                 const opened = await createTicketEmbed(client, interaction, c);
+                                if (!ticketUser.ticketlog) {
+                                    ticketUser.ticketlog = [];
+                                }
+                                
                                 let ticketData = {
                                     guildId: interaction.guild.id,
                                     activeStatus: true,
@@ -137,9 +126,15 @@ const event: BotEvent = {
                                     ticketId: c.id,
                                     ticketPannelId: opened.id,
                                 };
-                                ticketUser.ticketlog.push(ticketData);
-                                ticketUser.recentTicketId = c.id;
-                                await ticketUser.save();
+                                
+                                await ticketUserModel.findOneAndUpdate(
+                                    { userId: interaction.user.id },
+                                    { 
+                                        $push: { ticketlog: ticketData },
+                                        $set: { recentTicketId: c.id }
+                                    },
+                                    { new: true, upsert: true }
+                                );
                             });
 
                     }

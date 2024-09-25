@@ -8,8 +8,10 @@ const writeTicketLog = async (guildId: string, userId: string, ticketId: string,
         const logDir = path.join(__dirname, '../../../ticket-user-data', guildId, userId);
         const logFile = path.join(logDir, `${ticketId}.log`);
         await fs.mkdir(logDir, { recursive: true });
+        
+        const sortedMessages = messages.sort((a, b) => a.createdTimestamp - b.createdTimestamp);
 
-        const logContent = messages.map(msg => {
+        const logContent = sortedMessages.map(msg => {
             let content = `[${msg.createdAt.toISOString()}] [${msg.author.id} | ${msg.author.username}] ${msg.content}`;
 
             if (msg.embeds.length > 0) {
@@ -41,7 +43,6 @@ const writeTicketLog = async (guildId: string, userId: string, ticketId: string,
         }
 
         await fs.writeFile(logFile, logContent, 'utf-8');
-        client.logger.info(`Ticket log written successfully: ${logFile}`);
     } catch (error) {
         client.logger.error('Error writing ticket log:', error);
     }
