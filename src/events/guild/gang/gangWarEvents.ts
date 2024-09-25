@@ -16,7 +16,7 @@ const event: BotEvent = {
             try {
                 await user.send(content);
             } catch (error) {
-                console.error(`Failed to send DM to ${user.tag}:`, error);
+                client.logger.error(`Failed to send DM to ${user.tag}:`, error);
             }
         };
 

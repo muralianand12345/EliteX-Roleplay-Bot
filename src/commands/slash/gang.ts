@@ -177,7 +177,7 @@ const command: SlashCommand = {
             );
             await interaction.respond(filtered.slice(0, 25));
         } catch (error) {
-            console.error("Error in autocomplete function:", error);
+            client.logger.error("Error in autocomplete function:", error);
             await interaction.respond([{ name: "Error occurred", value: "error" }]);
         }
     },

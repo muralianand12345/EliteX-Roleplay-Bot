@@ -1,4 +1,5 @@
-import { CategoryChannel, ChannelType, Client, Interaction, PermissionFlagsBits, TextChannel } from "discord.js";
+import { CategoryChannel, ChannelType, Client, Interaction, PermissionFlagsBits, TextChannel, Collection, Message } from "discord.js";
+import { writeTicketLog } from "./ticketDataLogger";
 import discordTranscripts from "discord-html-transcripts";
 import fs from "fs";
 const fsPromises = fs.promises;
@@ -73,6 +74,22 @@ const closeTicketChan = async (client: Client, interaction: Interaction, parentC
 };
 
 const deleteTicketLog = async (client: Client, interaction: Interaction, ticketLogDir: string, chan: TextChannel, type: string) => {
+
+    let messages: Collection<string, Message>;
+    try {
+        messages = await chan.messages.fetch({ limit: 100 });
+    } catch (error) {
+        client.logger.error('Error fetching messages:', error);
+        messages = new Collection<string, Message>();
+    }
+
+    await writeTicketLog(
+        interaction.guild?.id ?? '',
+        (interaction.member?.user as any)?.id ?? '', 
+        interaction.channel?.id ?? '',
+        Array.from(messages.values())
+    );
+    
     let htmlCode;
 
     switch (type) {

@@ -143,3 +143,6 @@ build
 /vector-store/faiss.index
 *.lock
 yarn.lock
+
+/ticket-logs
+/ticket-user-data
