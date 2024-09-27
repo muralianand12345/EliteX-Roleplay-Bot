@@ -72,18 +72,34 @@ const event: BotEvent = {
 
             const chunks = splitMessage(responseContent);
             if (chunks.length > 0) {
-                await message.reply(chunks[0]);
-                for (let i = 1; i < chunks.length; i++) {
-                    if (chunks[i - 1].split('```').length % 2 === 0) {
-                        chunks[i] = '```\n' + chunks[i];
+                try {
+                    await message.reply(chunks[0]);
+                    for (let i = 1; i < chunks.length; i++) {
+                        if (chunks[i - 1].split('```').length % 2 === 0) {
+                            chunks[i] = '```\n' + chunks[i];
+                        }
+                        if (chunks[i].split('```').length % 2 === 0) {
+                            chunks[i] += '\n```';
+                        }
+                        await chan.send(chunks[i]);
                     }
-                    if (chunks[i].split('```').length % 2 === 0) {
-                        chunks[i] += '\n```';
+                } catch (replyError: any) {
+                    if (replyError.code === 10008) {
+                        await chan.send("It seems the original message was deleted. Here's my response anyway:\n\n" + chunks.join('\n'));
+                    } else {
+                        throw replyError;
                     }
-                    await chan.send(chunks[i]);
                 }
             } else {
-                await message.reply("I apologize, but I don't have a response for that.");
+                try {
+                    await message.reply("I apologize, but I don't have a response for that.");
+                } catch (replyError: any) {
+                    if (replyError.code === 10008) {
+                        client.logger.warn("Original AI message was deleted. Unable to reply.");
+                    } else {
+                        throw replyError;
+                    }
+                }
             }
         } catch (error: Error | any) {
             try {

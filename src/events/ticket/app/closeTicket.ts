@@ -91,18 +91,33 @@ const event: BotEvent = {
 
                 collector.on('end', async (collected: Collection<Snowflake, Message>) => {
                     if (collected.size <= 0) {
-                        await interaction.editReply({
-                            content: `**Ticket closure cancelled!** (<@!${userButton}>)`,
-                            components: []
-                        }).catch(async (err: Error | any) => {
-                            if (err.code == 10008) {
-                                await interaction.channel.send({ content: '**ERROR: Interaction Not Found!**' }).then((msg: Message) => {
-                                    setTimeout(() => {
-                                        msg.delete();
-                                    }, 4000);
-                                });
+                        try {
+                            await interaction.editReply({
+                                content: `**Ticket closure cancelled!** (<@!${userButton}>)`,
+                                components: []
+                            });
+                        } catch (err: any) {
+                            if (err.code === 10008) {
+                                client.logger.warn('Ticket interaction is no longer valid. Unable to edit reply.');
+                            } else if (err.code === 10062) {
+                                client.logger.warn('Ticket interaction has already been acknowledged. Unable to edit reply.');
+                            } else {
+                                client.logger.error('Error while editing reply:', err);
                             }
-                        });
+
+                            if (interaction.channel) {
+                                try {
+                                    const msg = await interaction.channel.send({ content: '**Ticket closure cancelled!**' });
+                                    setTimeout(() => {
+                                        msg.delete().catch((deleteErr: Error) => client.logger.warn('Failed to delete message:', deleteErr));
+                                    }, 4000);
+                                } catch (channelErr) {
+                                    client.logger.error('Failed to send message to channel:', channelErr);
+                                }
+                            } else {
+                                client.logger.warn('Ticket channel not available. Unable to send fallback message.');
+                            }
+                        }
                     }
                 });
             }
