@@ -347,6 +347,11 @@ const command: SlashCommand = {
                     return "Cannot invite a bot to the gang.";
                 }
 
+                const member = interaction.guild?.members.cache.get(user.id);
+                if (member?.permissions.has(PermissionFlagsBits.Administrator)) {
+                    return "Cannot invite an Administrator to the gang.";
+                }
+
                 if (gangData.gangMembers.length >= 25) {
                     return "Cannot invite more members, gang is full.";
                 }
