@@ -159,15 +159,23 @@ const command: SlashCommand = {
                 if (gangName) {
                     const gangData = await GangInitSchema.findOne({ gangName: gangName });
                     if (gangData) {
-                        const allGangs = await GangInitSchema.find({});
-                        const takenLocations = allGangs.flatMap(gang => gang.gangLocation || []);
-                        const availableLocations = client.config.gang.war.location.filter((loc: GangWarLocation) =>
-                            !takenLocations.includes(loc.value)
-                        );
-                        choices = availableLocations.map((location: GangWarLocation) => ({
-                            name: `${location.name} ${location.emoji}`,
-                            value: location.value
-                        }));
+                        if (interaction.commandName === "remove_location") {
+                            const currentLocations = gangData.gangLocation || [];
+                            choices = currentLocations.map(location => ({
+                                name: location,
+                                value: location
+                            }));
+                        } else if (interaction.commandName === "location") {
+                            const allGangs = await GangInitSchema.find({});
+                            const takenLocations = allGangs.flatMap(gang => gang.gangLocation || []);
+                            const availableLocations = client.config.gang.war.location.filter((loc: GangWarLocation) =>
+                                !takenLocations.includes(loc.value)
+                            );
+                            choices = availableLocations.map((location: GangWarLocation) => ({
+                                name: `${location.name} ${location.emoji}`,
+                                value: location.value
+                            }));
+                        }
                     }
                 }
             }

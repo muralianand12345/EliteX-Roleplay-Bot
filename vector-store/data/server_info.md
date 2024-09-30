@@ -1,9 +1,11 @@
 # EliteX Roleplay: The Ultimate Tamil Roleplay Experience
 
 ## Overview
-EliteX RP is a premier Tamil roleplay server, created by an person OwnerPlayz. Our server offers an immersive and authentic roleplaying environment for the Tamil community.
 
-### Key Features:
+EliteX RP is a premier Tamil roleplay server, created by an person OwnerPlayz. Our server offers an immersive and authentic roleplaying environment for the Tamil community. EliteX Roleplay is founded by OwnerPlayz and managed by OwnerPlayz, Tamilgamers, SRPlayz and Bolt.
+
+### Key Features
+
 - Available on FiveM
 - Free-to-play, high-quality roleplaying experience
 - Rich, immersive world with detailed environments
@@ -11,16 +13,19 @@ EliteX RP is a premier Tamil roleplay server, created by an person OwnerPlayz. O
 - Strong community focus
 
 ## Platforms
+
 1. FiveM: A modification framework for GTA V, allowing multiplayer on customized dedicated servers.
 
 ## Community Highlights
+
 - Engaging storylines and character development
 - Regular events and interactive scenarios
 - Supportive community for both new and experienced roleplayers
 - Continuous updates and improvements to enhance gameplay
 
 ## Getting Started
-1. Join our Discord server: https://discord.gg/CKEQEEy8Pv (Permanent link) or discord.gg/elitexrp (Temporary link)
+
+1. Join our Discord server: <https://discord.gg/CKEQEEy8Pv> (Permanent link) or discord.gg/elitexrp (Temporary link)
 2. Apply for a visa through the application process
 3. Review the server rules and guidelines
 4. Connect to the server using FiveM client
@@ -28,6 +33,7 @@ EliteX RP is a premier Tamil roleplay server, created by an person OwnerPlayz. O
 ## Server Rules
 
 ### Discord Rules (Detailed)
+
 1. Respectful Behavior:
    - Treat all members with courtesy and respect
    - Avoid offensive language, slurs, or derogatory terms
@@ -72,6 +78,7 @@ EliteX RP is a premier Tamil roleplay server, created by an person OwnerPlayz. O
 ### Roleplay Rules (Expanded)
 
 #### 1. Out of Character (OOC) Communication
+
 - Definition: OOC refers to any communication or action not part of the in-game roleplay.
 - Handling OOC Issues:
   - Use the ticket system for all OOC-related issues, except item loss
@@ -81,6 +88,7 @@ EliteX RP is a premier Tamil roleplay server, created by an person OwnerPlayz. O
   - Do not use OOC to gain in-game advantages
 
 #### 2. Fail RP (Fail Role Play)
+
 - Definition: Actions or behaviors that break immersion or realism in roleplay.
 - Monitoring and Enforcement:
   - Admins actively monitor for Fail RP incidents
@@ -92,39 +100,48 @@ EliteX RP is a premier Tamil roleplay server, created by an person OwnerPlayz. O
 
 Examples of Fail RP (Detailed):
 a) Breaking Character:
-   - Suddenly switching from your character's personality to your real-life self
-   - Using out-of-character knowledge in roleplay situations
+
+- Suddenly switching from your character's personality to your real-life self
+- Using out-of-character knowledge in roleplay situations
 
 b) Powergaming:
-   - Performing impossible actions (e.g., lifting a car single-handedly)
-   - Forcing outcomes on other players without their consent
+
+- Performing impossible actions (e.g., lifting a car single-handedly)
+- Forcing outcomes on other players without their consent
 
 c) Metagaming:
-   - Using information from Discord or out-of-game sources in roleplay
-   - Acting on information your character wouldn't realistically know
+
+- Using information from Discord or out-of-game sources in roleplay
+- Acting on information your character wouldn't realistically know
 
 d) Random Deathmatch (RDM):
-   - Killing other players without valid roleplay reason
-   - Initiating violence without proper roleplay buildup
+
+- Killing other players without valid roleplay reason
+- Initiating violence without proper roleplay buildup
 
 e) Ignoring Injuries:
-   - Continuing to act normally after sustaining serious injuries in roleplay
-   - Neglecting to seek medical attention when realistically required
+
+- Continuing to act normally after sustaining serious injuries in roleplay
+- Neglecting to seek medical attention when realistically required
 
 f) Unrealistic Actions:
-   - Driving vehicles in impossible ways
-   - Surviving falls or injuries that would be fatal in reality
+
+- Driving vehicles in impossible ways
+- Surviving falls or injuries that would be fatal in reality
 
 g) Disregarding RP Consequences:
-   - Ignoring the results of roleplay interactions (e.g., acting unaffected after losing a fight)
-   - Failing to acknowledge or respond to significant events in the RP world
+
+- Ignoring the results of roleplay interactions (e.g., acting unaffected after losing a fight)
+- Failing to acknowledge or respond to significant events in the RP world
 
 #### 3. Basic RP Principles
+
 - Realism: Maintain a realistic approach to actions and interactions
 - Consistency: Stay true to your character's established personality and background
 - Immersion: Contribute to the overall atmosphere of the roleplay world
 
 #### 4. General Behavior
+
 - No Verbal Abuse: Strictly prohibited, including in-character interactions
 - Respect: Treat all players professionally, regardless of in-game conflicts
 - Constructive Roleplay: Focus on creating engaging and meaningful interactions
@@ -132,29 +149,34 @@ g) Disregarding RP Consequences:
 ### Roleplay Robbery Rules (Detailed)
 
 #### 1. Car Robbery
+
 - Participants: 1 robber, 1 police officer
 - No hostage required
 - Focus on quick, opportunistic theft scenarios
 
 #### 2. Store Robbery
+
 - Participants: 2-4 robbers, 5 police officers (4 chase, 1 hostage handler)
 - Vehicle Limit: 1 getaway vehicle
 - Hostage: 1 required
 - Emphasis on coordinated team effort and negotiation skills
 
 #### 3. Fleeca Robbery
+
 - Participants: 4 robbers, 5 police officers (4 chase, 1 hostage handler)
 - Vehicle Limit: 1 getaway vehicle
 - Hostage: 1 required
 - Higher stakes, requires more planning and execution skill
 
 #### 4. Pacific Robbery
+
 - Participants: 6-8 robbers, 10 police officers (8 chase including chopper, 2 hostage handlers)
 - Vehicle Limit: 2 getaway vehicles
 - Hostages: 2 required
 - Highest tier robbery, demands extensive planning and coordination
 
 #### 5. Deluxe Car Heist
+
 - Participants: 3-4 robbers, 4 police officers
 - No hostage required
 - Vehicle Limit: 1 getaway vehicle
@@ -164,31 +186,36 @@ g) Disregarding RP Consequences:
   - Focused on strategic gameplay rather than widespread pursuit
   
 #### 6. Truck robbery
+
 - Robber Count: 4
 - PD Count: 5 (4 Chase Units + 1 Hostage Handler)
 - Number of Vehicles Allowed: 1
 - Hostage Needed: 1
 
 #### 7. Yatch robbery
+
 - Robber Count: 4
 - PD Count: 5 (4 Chase Units + 1 Hostage Handler)
 - Number of Vehicles Allowed: 1
 - Hostage Needed: 1
 
 #### General Rule for All Robberies
+
 - 10-minute waiting period after robbery completion
 - Allows for fair police response and roleplay development
 
 ### Visa Application Process
-1. Access the application: Go to https://discord.com/channels/784794493580476436/1274078968621961246
+
+1. Access the application: Go to <https://discord.com/channels/784794493580476436/1274078968621961246>
 2. Click "Apply for Visa" button
 3. Complete the detailed application form
 4. Submit and await review (typically 1-24 hours)
 5. Ensure all provided information is accurate and comprehensive
 
 ### Additional Information
-- Developer: EliteX Bot developed by Murali Anand (@murlee)
-- Community Events: Check Discord announcements (https://discord.com/channels/784794493580476436/1273689837030867024) for special events and activities 
-- Roleplay Resources: Extensive guidebook available at https://discord.com/channels/784794493580476436/1273691719786954793
+
+- EliteX Discord bot is created by murlee <@678402714765361182>, any questions regarding the bot can be asked through him.
+- Community Events: Check Discord announcements (<https://discord.com/channels/784794493580476436/1273689837030867024>) for special events and activities.
+- Roleplay Resources: Extensive guidebook available at <https://discord.com/channels/784794493580476436/1273691719786954793>
 
 Remember, EliteX Roleplay is committed to providing an immersive, enjoyable, and fair roleplaying experience for all participants. Adherence to these rules and guidelines ensures a positive environment for everyone in our community.

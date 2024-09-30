@@ -199,8 +199,12 @@ const handleButtonInteraction = async (interaction: any, client: Client) => {
         } else if (error.code === 10008) {
             return await interaction.reply({ content: 'Error: Message not found.', ephemeral: true });
         }
-        client.logger.error('Error in handleButtonInteraction:', error);
-        await interaction.reply({ content: 'An error occurred while processing the application. Please try again later.', ephemeral: true }).catch((err: Error | any) => client.logger.error('Error in handleButtonInteraction:', err));
+        client.logger.error('Error in handleButtonInteraction:');
+        client.logger.error(error);
+        await interaction.reply({ content: 'An error occurred while processing the application. Please try again later.', ephemeral: true }).catch((err: Error | any) => {
+            client.logger.error('Error sending error message:');
+            client.logger.error(err);
+        });
     }
 };
 

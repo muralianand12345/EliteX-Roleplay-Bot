@@ -127,7 +127,7 @@ const handleVisaDecision = async (interaction: ButtonInteraction, client: Client
                 }
             }
         } catch (error) {
-            client.logger.error(`Failed to send DM to user ${user.tag} | Visa Application`);
+            client.logger.warn(`Failed to send DM to user ${user.tag}, they may have DMs disabled. | Visa Application`);
             await notificationChannel.send(`Failed to send ${decision} notification DM to ${user.tag}. They may have DMs disabled.`);
         }
 
@@ -248,7 +248,8 @@ const handleError = async (interaction: Interaction, client: Client, message: st
                 await interaction.reply({ content: `${message}. Please try again later.`, ephemeral: true });
             }
         } catch (replyError) {
-            client.logger.error('Failed to send error message to user:', replyError);
+            client.logger.error('Failed to send error message to user:');
+            client.logger.error(replyError);
         }
     }
 };

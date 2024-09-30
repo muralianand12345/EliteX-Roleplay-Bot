@@ -1,4 +1,4 @@
-import { ButtonInteraction, Events, Message, TextChannel } from "discord.js";
+import { ButtonInteraction, Events, Message, PermissionFlagsBits, TextChannel } from "discord.js";
 import { config } from "dotenv";
 import path from "path";
 
@@ -89,7 +89,16 @@ const event: BotEvent = {
 
                     const guild = client.guilds.cache.get(interaction.guildId);
                     const chan = guild.channels.cache.get(interaction.channelId);
-                    if (chan == null) return;
+                    if (!chan) {
+                        client.logger.warn(`Channel ${interaction.channelId} not found.`);
+                        return;
+                    }
+
+                    const permissions = chan.permissionsFor(client.user);
+                    if (!permissions || !permissions.has(PermissionFlagsBits.ManageChannels)) {
+                        await interaction.reply({ content: 'I lack permissions to manage this channel.', ephemeral: true });
+                        return;
+                    }
 
                     await interaction.editReply({
                         content: 'Saving Messages and Deleting the channel ...',
@@ -120,7 +129,10 @@ const event: BotEvent = {
             } catch (err) {
                 const guild = client.guilds.cache.get(interaction.guildId);
                 const chan = guild.channels.cache.get(interaction.channelId);
-                if (chan == null) return;
+                if (!chan) {
+                    client.logger.warn(`Channel ${interaction.channelId} not found.`);
+                    return;
+                }
                 await handleTicketError(interaction, chan);
             }
         }
@@ -146,7 +158,16 @@ const event: BotEvent = {
 
                     const guild = client.guilds.cache.get(interaction.guildId);
                     const chan = guild.channels.cache.get(interaction.channelId);
-                    if (chan == null) return;
+                    if (!chan) {
+                        client.logger.warn(`Channel ${interaction.channelId} not found.`);
+                        return;
+                    }
+
+                    const permissions = chan.permissionsFor(client.user);
+                    if (!permissions || !permissions.has(PermissionFlagsBits.ManageChannels)) {
+                        await interaction.reply({ content: 'I lack permissions to manage this channel.', ephemeral: true });
+                        return;
+                    }
 
                     await interaction.editReply({
                         content: 'Saving Messages and Deleting the channel ...',
@@ -177,7 +198,10 @@ const event: BotEvent = {
             } catch (err) {
                 const guild = client.guilds.cache.get(interaction.guildId);
                 const chan = guild.channels.cache.get(interaction.channelId);
-                if (chan == null) return;
+                if (!chan) {
+                    client.logger.warn(`Channel ${interaction.channelId} not found.`);
+                    return;
+                }
                 await handleTicketError(interaction, chan);
             }
         }

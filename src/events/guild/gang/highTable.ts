@@ -92,7 +92,8 @@ const event: BotEvent = {
                 }
             }
         } catch (error) {
-            client.logger.error("Error in AnonChat event:", error);
+            client.logger.error("Error in AnonChat event:");
+            client.logger.error(error);
         }
     }
 };
