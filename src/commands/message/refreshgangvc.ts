@@ -52,7 +52,8 @@ const command: Command = {
                     if (!voiceChannel) {
 
                         const gangNameConverted = convertToSpecialText(gang.gangName);
-                        const voiceChannelName = `${client.config.gang.channel.gangvcname.split("{gang}")[0]}${gangNameConverted}`;
+                        const prefix = client.config.gang.channel.gangvcname.split("{gang}")[0];
+                        const voiceChannelName = `${prefix}${gangNameConverted}`;
 
                         voiceChannel = await message.guild?.channels.create({
                             name: voiceChannelName,

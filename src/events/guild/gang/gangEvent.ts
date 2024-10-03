@@ -28,7 +28,8 @@ const event: BotEvent = {
                 }
 
                 const gangNameConverted = convertToSpecialText(gangName);
-                const voiceChannelName = `${client.config.gang.channel.gangvcname.split("{gang}")[0]}${gangNameConverted}`;
+                const prefix = client.config.gang.channel.gangvcname.split("{gang}")[0];
+                const voiceChannelName = `${prefix}${gangNameConverted}`;
 
                 const voiceChannel = await guild.channels.create({
                     name: voiceChannelName,
