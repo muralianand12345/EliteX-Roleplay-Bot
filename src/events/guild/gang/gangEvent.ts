@@ -1,10 +1,77 @@
-import { ButtonInteraction, ColorResolvable, Events, PermissionsBitField } from "discord.js";
+import { ButtonInteraction, ColorResolvable, Events, PermissionsBitField, ChannelType, Guild, Client, CategoryChannel } from "discord.js";
 import GangInitSchema from "../../database/schema/gangInit";
 import { BotEvent } from "../../../types";
+import { convertToSpecialText } from "../../../utils/convertion/text"; 
+import { VoiceChannel } from "discord.js";
 
 const event: BotEvent = {
     name: Events.InteractionCreate,
     async execute(interaction, client) {
+
+        const createGangVoiceChannel = async (guild: Guild, gangName: string, gangRole: string, client: Client) => {
+            try {
+                let category = guild.channels.cache.find(
+                    (channel) => channel.name === client.config.gang.channel.vccategoryname && channel.type === ChannelType.GuildCategory
+                ) as CategoryChannel;
+
+                if (!category) {
+                    category = await guild.channels.create({
+                        name: client.config.gang.channel.vccategoryname,
+                        type: ChannelType.GuildCategory,
+                        permissionOverwrites: [
+                            {
+                                id: guild.id,
+                                deny: [PermissionsBitField.Flags.ViewChannel],
+                            },
+                        ],
+                    });
+                }
+
+                const voiceChannelName = client.config.gang.channel.gangvcname.replace("{gang}", gangName);
+                const convertedChannelName = convertToSpecialText(voiceChannelName);
+
+                const voiceChannel = await guild.channels.create({
+                    name: convertedChannelName,
+                    type: ChannelType.GuildVoice,
+                    parent: category,
+                    permissionOverwrites: [
+                        {
+                            id: guild.id,
+                            deny: [PermissionsBitField.Flags.ViewChannel],
+                        },
+                        {
+                            id: gangRole,
+                            allow: [
+                                PermissionsBitField.Flags.ViewChannel,
+                                PermissionsBitField.Flags.Connect,
+                                PermissionsBitField.Flags.Speak,
+                            ],
+                        },
+                    ],
+                });
+
+                await GangInitSchema.findOneAndUpdate(
+                    { gangName: gangName },
+                    { gangVoiceChat: voiceChannel.id }
+                );
+
+                return voiceChannel.id;
+            } catch (error) {
+                client.logger.error("Error creating gang voice channel:", error);
+                throw error;
+            }
+        }
+
+        const deleteGangVoiceChannel = async (guild: Guild, channelId: string, client: Client) => {
+            try {
+                const voiceChannel = guild.channels.cache.get(channelId) as VoiceChannel;
+                if (!voiceChannel) return;
+                await voiceChannel.delete();
+            } catch (error) {
+                client.logger.error("Error deleting gang voice channel:", error);
+                throw error;
+            }
+        }
 
         const handleAdminApproval = async (interaction: ButtonInteraction) => {
             if (!(interaction.member && 'permissions' in interaction.member && interaction.member.permissions instanceof PermissionsBitField)) return interaction.reply({ content: "Unable to verify permissions.", ephemeral: true });
@@ -31,8 +98,12 @@ const event: BotEvent = {
 
                     if (!role) return interaction.reply({ content: "Unable to create role.", ephemeral: true });
 
+                    const voiceChannelId = await createGangVoiceChannel(interaction.guild as Guild, gangData.gangName, role.id, client);
+                    if (!voiceChannelId) return interaction.reply({ content: "Unable to create voice channel.", ephemeral: true });
+
                     gangData.gangStatus = true;
                     gangData.gangRole = role.id;
+                    gangData.gangVoiceChat = voiceChannelId;
                     await gangData.save();
 
                     const leader = await interaction.guild?.members.fetch(gangData.gangLeader);
@@ -76,7 +147,10 @@ const event: BotEvent = {
                 if (interaction.customId === 'approve-gang-disband') {
                     const role = interaction.guild?.roles.cache.get(gangData.gangRole);
                     if (role) await role.delete();
-            
+                    if (gangData.gangVoiceChat) {
+                        await deleteGangVoiceChannel(interaction.guild as Guild, gangData.gangVoiceChat, client);
+                    }
+
                     await leaderUser.send(`Your gang **${gangData.gangName}** has been disbanded.`);
                     await GangInitSchema.findByIdAndDelete(gangId);
                     await interaction.editReply({ content: "Gang disbanded and role deleted." });
@@ -130,7 +204,7 @@ const event: BotEvent = {
 
                         const role = interaction.guild?.roles.cache.get(gangData.gangRole);
                         if (role) await role.edit({ name: gangData.gangName, color: gangData.gangColor as ColorResolvable });
-                        
+
                         const leaderUser = await client.users.fetch(gangData.gangLeader);
                         await leaderUser.send(`Your gang edit request for **${gangData.gangName}** has been approved.`);
 

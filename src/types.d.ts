@@ -205,6 +205,7 @@ export interface IGangInit extends mongoose.Document {
     gangLeader: string,
     gangRole: string,
     gangMembers: Array<IGangMembers>,
+    gangVoiceChat: string | null,
     gangCreated: Date,
     gangStatus: boolean,
     warWon: number,

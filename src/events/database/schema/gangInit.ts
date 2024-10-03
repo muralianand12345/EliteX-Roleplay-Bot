@@ -11,6 +11,7 @@ const ganginitSchema = new Schema<IGangInit>({
         userId: { type: String, required: true },
         gangJoinDate: { type: Date, required: true }
     }],
+    gangVoiceChat: { type: String, required: false },
     gangCreated: { type: Date, required: true, default: Date.now },
     gangStatus: { type: Boolean, required: true, default: true },
     warWon: { type: Number, required: false, default: 0 },

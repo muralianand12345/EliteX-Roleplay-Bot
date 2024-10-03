@@ -28,16 +28,6 @@ const event: BotEvent = {
             }
         };
 
-        const updateLoserLocation = async (loserGang: IGangWarCombatants | undefined, location: string) => {
-            if (loserGang) {
-                const gangInit = await GangInitSchema.findOne({ gangLeader: loserGang.gangLeader });
-                if (gangInit) {
-                    gangInit.gangLocation = gangInit.gangLocation.filter(loc => loc !== location);
-                    await gangInit.save();
-                }
-            }
-        };
-
         const announceGangWar = async (client: any, gangWar: any) => {
             const attackerGang = gangWar.combatants.find((c: IGangWarCombatants) => c.type === 'attacker');
             const defenderGang = gangWar.combatants.find((c: IGangWarCombatants) => c.type === 'defender');

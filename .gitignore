@@ -146,3 +146,5 @@ yarn.lock
 
 /ticket-logs
 /ticket-user-data
+
+/data_processing
