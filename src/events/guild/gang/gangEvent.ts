@@ -27,11 +27,11 @@ const event: BotEvent = {
                     });
                 }
 
-                const voiceChannelName = client.config.gang.channel.gangvcname.replace("{gang}", gangName);
-                const convertedChannelName = convertToSpecialText(voiceChannelName);
+                const gangNameConverted = convertToSpecialText(gangName);
+                const voiceChannelName = `${client.config.gang.channel.gangvcname.split("{gang}")[0]}${gangNameConverted}`;
 
                 const voiceChannel = await guild.channels.create({
-                    name: convertedChannelName,
+                    name: voiceChannelName,
                     type: ChannelType.GuildVoice,
                     parent: category,
                     permissionOverwrites: [

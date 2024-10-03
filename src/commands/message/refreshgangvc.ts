@@ -50,12 +50,12 @@ const command: Command = {
                         message.guild?.channels.cache.get(gang.gangVoiceChat) : null;
 
                     if (!voiceChannel) {
-                        const voiceChannelName = client.config.gang.channel.gangvcname
-                            .replace("{gang}", gang.gangName);
-                        const convertedChannelName = convertToSpecialText(voiceChannelName);
+
+                        const gangNameConverted = convertToSpecialText(gang.gangName);
+                        const voiceChannelName = `${client.config.gang.channel.gangvcname.split("{gang}")[0]}${gangNameConverted}`;
 
                         voiceChannel = await message.guild?.channels.create({
-                            name: convertedChannelName,
+                            name: voiceChannelName,
                             type: ChannelType.GuildVoice,
                             parent: category,
                             permissionOverwrites: [
