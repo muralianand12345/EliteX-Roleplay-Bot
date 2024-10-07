@@ -4,9 +4,84 @@ import { scheduleJob } from 'node-schedule';
 import { BotEvent, IGangInit } from '../../../types';
 
 const CHUNK_SIZE = 1000;
-const FETCH_TIMEOUT = 30000;
+const FETCH_TIMEOUT = 60000; // Increased to 60 seconds
+const CHUNK_DELAY = 500; // 500ms delay between chunks
+const MAX_RETRIES = 3;
 
 const fetchAllGangs = async () => await GangInitSchema.find({ gangStatus: true });
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const fetchMemberChunk = async (guild: any, options: any, retryCount = 0): Promise<Collection<string, GuildMember>> => {
+    try {
+        const chunk = await guild.members.fetch(options);
+        return chunk;
+    } catch (error) {
+        if (retryCount < MAX_RETRIES) {
+            await delay(1000 * (retryCount + 1)); 
+            return fetchMemberChunk(guild, options, retryCount + 1);
+        }
+        throw error;
+    }
+};
+
+const fetchGuildMembers = async (guild: any, client: Client, requiredMemberIds: Set<string>): Promise<Collection<string, GuildMember>> => {
+    const members = new Collection<string, GuildMember>();
+    const chunks: Promise<void>[] = [];
+    let lastId: string | undefined;
+
+    requiredMemberIds.forEach(id => {
+        const cachedMember = guild.members.cache.get(id);
+        if (cachedMember) {
+            members.set(id, cachedMember);
+            requiredMemberIds.delete(id);
+        }
+    });
+
+    if (requiredMemberIds.size === 0) {
+        return members;
+    }
+
+    try {
+        while (true) {
+            const options: any = { limit: CHUNK_SIZE };
+            if (lastId) options.after = lastId;
+
+            const chunkPromise = async () => {
+                try {
+                    const chunk = await fetchMemberChunk(guild, options);
+                    if (chunk.size === 0) return;
+
+                    chunk.forEach((member: GuildMember) => {
+                        if (requiredMemberIds.has(member.id)) {
+                            members.set(member.id, member);
+                        }
+                    });
+
+                    lastId = chunk.last()?.id;
+                    await delay(CHUNK_DELAY);
+                } catch (error) {
+                    client.logger.warn(`Chunk fetch error: ${error}. Continuing with partial data.`);
+                }
+            };
+
+            chunks.push(chunkPromise());
+            if (members.size >= requiredMemberIds.size) break;
+            await delay(100);
+        }
+
+        await Promise.race([
+            Promise.all(chunks),
+            new Promise((_, reject) =>
+                setTimeout(() => reject(new Error('Member fetch timeout')), FETCH_TIMEOUT)
+            )
+        ]);
+
+    } catch (error) {
+        client.logger.warn(`Member fetch partial completion: ${error}`);
+    }
+
+    return members;
+};
 
 const createGangEmbed = (gang: IGangInit, config: any) => {
     const getLocationNames = (locationValues: string[]) => {
@@ -27,37 +102,14 @@ const createGangEmbed = (gang: IGangInit, config: any) => {
             { name: 'Created', value: gang.gangCreated.toDateString(), inline: true },
             { name: "Status", value: gang.gangStatus ? "Active" : "Inactive", inline: true },
             { name: 'Gang Locations', value: getLocationNames(gang.gangLocation), inline: false },
-            { name: 'Members', value: gang.gangMembers.length > 0 ? 
-                gang.gangMembers.map(m => `<@${m.userId}>`).join('\n') : 
-                'No members'
+            {
+                name: 'Members', value: gang.gangMembers.length > 0 ?
+                    gang.gangMembers.map(m => `<@${m.userId}>`).join('\n') :
+                    'No members'
             }
         )
         .setFooter({ text: `Gang ID: ${gang._id}` })
         .setTimestamp();
-};
-
-const fetchGuildMembers = async (guild: any): Promise<Collection<string, GuildMember>> => {
-    try {
-        const members = new Collection<string, GuildMember>();
-        let lastId: string | undefined;
-        while (true) {
-            const options: any = { limit: CHUNK_SIZE };
-            if (lastId) options.after = lastId;
-
-            const chunk = await guild.members.fetch(options);
-            if (chunk.size === 0) break;
-
-            chunk.forEach((member: GuildMember) => {
-                members.set(member.id, member);
-            });
-
-            lastId = chunk.last()?.id;
-        }
-
-        return members;
-    } catch (error) {
-        throw new Error(`Failed to fetch guild members: ${error}`);
-    }
 };
 
 const updateGangEmbeds = async (client: Client, channelId: string) => {
@@ -69,16 +121,13 @@ const updateGangEmbeds = async (client: Client, channelId: string) => {
         const gangs = await fetchAllGangs();
         const updatedMessages: string[] = [];
 
-        const guildMembersPromise = fetchGuildMembers(channel.guild);
-        const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Member fetch timeout')), FETCH_TIMEOUT)
-        );
+        const requiredMemberIds = new Set<string>();
+        gangs.forEach(gang => {
+            requiredMemberIds.add(gang.gangLeader);
+            gang.gangMembers.forEach(member => requiredMemberIds.add(member.userId));
+        });
 
-        const guildMembers = await Promise.race([guildMembersPromise, timeoutPromise])
-            .catch(error => {
-                client.logger.warn(`Member fetch issue: ${error}. Proceeding with partial data.`);
-                return new Collection<string, GuildMember>();
-            }) as Collection<string, GuildMember>;
+        const guildMembers = await fetchGuildMembers(channel.guild, client, requiredMemberIds);
 
         for (const gang of gangs) {
             try {
@@ -102,6 +151,8 @@ const updateGangEmbeds = async (client: Client, channelId: string) => {
                     const newMessage = await channel.send({ embeds: [embed] });
                     updatedMessages.push(newMessage.id);
                 }
+
+                await delay(1000);
             } catch (error) {
                 client.logger.error(`Error updating gang ${gang.gangName}: ${error}`);
             }
@@ -123,11 +174,11 @@ const updateGangEmbeds = async (client: Client, channelId: string) => {
 };
 
 const setupGangEmbedUpdates = (client: Client, channelId: string) => {
-    updateGangEmbeds(client, channelId).catch(error => 
+    updateGangEmbeds(client, channelId).catch(error =>
         client.logger.error(`Failed initial gang embed update: ${error}`)
     );
     scheduleJob('*/5 * * * *', () => {
-        updateGangEmbeds(client, channelId).catch(error => 
+        updateGangEmbeds(client, channelId).catch(error =>
             client.logger.error(`Failed scheduled gang embed update: ${error}`)
         );
     });
@@ -136,7 +187,7 @@ const setupGangEmbedUpdates = (client: Client, channelId: string) => {
 const event: BotEvent = {
     name: Events.ClientReady,
     async execute(client) {
-        if (!client.config.gang.enabled) return
+        if (!client.config.gang.enabled) return;
         setupGangEmbedUpdates(client, client.config.gang.channel.update);
     }
 };
