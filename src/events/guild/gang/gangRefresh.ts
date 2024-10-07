@@ -14,17 +14,6 @@ const createGangEmbed = (gang: IGangInit, config: any) => {
         }).join(', ');
     };
 
-    console.log({
-        gangName: gang.gangName,
-        gangLeader: gang.gangLeader,
-        totalMembers: gang.gangMembers?.length,
-        gangCreated: gang.gangCreated,
-        gangStatus: gang.gangStatus,
-        gangLocations: gang.gangLocation,
-        gangMembers: gang.gangMembers.map(m => m.userId)
-    });
-    
-
     const gangLeader = gang.gangLeader ? `<@${gang.gangLeader}>` : 'Unknown';
     const totalMembers = gang.gangMembers?.length?.toString() || '0';
     const gangCreated = gang.gangCreated ? gang.gangCreated.toDateString() : 'Unknown';
