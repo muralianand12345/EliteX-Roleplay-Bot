@@ -19,7 +19,7 @@ const createGangEmbed = (gang: IGangInit, config: any) => {
     const gangCreated = gang.gangCreated ? gang.gangCreated.toDateString() : 'Unknown';
     const gangLocations = getLocationNames(gang.gangLocation ?? []);
     const gangMembers = gang.gangMembers.length > 0 
-        ? gang.gangMembers.map(m => `<@${m.userId}> | \`<@${m.username}\`${m.isActive ? '' : ' (**InActive**)'}`).join('\n') 
+        ? gang.gangMembers.map(m => `<@${m.userId}> | \`${m.username}\`${m.isActive ? '' : ' (**InActive**)'}`).join('\n') 
         : 'No Members';
 
     return new EmbedBuilder()
