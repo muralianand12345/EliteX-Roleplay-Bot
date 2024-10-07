@@ -50,11 +50,12 @@ const command: SlashCommand = {
             subcommand
                 .setName("kick")
                 .setDescription("Kick a user from your gang.")
-                .addUserOption(option =>
+                .addStringOption(option =>
                     option
                         .setName("user")
                         .setDescription("User to kick.")
                         .setRequired(true)
+                        .setAutocomplete(true)
                 )
         )
         .addSubcommand(subcommand =>
@@ -182,6 +183,14 @@ const command: SlashCommand = {
                             }));
                         }
                     }
+                }
+            } else if (focusedOption.name === "user" && interaction.options.getSubcommand() === "kick") {
+                const gangData = await GangInitSchema.findOne({ gangLeader: interaction.user.id });
+                if (gangData) {
+                    choices = gangData.gangMembers.map(member => ({
+                        name: `${member.username}${member.isActive ? '' : ' (inactive)'}`,
+                        value: member.userId
+                    }));
                 }
             }
 
@@ -478,25 +487,33 @@ const command: SlashCommand = {
             }
         };
 
-        const kickUser = async (user: User) => {
+        const kickUser = async (userId: string) => {
             const gangData = await GangInitSchema.findOne({
                 gangLeader: interaction.user.id,
-                "gangMembers.userId": user.id
+                "gangMembers.userId": userId
             });
 
             if (!gangData || !gangData.gangStatus) {
                 return "Cannot kick this user. Either you are not the gang leader, the user is not a member of your gang, or your gang is not approved.";
             }
 
-            gangData.gangMembers = gangData.gangMembers.filter(member => member.userId !== user.id);
+            const memberToKick = gangData.gangMembers.find(member => member.userId === userId);
+            if (!memberToKick) {
+                return "User not found in your gang.";
+            }
+
+            gangData.gangMembers = gangData.gangMembers.filter(member => member.userId !== userId);
             await gangData.save();
 
             const role = interaction.guild?.roles.cache.get(gangData.gangRole);
             if (role) {
-                await interaction.guild?.members.cache.get(user.id)?.roles.remove(role);
+                const guildMember = await interaction.guild?.members.fetch(userId).catch(() => null);
+                if (guildMember) {
+                    await guildMember.roles.remove(role);
+                }
             }
 
-            return `User ${user.username} kicked successfully.`;
+            return `User ${memberToKick.username} kicked successfully.`;
         };
 
         const viewStatus = async () => {
@@ -511,16 +528,33 @@ const command: SlashCommand = {
                 return "Cannot edit the gang. Either you are not a leader of any gang or your gang is not approved.";
             }
 
+            const getLocationNames = (locationValues: string[]) => {
+                if (!locationValues || locationValues.length === 0) return 'No Gang Locations';
+                return locationValues.map(locationValue => {
+                    const location = client.config.gang.war.location.find((loc: any) => loc.value === locationValue);
+                    return location ? `${location.name} ${location.emoji}` : 'Unknown Location';
+                }).join(', ');
+            };
+
+            const gangLeader = gangData.gangLeader ? `<@${gangData.gangLeader}>` : 'Unknown';
+            const totalMembers = gangData.gangMembers?.length?.toString() || '0';
+            const gangCreated = gangData.gangCreated ? gangData.gangCreated.toDateString() : 'Unknown';
+            const gangLocations = getLocationNames(gangData.gangLocation ?? []);
+            const gangMembers = gangData.gangMembers.length > 0
+                ? gangData.gangMembers.map(m => `<@${m.userId}> | \`<@${m.username}\`${m.isActive ? '' : ' (**InActive**)'}`).join('\n')
+                : 'No Members';
+
             const embed = new EmbedBuilder()
                 .setTitle(`Gang: ${gangData.gangName}`)
                 .setColor(gangData.gangColor as ColorResolvable)
                 .setThumbnail(gangData.gangLogo)
                 .addFields(
-                    { name: "Leader", value: `<@${gangData.gangLeader}>`, inline: true },
-                    { name: 'Total Members', value: gangData.gangMembers.length.toString(), inline: true },
-                    { name: "Created", value: gangData.gangCreated.toDateString(), inline: true },
+                    { name: 'Leader', value: gangLeader, inline: true },
+                    { name: 'Total Members', value: totalMembers, inline: true },
+                    { name: 'Created', value: gangCreated, inline: true },
                     { name: "Status", value: gangData.gangStatus ? "Active" : "Inactive", inline: true },
-                    { name: "Members", value: gangData.gangMembers.map(member => `<@${member.userId}>`).join(", ") }
+                    { name: 'Gang Locations', value: gangLocations, inline: false },
+                    { name: 'Members', value: gangMembers, inline: false }
                 );
 
             return { embeds: [embed] };
@@ -837,9 +871,9 @@ const command: SlashCommand = {
                 }
                 case "kick": {
                     if (!Restriction.isDayRestricted(client.config.gang.restrictionday)) return await interaction.editReply({ content: `You can only kick users on ${getDayName(client.config.gang.restrictionday)}.` });
-                    const user = interaction.options.getUser("user", true);
+                    const userId = interaction.options.getString("user", true);
 
-                    const response = await kickUser(user);
+                    const response = await kickUser(userId);
                     await interaction.editReply(response);
                     break;
                 }
