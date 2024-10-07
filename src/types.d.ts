@@ -214,6 +214,8 @@ export interface IGangInit extends mongoose.Document {
 
 export interface IGangMembers {
     userId: string,
+    username: string,
+    isActive: boolean,
     gangJoinDate: Date
 }
 

@@ -19,7 +19,7 @@ const createGangEmbed = (gang: IGangInit, config: any) => {
     const gangCreated = gang.gangCreated ? gang.gangCreated.toDateString() : 'Unknown';
     const gangLocations = getLocationNames(gang.gangLocation ?? []);
     const gangMembers = gang.gangMembers.length > 0 
-        ? gang.gangMembers.map(m => `<@${m.userId}>`).join('\n') 
+        ? gang.gangMembers.map(m => `<@${m.userId}>${m.isActive ? '' : ' (InActive)'}`).join('\n') 
         : 'No Members';
 
     return new EmbedBuilder()
@@ -38,7 +38,6 @@ const createGangEmbed = (gang: IGangInit, config: any) => {
         .setTimestamp();
 };
 
-
 const updateGangEmbeds = async (client: Client, channelId: string) => {
     try {
         const channel = await client.channels.fetch(channelId) as TextChannel;
@@ -54,9 +53,11 @@ const updateGangEmbeds = async (client: Client, channelId: string) => {
                 client.logger.error(`Error fetching guild members: ${error.message || error}`);
                 return new Map<string, GuildMember>();
             });
-            gang.gangMembers = gang.gangMembers.filter(member =>
-                guildMembers.has(member.userId)
-            );
+
+            gang.gangMembers = gang.gangMembers.map(member => ({
+                ...member,
+                isActive: guildMembers.has(member.userId)
+            }));
 
             try {
                 await GangInitSchema.findByIdAndUpdate(gang._id, { gangMembers: gang.gangMembers });

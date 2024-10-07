@@ -428,6 +428,8 @@ const command: SlashCommand = {
 
                                 gangData.gangMembers.push({
                                     userId: user.id,
+                                    username: user.username,
+                                    isActive: true,
                                     gangJoinDate: new Date()
                                 });
                                 await gangData.save();
