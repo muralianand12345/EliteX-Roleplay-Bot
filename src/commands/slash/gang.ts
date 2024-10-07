@@ -894,7 +894,8 @@ const command: SlashCommand = {
                 }
             }
         } catch (error) {
-            client.logger.error("Error in gang command:", error);
+            client.logger.error("Error in gang command:");
+            client.logger.error(error)
             await interaction.editReply("An error occurred while processing your request.");
         }
     }
