@@ -14,21 +14,41 @@ const createGangEmbed = (gang: IGangInit, config: any) => {
         }).join(', ');
     };
 
+    console.log({
+        gangName: gang.gangName,
+        gangLeader: gang.gangLeader,
+        totalMembers: gang.gangMembers?.length,
+        gangCreated: gang.gangCreated,
+        gangStatus: gang.gangStatus,
+        gangLocations: gang.gangLocation,
+        gangMembers: gang.gangMembers.map(m => m.userId)
+    });
+    
+
+    const gangLeader = gang.gangLeader ? `<@${gang.gangLeader}>` : 'Unknown';
+    const totalMembers = gang.gangMembers?.length?.toString() || '0';
+    const gangCreated = gang.gangCreated ? gang.gangCreated.toDateString() : 'Unknown';
+    const gangLocations = getLocationNames(gang.gangLocation ?? []);
+    const gangMembers = gang.gangMembers.length > 0 
+        ? gang.gangMembers.map(m => `<@${m.userId}>`).join('\n') 
+        : 'No Members';
+
     return new EmbedBuilder()
         .setTitle(gang.gangName)
         .setColor(gang.gangColor as ColorResolvable)
         .setThumbnail(gang.gangLogo)
         .addFields(
-            { name: 'Leader', value: `<@${gang.gangLeader}>`, inline: true },
-            { name: 'Total Members', value: gang.gangMembers.length.toString(), inline: true },
-            { name: 'Created', value: gang.gangCreated.toDateString(), inline: true },
+            { name: 'Leader', value: gangLeader, inline: true },
+            { name: 'Total Members', value: totalMembers, inline: true },
+            { name: 'Created', value: gangCreated, inline: true },
             { name: "Status", value: gang.gangStatus ? "Active" : "Inactive", inline: true },
-            { name: 'Gang Locations', value: getLocationNames(gang.gangLocation), inline: false },
-            { name: 'Members', value: gang.gangMembers.map(m => `<@${m.userId}>`).join('\n') }
+            { name: 'Gang Locations', value: gangLocations, inline: false },
+            { name: 'Members', value: gangMembers, inline: false }
         )
         .setFooter({ text: `Gang ID: ${gang._id}` })
         .setTimestamp();
 };
+
 
 const updateGangEmbeds = async (client: Client, channelId: string) => {
     try {
