@@ -324,6 +324,8 @@ const command: SlashCommand = {
                 gangRole: "None",
                 gangMembers: [{
                     userId: interaction.user.id,
+                    username: interaction.user.username,
+                    isActive: true,
                     gangJoinDate: new Date()
                 }],
                 gangCreated: new Date(),
