@@ -41,12 +41,19 @@ const updateGangEmbeds = async (client: Client, channelId: string) => {
         const updatedMessages: string[] = [];
 
         for (const gang of gangs) {
-            const guildMembers = await channel.guild.members.fetch();
-            gang.gangMembers = gang.gangMembers.filter(member => 
+            const guildMembers = await channel.guild.members.fetch().catch(error => {
+                client.logger.error(`Error fetching guild members: ${error.message || error}`);
+                return new Map<string, GuildMember>();
+            });
+            gang.gangMembers = gang.gangMembers.filter(member =>
                 guildMembers.has(member.userId)
             );
 
-            await GangInitSchema.findByIdAndUpdate(gang._id, { gangMembers: gang.gangMembers });
+            try {
+                await GangInitSchema.findByIdAndUpdate(gang._id, { gangMembers: gang.gangMembers });
+            } catch (dbError: Error | any) {
+                client.logger.error(`Database update error for Gang ID ${gang._id}: ${dbError.message || dbError}`);
+            }
 
             const embed = createGangEmbed(gang, client.config);
 
@@ -64,8 +71,11 @@ const updateGangEmbeds = async (client: Client, channelId: string) => {
         for (const message of messagesToDelete.values()) {
             await message.delete();
         }
-    } catch (error) {
-        client.logger.error(`Error updating gang embeds: ${error}`);
+    } catch (error: Error | any) {
+        client.logger.error(`Error updating gang embeds: ${error.message || error}`);
+        if (error.stack) {
+            client.logger.error(error.stack);
+        }
     }
 };
 
