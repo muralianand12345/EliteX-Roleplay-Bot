@@ -13,6 +13,7 @@ const event: BotEvent = {
         if (!client.config.ai.enabled) return;
         const channel_data_list = client.config.ai.channel_data_list;
         if (!channel_data_list || !channel_data_list.includes(message.channel.id) || message.author.bot) return;
+        if (!client.config.bot.owners.includes(message.author.id)) return message.reply('You are not allowed to feed data to the AI');
 
         const msg_channel = message.channel as GuildTextBasedChannel;
         const msg_user = message.author as User;
