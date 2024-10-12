@@ -862,7 +862,9 @@ const command: SlashCommand = {
                     break;
                 }
                 case "invite": {
-                    if (!Restriction.isDayRestricted(client.config.gang.restrictionday)) return await interaction.editReply({ content: `You can only invite users on ${getDayName(client.config.gang.restrictionday)}.` });
+                    if (client.config.gang.restrict.enabled && !Restriction.isDayRestricted(client.config.gang.restrict.restrictionday)) {
+                        return await interaction.editReply({ content: `You can only invite users on ${getDayName(client.config.gang.restrict.restrictionday)}.` });
+                    }
                     const user = interaction.options.getUser("user", true);
 
                     const response = await inviteUser(user);
@@ -870,7 +872,9 @@ const command: SlashCommand = {
                     break;
                 }
                 case "kick": {
-                    if (!Restriction.isDayRestricted(client.config.gang.restrictionday)) return await interaction.editReply({ content: `You can only kick users on ${getDayName(client.config.gang.restrictionday)}.` });
+                    if (client.config.gang.restrict.enabled && !Restriction.isDayRestricted(client.config.gang.restrict.restrictionday)) {
+                        return await interaction.editReply({ content: `You can only kick users on ${getDayName(client.config.gang.restrict.restrictionday)}.` });
+                    }
                     const userId = interaction.options.getString("user", true);
 
                     const response = await kickUser(userId);
@@ -892,7 +896,9 @@ const command: SlashCommand = {
                     break;
                 }
                 case "leader": {
-                    if (!Restriction.isDayRestricted(client.config.gang.restrictionday)) return await interaction.editReply({ content: `You can only transfer leadership on ${getDayName(client.config.gang.restrictionday)}.` });
+                    if (client.config.gang.restrict.enabled && !Restriction.isDayRestricted(client.config.gang.restrict.restrictionday)) {
+                        return await interaction.editReply({ content: `You can only transfer leadership on ${getDayName(client.config.gang.restrict.restrictionday)}.` });
+                    }
                     const user = interaction.options.getUser("user", true);
                     const response = await transferLeader(user);
                     if (!response) return await interaction.editReply("An error occurred while processing your request.");
@@ -905,7 +911,9 @@ const command: SlashCommand = {
                     break;
                 }
                 case "leave": {
-                    if (!Restriction.isDayRestricted(client.config.gang.restrictionday)) return await interaction.editReply({ content: `You can only leave gangs on ${getDayName(client.config.gang.restrictionday)}.` });
+                    if (client.config.gang.restrict.enabled && !Restriction.isDayRestricted(client.config.gang.restrict.restrictionday)) {
+                        return await interaction.editReply({ content: `You can only leave gangs on ${getDayName(client.config.gang.restrict.restrictionday)}.` });
+                    }
                     const response = await leaveGang();
                     await interaction.editReply(response);
                     break;
