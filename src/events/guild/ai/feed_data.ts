@@ -9,11 +9,15 @@ config();
 const event: BotEvent = {
     name: Events.MessageCreate,
     async execute(message: Message, client: Client) {
-        
+
         if (!client.config.ai.enabled) return;
         const channel_data_list = client.config.ai.channel_data_list;
-        if (!channel_data_list || !channel_data_list.includes(message.channel.id) || message.author.bot) return;
-        // if (!client.config.bot.owners.includes(message.author.id)) return message.reply('You are not allowed to feed data to the AI');
+        const channel_priv_data_list = client.config.ai.channel_priv_data_list;
+        if (!channel_data_list || !channel_data_list.includes(message.channel.id) || !channel_priv_data_list || !channel_priv_data_list.includes(message.channel.id) || message.author.bot) return;
+        if (channel_priv_data_list.includes(message.channel.id) && !client.config.bot.owners.includes(message.author.id)) {
+            await message.delete();
+            return message.reply('You are not allowed to feed data to the AI');
+        };
 
         const msg_channel = message.channel as GuildTextBasedChannel;
         const msg_user = message.author as User;

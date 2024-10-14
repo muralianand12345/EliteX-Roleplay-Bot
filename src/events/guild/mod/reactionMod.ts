@@ -18,6 +18,8 @@ const event: BotEvent = {
         if (reaction.message && emojisToRemove.includes(emoji)) {
             try {
 
+                client.logger.info(`Removing ${emoji} reaction from ${user.tag} in ${reaction.message.guild?.name}`);
+
                 const reactionModData = await reactionModLog.findOne({
                     userId: user.id
                 }).catch((err: Error) => { return; });

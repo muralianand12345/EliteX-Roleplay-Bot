@@ -295,3 +295,23 @@ export interface GangWarLocation {
     value: string;
     emoji: string;
 }
+
+export interface JobRole {
+    head: string;
+    role: string;
+}
+
+export interface IFivemSurvey extends Document {
+    userId: string;
+    surveyData: IFivemSurveyData[];
+}
+
+export interface IFivemSurveyData {
+    citizenId: string;
+    IgName: string;
+    phoneNumber: string;
+    cpu: string;
+    gpu: string;
+    ram: string;
+    identifier?: string;
+}
