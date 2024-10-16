@@ -13,7 +13,9 @@ const gangWarSchema = new Schema<IGangWar>({
     }],
     warStatus: { type: String, required: true, enum: ['pending', 'active', 'ended'], default: 'pending' },
     warStart: { type: Date, required: false },
-    warEnd: { type: Date, required: false }
+    warEnd: { type: Date, required: false },
+    approvedBy: { type: String, required: false, default: null },
+    resolvedBy: { type: String, required: false, default: null },
 });
 
 export default model('gang-war-data', gangWarSchema);

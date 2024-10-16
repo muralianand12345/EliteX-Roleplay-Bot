@@ -265,7 +265,9 @@ export interface IGangWar extends mongoose.Document {
     combatants: Array<IGangWarCombatants>,
     warStatus: 'pending' | 'active' | 'ended',
     warStart: Date | null,
-    warEnd: Date | null
+    warEnd: Date | null,
+    approvedBy: string | null,
+    resolvedBy: string | null
 }
 
 export interface IGangWarCombatants {

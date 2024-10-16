@@ -280,6 +280,7 @@ const event: BotEvent = {
 
             gangWar.warStatus = 'active';
             gangWar.warStart = new Date();
+            gangWar.approvedBy = interaction.user.id;
             await gangWar.save();
 
             const attackerGang = gangWar.combatants.find(c => c.type === 'attacker');
@@ -291,7 +292,8 @@ const event: BotEvent = {
                 .setColor('Red')
                 .addFields(
                     { name: '🗡️ Attacker', value: `**${attackerGang?.gangName || 'Unknown'}**`, inline: true },
-                    { name: '🛡️ Defender', value: `**${defenderGang?.gangName || 'Unknown'}**`, inline: true }
+                    { name: '🛡️ Defender', value: `**${defenderGang?.gangName || 'Unknown'}**`, inline: true },
+                    { name: '👤 Approved By', value: `<@${interaction.user.id}>`, inline: false } // Add the approver's mention
                 )
                 .setFooter({ text: `${gangWarId}` })
                 .setTimestamp();
@@ -341,6 +343,7 @@ const event: BotEvent = {
 
             gangWar.warStatus = 'ended';
             gangWar.warEnd = new Date();
+            gangWar.resolvedBy = interaction.user.id;
             await gangWar.save();
 
             const attackerGang = gangWar.combatants.find(c => c.type === 'attacker');
@@ -382,11 +385,12 @@ const event: BotEvent = {
                     { name: '🛡️ Defender', value: `\`${defenderGang?.gangName || 'Unknown'}\``, inline: true },
                     { name: '🏆 Result', value: isDraw ? '**It\'s a Draw!** 🤝' : `**${winnerGang?.gangName} Wins** 🎉`, inline: false },
                     { name: '📅 Duration', value: `${Math.round((new Date().getTime() - new Date(gangWar.warStart || 0).getTime()) / (1000 * 60))} minutes`, inline: true },
-                    { name: '📍 Location', value: `${locationName}`, inline: true }
+                    { name: '📍 Location', value: `${locationName}`, inline: true },
+                    { name: '👤 Approved By', value: `<@${gangWar.approvedBy}>`, inline: false },
+                    { name: '👤 Resolved By', value: `<@${interaction.user.id}>`, inline: false } // Add the resolver's mention
                 )
                 .setFooter({ text: `${gangWarId}` })
                 .setTimestamp();
-
 
             await interaction.editReply({
                 embeds: [embed],
