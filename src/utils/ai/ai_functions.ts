@@ -5,6 +5,7 @@ import { config } from 'dotenv';
 import { MongoClient } from "mongodb";
 import { MongoDBChatMessageHistory } from "@langchain/mongodb";
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
@@ -112,6 +113,16 @@ const createConversationChain = async (client: Client, model: ChatGroq, mongoCli
 
     let memory = undefined;
     let prompt: ChatPromptTemplate;
+
+    const systemMessage = new SystemMessage({
+        content: [
+            {
+                type: "text",
+                text: systemPrompt
+            }
+        ]
+    });
+
     if (memory_enabled) {
         memory = new LimitedBufferMemory({
             chatHistory: new MongoDBChatMessageHistory({
@@ -125,14 +136,36 @@ const createConversationChain = async (client: Client, model: ChatGroq, mongoCli
         });
 
         prompt = ChatPromptTemplate.fromMessages([
-            ['system', systemPrompt],
+            systemMessage,
+            new HumanMessage({
+                content: [
+                    {
+                        type: "text",
+                        text: "{input}"
+                    },
+                    {
+                        type: "image_url",
+                        image_url: "{image_url}"
+                    }
+                ]
+            }),
             new MessagesPlaceholder(client.config.ai.database.memory_key),
-            ['human', '{input}']
         ]);
     } else {
         prompt = ChatPromptTemplate.fromMessages([
-            ['system', systemPrompt],
-            ['human', '{input}']
+            systemMessage,
+            new HumanMessage({
+                content: [
+                    {
+                        type: "text",
+                        text: "{input}"
+                    },
+                    {
+                        type: "image_url",
+                        image_url: "{image_url}"
+                    }
+                ]
+            })
         ]);
     }
 

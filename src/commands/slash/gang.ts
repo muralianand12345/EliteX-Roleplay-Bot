@@ -541,7 +541,7 @@ const command: SlashCommand = {
             const gangCreated = gangData.gangCreated ? gangData.gangCreated.toDateString() : 'Unknown';
             const gangLocations = getLocationNames(gangData.gangLocation ?? []);
             const gangMembers = gangData.gangMembers.length > 0
-                ? gangData.gangMembers.map(m => `<@${m.userId}> | \`<@${m.username}\`${m.isActive ? '' : ' (**InActive**)'}`).join('\n')
+                ? gangData.gangMembers.map(m => `<@${m.userId}> | \`${m.username}\`${m.isActive ? '' : ' (**InActive**)'}`).join('\n')
                 : 'No Members';
 
             const embed = new EmbedBuilder()

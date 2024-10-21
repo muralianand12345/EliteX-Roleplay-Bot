@@ -1,4 +1,4 @@
-import { Events, Message, Client, TextChannel } from "discord.js";
+import { Events, Message, Client, TextChannel, Attachment } from "discord.js";
 import { MongoClient } from "mongodb";
 import { config } from "dotenv";
 import { splitMessage, initializeMongoClient, createConversationChain, VectorStore } from "../../../utils/ai/ai_functions";
@@ -35,7 +35,7 @@ const event: BotEvent = {
             return message.reply('You are blocked from using the AI! Contact the server staff for more information.');
         }
 
-        if (!model) model = await gen_model(0.2, client.config.ai.model_name.gen); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
+        if (!model) model = await gen_model(0.3, client.config.ai.model_name.gen); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
         if (!mongoClient) mongoClient = await initializeMongoClient();
 
         const chatbot_prompt = require("../../../utils/ai/ai_prompt").chatbot_prompt;
@@ -64,7 +64,20 @@ const event: BotEvent = {
                 setTimeout(() => reject(new Error('AI response timed out')), 30000 * 2);
             });
 
-            const responsePromise = chain.invoke({ input: message.content });
+            const messageContent = message.content;
+            let imageUrl = "";
+
+            if (message.attachments.size > 0) {
+                const attachment = message.attachments.first() as Attachment;
+                if (attachment.contentType?.startsWith('image/')) {
+                    imageUrl = attachment.url;
+                }
+            }
+
+            const responsePromise = chain.invoke({ 
+                input: messageContent,
+                image_url: imageUrl
+            });
             const response = await Promise.race([responsePromise, timeoutPromise]) as any;
 
             const responseContent = String(response.response);
