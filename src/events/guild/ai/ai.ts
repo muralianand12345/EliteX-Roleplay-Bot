@@ -59,13 +59,11 @@ const event: BotEvent = {
             const context = await vectorStore.retrieveContext(message.content);
             const discordContext = getMentioned(message);
 
-            let imageData: Buffer | null = null;
+            let imageUrl: string = "";
+
             if (message.attachments.size > 0) {
                 const attachment = message.attachments.first() as Attachment;
-                if (attachment.contentType?.startsWith('image/')) {
-                    const response = await axios.get(attachment.url, { responseType: 'arraybuffer' });
-                    imageData = Buffer.from(response.data, 'binary');
-                }
+                imageUrl = attachment.url;
             }
 
             const SYSTEM_PROMPT: string = chatbot_prompt(discordContext, context);
@@ -78,12 +76,7 @@ const event: BotEvent = {
             const humanMessage = new HumanMessage({
                 content: [
                     { type: "text", text: message.content },
-                    ...(imageData ? [{
-                        type: "image_url",
-                        image_url: {
-                            url: `data:image/jpeg;base64,${imageData.toString("base64")}`
-                        }
-                    }] : [])
+                    { type: "image", url: imageUrl }
                 ]
             });
 
