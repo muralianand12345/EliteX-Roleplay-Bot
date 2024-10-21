@@ -7,6 +7,8 @@ import { getMentioned } from "../../../utils/ai/get_mentioned";
 import { client } from "../../../bot";
 import { BotEvent } from "../../../types";
 import blockUserAI from "../../database/schema/blockUserAI";
+import { HumanMessage } from "@langchain/core/messages";
+import axios from "axios";
 
 config();
 
@@ -57,30 +59,51 @@ const event: BotEvent = {
             const context = await vectorStore.retrieveContext(message.content);
             const discordContext = getMentioned(message);
 
-            const SYSTEM_PROMPT: string = chatbot_prompt(discordContext, context);
-            const chain = await createConversationChain(client, model, mongoClient, SYSTEM_PROMPT, message.author.id);
+            let imageData: Buffer | null = null;
+            if (message.attachments.size > 0) {
+                const attachment = message.attachments.first() as Attachment;
+                if (attachment.contentType?.startsWith('image/')) {
+                    const response = await axios.get(attachment.url, { responseType: 'arraybuffer' });
+                    imageData = Buffer.from(response.data, 'binary');
+                }
+            }
 
+            const SYSTEM_PROMPT: string = chatbot_prompt(discordContext, context);
+            const { model: chatModel, memory, systemMessage } = await createConversationChain(client, model, mongoClient, SYSTEM_PROMPT, message.author.id);
+            
             const timeoutPromise = new Promise((_, reject) => {
                 setTimeout(() => reject(new Error('AI response timed out')), 30000 * 2);
             });
 
-            const messageContent = message.content;
-            let imageUrl = "";
+            const humanMessage = new HumanMessage({
+                content: [
+                    { type: "text", text: message.content },
+                    ...(imageData ? [{
+                        type: "image_url",
+                        image_url: {
+                            url: `data:image/jpeg;base64,${imageData.toString("base64")}`
+                        }
+                    }] : [])
+                ]
+            });
 
-            if (message.attachments.size > 0) {
-                const attachment = message.attachments.first() as Attachment;
-                if (attachment.contentType?.startsWith('image/')) {
-                    imageUrl = attachment.url;
-                }
+            const messages = [systemMessage, humanMessage];
+            if (memory) {
+                const historyMessages = await memory.chatHistory.getMessages();
+                messages.push(...historyMessages);
             }
 
-            const responsePromise = chain.invoke({ 
-                input: messageContent,
-                image_url: imageUrl
-            });
+            const responsePromise = chatModel.invoke(messages);
             const response = await Promise.race([responsePromise, timeoutPromise]) as any;
 
-            const responseContent = String(response.response);
+            if (memory) {
+                await memory.saveContext(
+                    { input: message.content },
+                    { output: response.content }
+                );
+            }
+
+            const responseContent = String(response.content);
             if (!responseContent) return;
 
             const chunks = splitMessage(responseContent);

@@ -4,15 +4,12 @@ import { Client } from "discord.js";
 import { config } from 'dotenv';
 import { MongoClient } from "mongodb";
 import { MongoDBChatMessageHistory } from "@langchain/mongodb";
-import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { SystemMessage } from "@langchain/core/messages";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
 import { UnstructuredLoader } from "@langchain/community/document_loaders/fs/unstructured";
 import { BufferMemory } from "langchain/memory";
-import { ConversationChain } from "langchain/chains";
-import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatGroq } from "@langchain/groq";
 import { LimitedBufferMemoryOptions } from "../../types";
 import { client } from "../../bot";
@@ -112,16 +109,8 @@ const createConversationChain = async (client: Client, model: ChatGroq, mongoCli
     const collection = mongoClient.db(client.config.ai.database.db_name).collection(client.config.ai.database.collection_name);
 
     let memory = undefined;
-    let prompt: ChatPromptTemplate;
 
-    const systemMessage = new SystemMessage({
-        content: [
-            {
-                type: "text",
-                text: systemPrompt
-            }
-        ]
-    });
+    const systemMessage = new SystemMessage(systemPrompt);
 
     if (memory_enabled) {
         memory = new LimitedBufferMemory({
@@ -134,47 +123,13 @@ const createConversationChain = async (client: Client, model: ChatGroq, mongoCli
             maxHistory: maxHistory,
             userId: userId
         });
-
-        prompt = ChatPromptTemplate.fromMessages([
-            systemMessage,
-            new HumanMessage({
-                content: [
-                    {
-                        type: "text",
-                        text: "{input}"
-                    },
-                    {
-                        type: "image_url",
-                        image_url: "{image_url}"
-                    }
-                ]
-            }),
-            new MessagesPlaceholder(client.config.ai.database.memory_key),
-        ]);
-    } else {
-        prompt = ChatPromptTemplate.fromMessages([
-            systemMessage,
-            new HumanMessage({
-                content: [
-                    {
-                        type: "text",
-                        text: "{input}"
-                    },
-                    {
-                        type: "image_url",
-                        image_url: "{image_url}"
-                    }
-                ]
-            })
-        ]);
     }
 
-    return new ConversationChain({
-        llm: model,
-        memory: memory,
-        prompt: prompt,
-        outputParser: new StringOutputParser()
-    });
+    return {
+        model,
+        memory,
+        systemMessage
+    };
 };
 
 class VectorStore {
