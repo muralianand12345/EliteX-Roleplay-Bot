@@ -98,7 +98,7 @@ const event: BotEvent = {
 
             if (memory) {
                 await memory.saveContext(
-                    { input: message.content },
+                    { input: JSON.stringify(humanMessageContent) },
                     { output: response.content }
                 );
             }
