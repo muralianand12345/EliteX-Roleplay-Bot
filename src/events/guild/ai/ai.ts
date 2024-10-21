@@ -1,4 +1,4 @@
-import { Events, Message, Client, TextChannel, Attachment } from "discord.js";
+import { Events, Message, Client, TextChannel } from "discord.js";
 import { MongoClient } from "mongodb";
 import { config } from "dotenv";
 import { splitMessage, initializeMongoClient, createConversationChain, VectorStore } from "../../../utils/ai/ai_functions";
@@ -7,7 +7,6 @@ import { getMentioned } from "../../../utils/ai/get_mentioned";
 import { client } from "../../../bot";
 import { BotEvent } from "../../../types";
 import blockUserAI from "../../database/schema/blockUserAI";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 config();
 
@@ -36,7 +35,7 @@ const event: BotEvent = {
             return message.reply('You are blocked from using the AI! Contact the server staff for more information.');
         }
 
-        if (!model) model = await gen_model(0.3, client.config.ai.model_name.gen); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
+        if (!model) model = await gen_model(0.2, client.config.ai.model_name.gen); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
         if (!mongoClient) mongoClient = await initializeMongoClient();
 
         const chatbot_prompt = require("../../../utils/ai/ai_prompt").chatbot_prompt;
@@ -58,52 +57,17 @@ const event: BotEvent = {
             const context = await vectorStore.retrieveContext(message.content);
             const discordContext = getMentioned(message);
 
-            let imageUrl: string | null = null;
-
-            if (message.attachments.size > 0) {
-                const attachment = message.attachments.first() as Attachment;
-                if (attachment.contentType?.startsWith('image/')) {
-                    imageUrl = attachment.url;
-                }
-            }
-
             const SYSTEM_PROMPT: string = chatbot_prompt(discordContext, context);
-            const { model: chatModel, memory, systemMessage } = await createConversationChain(client, model, mongoClient, SYSTEM_PROMPT, message.author.id);
-            
+            const chain = await createConversationChain(client, model, mongoClient, SYSTEM_PROMPT, message.author.id);
+
             const timeoutPromise = new Promise((_, reject) => {
                 setTimeout(() => reject(new Error('AI response timed out')), 30000 * 2);
             });
 
-            let humanMessageContent: any[] = [{ type: "text", text: message.content }];
-            if (imageUrl) {
-                humanMessageContent.push({ type: "image_url", image_url: imageUrl });
-            }
-
-            const humanMessage = new HumanMessage({
-                content: humanMessageContent
-            });
-
-            const messages = [
-                new SystemMessage(SYSTEM_PROMPT),
-                humanMessage
-            ];
-
-            if (memory) {
-                const historyMessages = await memory.chatHistory.getMessages();
-                messages.push(...historyMessages);
-            }
-
-            const responsePromise = chatModel.invoke(messages);
+            const responsePromise = chain.invoke({ input: message.content });
             const response = await Promise.race([responsePromise, timeoutPromise]) as any;
 
-            if (memory) {
-                await memory.saveContext(
-                    { input: JSON.stringify(humanMessageContent) },
-                    { output: response.content }
-                );
-            }
-
-            const responseContent = String(response.content);
+            const responseContent = String(response.response);
             if (!responseContent) return;
 
             const chunks = splitMessage(responseContent);
