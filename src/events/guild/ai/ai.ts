@@ -7,8 +7,7 @@ import { getMentioned } from "../../../utils/ai/get_mentioned";
 import { client } from "../../../bot";
 import { BotEvent } from "../../../types";
 import blockUserAI from "../../database/schema/blockUserAI";
-import { HumanMessage } from "@langchain/core/messages";
-import axios from "axios";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 config();
 
@@ -59,11 +58,13 @@ const event: BotEvent = {
             const context = await vectorStore.retrieveContext(message.content);
             const discordContext = getMentioned(message);
 
-            let imageUrl: string = "";
+            let imageUrl: string | null = null;
 
             if (message.attachments.size > 0) {
                 const attachment = message.attachments.first() as Attachment;
-                imageUrl = attachment.url;
+                if (attachment.contentType?.startsWith('image/')) {
+                    imageUrl = attachment.url;
+                }
             }
 
             const SYSTEM_PROMPT: string = chatbot_prompt(discordContext, context);
@@ -73,14 +74,20 @@ const event: BotEvent = {
                 setTimeout(() => reject(new Error('AI response timed out')), 30000 * 2);
             });
 
+            let humanMessageContent: any[] = [{ type: "text", text: message.content }];
+            if (imageUrl) {
+                humanMessageContent.push({ type: "image_url", image_url: imageUrl });
+            }
+
             const humanMessage = new HumanMessage({
-                content: [
-                    { type: "text", text: message.content },
-                    { type: "image", url: imageUrl }
-                ]
+                content: humanMessageContent
             });
 
-            const messages = [systemMessage, humanMessage];
+            const messages = [
+                new SystemMessage(SYSTEM_PROMPT),
+                humanMessage
+            ];
+
             if (memory) {
                 const historyMessages = await memory.chatHistory.getMessages();
                 messages.push(...historyMessages);
