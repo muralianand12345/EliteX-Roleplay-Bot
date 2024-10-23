@@ -1,10 +1,11 @@
 import path from "path";
 import fs from 'fs/promises';
-import { Client } from "discord.js";
+import { Client, Message } from "discord.js";
 import { config } from 'dotenv';
 import { MongoClient } from "mongodb";
 import { MongoDBChatMessageHistory } from "@langchain/mongodb";
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts";
+import { HumanMessage } from "@langchain/core/messages";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { HuggingFaceInferenceEmbeddings } from "@langchain/community/embeddings/hf";
 import { FaissStore } from "@langchain/community/vectorstores/faiss";
@@ -105,6 +106,28 @@ const initializeMongoClient = async () => {
     return await new MongoClient(process.env.LLM_MONGO_URI || "", {
         driverInfo: { name: "langchainjs" },
     }).connect();
+};
+
+const createImageResponse = async (model: ChatGroq, prompt: string, image_url: string) => {
+
+    const message = new HumanMessage({
+        content: [
+            {
+                type: "text",
+                text: prompt,
+            },
+            {
+                type: "image_url",
+                image_url: {
+                    url: image_url,
+                }
+            }
+        ]
+    });
+
+    const reponseImg = await model.invoke([message]);
+    return reponseImg;
+
 };
 
 const createConversationChain = async (client: Client, model: ChatGroq, mongoClient: MongoClient, systemPrompt: string, userId: string, memory_enabled: boolean = true, maxHistory: number = 10) => {
@@ -261,10 +284,30 @@ class VectorStore {
     }
 };
 
+const extractMessageContent = (message: Message) => {
+    const content = message.content;
+    const attachments = message.attachments;
+    
+    let imageUrl = attachments.find(att => att.contentType?.startsWith('image/'))?.url;
+    
+    if (!imageUrl) {
+        const urlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp))/i;
+        const match = content.match(urlRegex);
+        imageUrl = match ? match[0] : undefined;
+    }
+    
+    const cleanContent = content.replace(/(https?:\/\/[^\s]+)/g, '').trim();
+    
+    return {
+        text: cleanContent,
+        imageUrl
+    };
+};
+
 async function processNewData(client: Client, content: string, metadata: Record<string, any> = {}, override: boolean = false) {
     const vectorStore = new VectorStore(client);
     await vectorStore.initialize();
     await vectorStore.addOrUpdateData(content, metadata, override);
 };
 
-export { splitMessage, initializeMongoClient, createConversationChain, VectorStore, processNewData };
+export { splitMessage, initializeMongoClient, createImageResponse, createConversationChain, VectorStore, extractMessageContent, processNewData };

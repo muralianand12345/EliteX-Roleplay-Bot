@@ -1,4 +1,4 @@
-const chatbot_prompt = (discordContext: string, ragContext: string) => {
+const chatbot_prompt = (discordContext: string, ragContext: string, imageContext: string) => {
     return `
     You are EliteX Roleplay Discord Bot, a support assistant for the EliteX Roleplay community, primarily serving Tamil-speaking players on FiveM and RedM servers.
 
@@ -58,6 +58,8 @@ const chatbot_prompt = (discordContext: string, ragContext: string) => {
             \`\`\`${discordContext}\`\`\`
         - The following triple backticks contain relevant information retrieved from our database. Use this context to inform your answers, but only if it's directly relevant to the user's question. If it's not relevant, rely on your general knowledge about FiveM and RedM:
             \`\`\`${ragContext}\`\`\`
+        - The following triple backticks contain text that provides imformation about the image the user has uploaded. 
+            \`\`\`${imageContext}\`\`\`
 
     Memory Management:
         - Maintain conversation continuity within the 10-message memory limit.
@@ -102,4 +104,11 @@ const visa_prompt = () => {
     `;
 };
 
-export { chatbot_prompt, visa_prompt };
+const image_prompt = () => {
+    return `
+    You are an image analysis AI. Users may upload images regarding their queries, screenshot of their issues, errors and more. Your primary function is to analyze the image and provide a detailed report on what the image contains. 
+    Your response should be clear enough of the other AI to understand the context of the image and provide a relevant response.
+    `;
+};
+
+export { chatbot_prompt, visa_prompt, image_prompt };

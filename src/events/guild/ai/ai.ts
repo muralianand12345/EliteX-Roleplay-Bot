@@ -1,7 +1,7 @@
 import { Events, Message, Client, TextChannel } from "discord.js";
 import { MongoClient } from "mongodb";
 import { config } from "dotenv";
-import { splitMessage, initializeMongoClient, createConversationChain, VectorStore } from "../../../utils/ai/ai_functions";
+import { splitMessage, initializeMongoClient, createConversationChain, createImageResponse, extractMessageContent, VectorStore } from "../../../utils/ai/ai_functions";
 import { gen_model } from "../../../utils/ai/langchain_models";
 import { getMentioned } from "../../../utils/ai/get_mentioned";
 import { client } from "../../../bot";
@@ -10,9 +10,11 @@ import blockUserAI from "../../database/schema/blockUserAI";
 
 config();
 
+const groq_img_api_key = process.env.GROQ_IMG_API_KEY;
 const vectorStore = new VectorStore(client);
 let mongoClient: MongoClient | null = null;
 let model: Awaited<ReturnType<typeof gen_model>> | null = null;
+let imgModel: Awaited<ReturnType<typeof gen_model>> | null = null;
 
 const event: BotEvent = {
     name: Events.MessageCreate,
@@ -35,10 +37,12 @@ const event: BotEvent = {
             return message.reply('You are blocked from using the AI! Contact the server staff for more information.');
         }
 
-        if (!model) model = await gen_model(0.2, client.config.ai.model_name.gen); //llama3-groq-70b-8192-tool-use-preview llama3-70b-8192 llama-3.1-70b-versatile
+        if (!model) model = await gen_model(0.2, client.config.ai.model_name.gen);
+        if (!imgModel) imgModel = await gen_model(0, client.config.ai.model_name.img_gen, groq_img_api_key);
         if (!mongoClient) mongoClient = await initializeMongoClient();
 
         const chatbot_prompt = require("../../../utils/ai/ai_prompt").chatbot_prompt;
+        const image_prompt = require("../../../utils/ai/ai_prompt").image_prompt;
 
         try {
             await vectorStore.initialize();
@@ -54,20 +58,40 @@ const event: BotEvent = {
         }
 
         try {
-            const context = await vectorStore.retrieveContext(message.content);
+            const { text, imageUrl } = extractMessageContent(message);
+
+            if (!text) {
+                await chan.send("Kindly provide a message/description to process.");
+                return;
+            }
+            
+            const context = await vectorStore.retrieveContext(text);
             const discordContext = getMentioned(message);
 
-            const SYSTEM_PROMPT: string = chatbot_prompt(discordContext, context);
-            const chain = await createConversationChain(client, model, mongoClient, SYSTEM_PROMPT, message.author.id);
+            let finalResponse: any;
 
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('AI response timed out')), 30000 * 2);
-            });
-
-            const responsePromise = chain.invoke({ input: message.content });
-            const response = await Promise.race([responsePromise, timeoutPromise]) as any;
-
-            const responseContent = String(response.response);
+            if (imageUrl) {
+                const IMAGE_PROMPT = image_prompt();
+                const imageAnalysis = await createImageResponse(model, IMAGE_PROMPT, imageUrl);
+                
+                const combinedContext = `${context}\n\nImage Analysis: ${imageAnalysis}`;
+                const SYSTEM_PROMPT = chatbot_prompt(discordContext, combinedContext, '');
+                
+                const chain = await createConversationChain(client, model, mongoClient, SYSTEM_PROMPT, message.author.id);
+                finalResponse = await Promise.race([
+                    chain.invoke({ input: text }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('AI response timed out')), 30000 * 2))
+                ]);
+            } else {
+                const SYSTEM_PROMPT = chatbot_prompt(discordContext, context, '');
+                const chain = await createConversationChain(client, model, mongoClient, SYSTEM_PROMPT, message.author.id);
+                finalResponse = await Promise.race([
+                    chain.invoke({ input: text }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('AI response timed out')), 30000 * 2))
+                ]);
+            }
+    
+            const responseContent = String(finalResponse.response);
             if (!responseContent) return;
 
             const chunks = splitMessage(responseContent);
@@ -118,7 +142,7 @@ const event: BotEvent = {
                 });
                 return;
             } else if (error.code === 50035) {
-                await chan.send("I'm sorry, some internal error occured!").then((msg) => {
+                await chan.send("I'm sorry, some internal error occurred!").then((msg) => {
                     setTimeout(() => msg.delete(), 5000);
                 });
                 client.logger.warn(error);
