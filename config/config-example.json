@@ -1,7 +1,7 @@
 {
     "bot": {
         "owners": [
-            "678402714765361182"
+            ""
         ],
         "prefix": "+",
         "disableMessage": false,
@@ -11,6 +11,7 @@
                 "ping"
             ]
         },
+        "adminChannel": "",
         "stdchan": "",
         "logchan": "",
         "cooldownMsg": "You are on `<duration>` cooldown!",
@@ -19,130 +20,280 @@
             "interval": 10000,
             "activity": [
                 {
-                    "name": "Indian Community",
-                    "type": "Competing"
-                },
-                {
-                    "name": "Iconic RolePlay ❤️",
-                    "type": "Playing"
-                },
-                {
                     "name": "your Feedback and Suggestions!",
-                    "type": "Listening"
+                    "type": "LISTENING"
                 },
                 {
                     "name": "<usersize> Users!",
-                    "type": "Listening"
-                },
-                {
-                    "name": "Rage Multiplayer!",
-                    "type": "Playing"
+                    "type": "LISTENING"
                 }
             ]
+        }
+    },
+    "fivem": {
+        "enabled": true,
+        "log": {
+            "enabled": true,
+            "webhook": ""
+        },
+        "discord": {
+            "guildId": "",
+            "job": {
+                "roles": [
+                    {
+                        "head": "",
+                        "role": ""
+                    },
+                    {
+                        "head": "",
+                        "role": ""
+                    }
+                ]
+            }
         }
     },
     "ticket": {
         "enabled": true
     },
-    "bugreport": {
-        "enabled": true,
-        "webhook": ""
-    },
     "ai": {
         "enabled": true,
+        "model_name": {
+            "gen": "llama-3.2-90b-text-preview",
+            "img_gen": "llama-3.2-90b-vision-preview",
+            "embed": "sentence-transformers/all-MiniLM-L6-v2"
+        },
+        "database": {
+            "db_name": "llm",
+            "collection_name": "ai-chat-history",
+            "memory_key": "memory-history"
+        },
         "channel": [
-            " "
+            "",
+            ""
+        ],
+        "channel_priv_data_list": [
+            ""
+        ],
+        "channel_data_list": [
+            "",
+            "",
+            ""
         ]
+    },
+    "gang": {
+        "enabled": true,
+        "guildId": "",
+        "channel": {
+            "vccategoryname": "▄▬「Gang Voice Chat」▬▄",
+            "gangvcname": "🔊・{gangname}",
+            "update": "",
+            "create": ""
+        },
+        "restrictionday": 0,
+        "hightable": {
+            "anonchat": {
+                "enabled": true,
+                "webhook": {
+                    "darkchat": "DarkChat",
+                    "hightable": "Affiliated Organizations"
+                },
+                "channel": {
+                    "darkchat": "",
+                    "hightable": "",
+                    "log": ""
+                }
+            },
+            "lords": {
+                "role": [
+                    "",
+                    "",
+                    ""
+                ]
+            }
+        },
+        "war": {
+            "enabled": true,
+            "channel": {
+                "war": "",
+                "announcement": ""
+            },
+            "location": [
+                {
+                    "name": "Grove Street",
+                    "emoji": "🏚️",
+                    "value": "gang-war-location-124"
+                },
+                {
+                    "name": "Lost MC Clubhouse",
+                    "emoji": "🏍️",
+                    "value": "gang-war-location-433"
+                },
+                {
+                    "name": "East Los Santos",
+                    "emoji": "🌉",
+                    "value": "gang-war-location-184"
+                },
+                {
+                    "name": "James Town",
+                    "emoji": "🏚️",
+                    "value": "gang-war-location-139"
+                },
+                {
+                    "name": "Vespucci",
+                    "emoji": "🏝️",
+                    "value": "gang-war-location-309"
+                },
+                {
+                    "name": "Paleto Bay",
+                    "emoji": "🏖️",
+                    "value": "gang-war-location-3015"
+                },
+                {
+                    "name": "El Rancho Blvd",
+                    "emoji": "🧑‍🌾",
+                    "value": "gang-war-location-64"
+                },
+                {
+                    "name": "Sandy Shores",
+                    "emoji": "🏜️",
+                    "value": "gang-war-location-1032"
+                },
+                {
+                    "name": "Forum Drive",
+                    "emoji": "🏚️",
+                    "value": "gang-war-location-118"
+                },
+                {
+                    "name": "Nikola Palace",
+                    "emoji": "🏢",
+                    "value": "gang-war-location-442"
+                },
+                {
+                    "name": "Chumash",
+                    "emoji": "🏰",
+                    "value": "gang-war-location-904"
+                },
+                {
+                    "name": "Stab City",
+                    "emoji": "🏚️",
+                    "value": "gang-war-location-1007"
+                }
+            ]
+        },
+        "zonalwar": {
+            "enabled": false,
+            "channel": {
+                "war": "",
+                "announcement": ""
+            },
+            "maxcombatants": 2,
+            "mingangmembers": 0,
+            "location": [
+                {
+                    "name": "Stab City",
+                    "emoji": "🏚️",
+                    "value": "gang-zonalwar-location-1007"
+                },
+                {
+                    "name": "Calafia",
+                    "emoji": "🏝️",
+                    "value": "gang-zonalwar-location-2008"
+                },
+                {
+                    "name": "Chilliad Mountain State Wilderness",
+                    "emoji": "🏖️",
+                    "value": "gang-zonalwar-location-3001"
+                }
+            ]
+        }
     },
     "modmail": {
         "enabled": true,
         "server": "",
         "channelid": "",
-        "staffname": "Iconic Support Staff",
-        "serverInvite": "https://discord.gg/iconic-rp"
-    },
-    "agedeclaration": {
-        "enabled": true,
-        "serverInvite": "https://discord.gg/iconic-rp",
-        "above18Img": "",
-        "below18Img": ""
-    },
-    "role_command": {
-        "enabled": true,
-        "admin_roles": [],
-        "log_webhook": "https://discord.com/api/webhooks//S6I_71pMFPk8VbJkmp-j2gwFNzV1v6-KSVXfcDQIUzyB",
-        "roles": {
-            "visa-holder": "123456789012345678",
-            "townfolks": "123456789012345678",
-            "community": "12321312312312312"
-        }
+        "staffname": "Support Staff",
+        "serverInvite": "https://discord.gg/InviteLink"
     },
     "visaform": {
         "enabled": true,
         "form": [
             {
-                "id": "visa-application-text-ig-name",
-                "question": "In-Game Name",
-                "placeholder": "Enter your In-Game Name",
-                "style": "short",
-                "required": true,
-                "min": 3,
-                "max": 30
-            },
-            {
                 "id": "visa-application-text-ooc-age",
                 "question": "Your OOC Age",
-                "placeholder": "Enter your OOC Age | Eg: 18",
+                "placeholder": "Enter your OOC Age | Eg: 18",   
                 "style": "short",
                 "required": true,
                 "min": 0,
                 "max": 2
             },
             {
-                "id": "visa-application-text-rp-exp",
-                "question": "How long have you been roleplaying?",
-                "placeholder": "Enter your Roleplay Experience | Eg: 1 Year",
+                "id": "visa-application-text-iden-one",
+                "question": "Person (A) kills Person (B) with no reason.",
+                "placeholder": "Identify the roleplay rule broken",
                 "style": "short",
                 "required": true,
-                "min": 0,
-                "max": 5
+                "min": 5,
+                "max": 50
             },
             {
-                "id": "visa-application-text-player-bio",
-                "question": "Character's backstory",
-                "placeholder": null,
+                "id": "visa-application-text-iden-two",
+                "question": "Person jumps from building for no reason.",
+                "placeholder": "Identify the roleplay rule broken with Explaination",
                 "style": "paragraph",
                 "required": true,
-                "min": 200,
-                "max": 2000
+                "min": 5,
+                "max": 250
+            },
+            {
+                "id": "visa-application-text-iden-three",
+                "question": "How can you spot rule break while staying IC?",
+                "placeholder": "Explain in detail",
+                "style": "paragraph",
+                "required": true,
+                "min": 5,
+                "max": 250
+            },
+            {
+                "id": "visa-application-text-iden-four",
+                "question": "Prior RP experience ",
+                "placeholder": "Iconic RP/TNRP/UURP/etc",
+                "style": "short",
+                "required": true,
+                "min": 5,
+                "max": 50
             }
         ],
+        "role": {
+            "immigration": "",
+            "visa": "",
+            "community": ""
+        },
         "channels": {
             "immigration": "",
             "accepted": "",
+            "onhold": "",
             "rejected": ""
         }
     },
     "birthday": {
-        "enabled": true,
+        "enabled": false,
         "wishat": "1 0 * * *",
         "timezone": "Asia/Kolkata",
-        "guildId": "1096848188935241878",
         "webhooks": [
-            "https://discord.com/api/webhooks/"
+            ""
         ]
     },
     "welcome": {
         "welcomeuser": {
-            "enabled": true,
-            "guildId": "1096848188935241878",
-            "channelId": "1097116659241721917",
+            "enabled": false,
+            "guildId": "",
+            "channelId": "",
             "message": "<a:welcome:1097130355137454181> {usermention} **Welcome to {server}** <a:welcome:1097130355137454181>\n\n<a:party:1097134575764914296> You are the {count} member of {server} <a:party:1097134575764914296>"
         },
         "goodbyemsg": {
-            "enabled": true,
-            "guildId": "1096848188935241878",
-            "channelId": "1096854041910333532",
+            "enabled": false,
+            "guildId": "",
+            "channelId": "",
             "message": "`{user}` | {usermention}! **Just Left {server}**!"
         }
     },
@@ -174,6 +325,177 @@
                 "👺",
                 "👹",
                 "😾"
+            ]
+        }
+    },
+    "job": {
+        "enabled": true,
+        "channel": {
+            "acceptreject": "",
+            "response": ""
+        },
+        "application": {
+            "enabled": true,
+            "jobtype": [
+                {
+                    "name": "ECPD",
+                    "value": "job-application-ecpd",
+                    "emoji": "👮‍♂️",
+                    "head": "",
+                    "form": [
+                        {
+                            "id": "job-applicationform-ecpd-1",
+                            "question": "Your Name",
+                            "placeholder": "IC Name",
+                            "style": "short",
+                            "required": true,
+                            "min": 3,
+                            "max": 100
+                        },
+                        {
+                            "id": "job-applicationform-ecpd-2",
+                            "question": "What does Police department mean to you?",
+                            "placeholder": "",
+                            "style": "paragraph",
+                            "required": true,
+                            "min": 30,
+                            "max": 200
+                        },
+                        {
+                            "id": "job-applicationform-ecpd-3",
+                            "question": "Why are you joining the ECPD?",
+                            "placeholder": "",
+                            "style": "short",
+                            "required": true,
+                            "min": 20,
+                            "max": 100
+                        },
+                        {
+                            "id": "job-applicationform-ecpd-4",
+                            "question": "Explain BOLO",
+                            "placeholder": "",
+                            "style": "paragraph",
+                            "required": true,
+                            "min": 30,
+                            "max": 200
+                        },
+                        {
+                            "id": "job-applicationform-ecpd-5",
+                            "question": "Previous Experience",
+                            "placeholder": "In-detail about your previous experience",
+                            "style": "paragraph",
+                            "required": true,
+                            "min": 30,
+                            "max": 200
+                        }
+                    ]
+                },
+                {
+                    "name": "ECMS",
+                    "value": "job-application-ecms",
+                    "emoji": "🚑",
+                    "head": "",
+                    "form": [
+                        {
+                            "id": "job-applicationform-ecms-1",
+                            "question": "Your Name",
+                            "placeholder": "IC Name",
+                            "style": "short",
+                            "required": true,
+                            "min": 3,
+                            "max": 100
+                        },
+                        {
+                            "id": "job-applicationform-ecms-2",
+                            "question": "Why are you joining the ECMS?",
+                            "placeholder": "",
+                            "style": "short",
+                            "required": true,
+                            "min": 20,
+                            "max": 100
+                        },
+                        {
+                            "id": "job-applicationform-ecms-3",
+                            "question": "Previous Experience",
+                            "placeholder": "In-detail about your previous experience",
+                            "style": "paragraph",
+                            "required": true,
+                            "min": 30,
+                            "max": 200
+                        },
+                        {
+                            "id": "job-applicationform-ecms-4",
+                            "question": "How do you handle stress?",
+                            "placeholder": "Like a multi-vechile accident",
+                            "style": "paragraph",
+                            "required": true,
+                            "min": 50,
+                            "max": 200
+                        },
+                        {
+                            "id": "job-applicationform-ecms-5",
+                            "question": "Handle uncooperative or hostile patients",
+                            "placeholder": "How will you handle them?",
+                            "style": "paragraph",
+                            "required": true,
+                            "min": 50,
+                            "max": 200
+                        }
+                    ]
+                },
+                {
+                    "name": "TAXI",
+                    "value": "job-application-taxi",
+                    "emoji": "🚖",
+                    "head": "",
+                    "form": [
+                        {
+                            "id": "job-applicationform-taxi-1",
+                            "question": "Your Name",
+                            "placeholder": "IC Name",
+                            "style": "short",
+                            "required": true,
+                            "min": 3,
+                            "max": 100
+                        },
+                        {
+                            "id": "job-applicationform-taxi-2",
+                            "question": "Working hours",
+                            "placeholder": "",
+                            "style": "short",
+                            "required": true,
+                            "min": 3,
+                            "max": 100
+                        },
+                        {
+                            "id": "job-applicationform-taxi-3",
+                            "question": "Why join the Taxi Service?",
+                            "placeholder": "",
+                            "style": "short",
+                            "required": true,
+                            "min": 20,
+                            "max": 100
+                        },
+                        {
+                            "id": "job-applicationform-taxi-4",
+                            "question": "Key to great customer service?",
+                            "placeholder": "",
+                            "style": "paragraph",
+                            "required": true,
+                            "min": 30,
+                            "max": 200
+                        },
+                        {
+                            "id": "job-applicationform-taxi-5",
+                            "question": "Previous Experience",
+                            "placeholder": "In-detail about your previous experience",
+                            "style": "paragraph",
+                            "required": true,
+                            "min": 30,
+                            "max": 200
+                        }
+                    ]
+                }
             ]
         }
     }
